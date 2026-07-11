@@ -80,7 +80,7 @@ const enroll=()=>{
         width: 25%;
         height: fit-content;
         padding:2%;
-        background-color: white;
+        background-color:$login-form-bgcolor;
         opacity: 0.9;
         position: absolute;
         top: 25%;
@@ -90,16 +90,16 @@ const enroll=()=>{
         }
         .title{
             text-align: center;
-            font-size: 35px;
+            font-size: $login-title-fontsize;
         }
         .another-title{
             text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: $login-another-title-fontfamily;
         }
         .input{
-            --el-input-focus-border-color: grey;
-            --el-input-border-color: #bdc3c7;
-            --el-input-bg-color: #bdc3c7;
+            --el-input-focus-border-color:grey;
+            --el-input-border-color:#bdc3c7 ;
+            --el-input-bg-color:#bdc3c7;
         }
     }
 }
