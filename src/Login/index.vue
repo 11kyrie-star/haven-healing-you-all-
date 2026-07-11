@@ -11,8 +11,8 @@
             <el-input v-model="form.password" style="width: 80%;" class="input"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onsubmit" style="margin-right: 37%;">登录</el-button>
-                <el-button @click="enroll">注册</el-button>
+                <el-button :type=primary @click="onsubmit" class="loginin">登录</el-button>
+                <el-button @click="enroll" class="register" :type="primary2">注册</el-button>
             </el-form-item>
         </el-form>
       </div>
@@ -20,8 +20,11 @@
 </template>
 
 <script setup lang="ts">
-import {ref,reactive} from 'vue'
+import {ref,reactive, watch} from 'vue'
 const formRef=ref()
+const judge=ref(true)
+const primary=ref('primary')
+const primary2=ref('')
 const form=reactive({
     username:'',
     password:''
@@ -55,18 +58,30 @@ const rules=reactive({
     ]
 })
 const onsubmit=()=>{
+    if(!primary.value){
+        primary.value='primary'
+        primary2.value=''
+    }
+    if(form.username && form.password){
     formRef.value.validate((valid:boolean)=>{
         if(valid){
 
         }
     })
 }
+}
 const enroll=()=>{
+    if(!primary2.value){
+        primary.value=''
+        primary2.value='primary'
+    }
+    if(form.username && form.password){
     formRef.value.validate((valid:boolean)=>{
         if(valid){
 
         }
     })
+}
 }
 </script>
 
@@ -80,11 +95,22 @@ const enroll=()=>{
         width: 25%;
         height: fit-content;
         padding:2%;
+        padding-bottom: 4%;
         background-color:$login-form-bgcolor;
-        opacity: 0.9;
+        opacity: 0.95;
         position: absolute;
-        top: 25%;
+        top: 30%;
         left: 60%;
+        .loginin{
+            position: absolute;
+            top: 73%;
+            left: 1%;
+        }
+        .register{
+            position: absolute;
+            top: 73%;
+            left: 55%;
+        }
         .el-form{
             margin-top: 10%;
         }
