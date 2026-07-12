@@ -20,7 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import {ref,reactive, watch} from 'vue'
+import {ref,reactive} from 'vue'
+import request from '@/utils/request'
+import { LoginApi,RegisterApi } from '@/api/login-register'
 const formRef=ref()
 const judge=ref(true)
 const primary=ref('primary')
@@ -65,7 +67,10 @@ const onsubmit=()=>{
     if(form.username && form.password){
     formRef.value.validate((valid:boolean)=>{
         if(valid){
-
+           const res=LoginApi(form)
+           form.password=''
+           form.username=''
+           console.log(res)
         }
     })
 }
@@ -75,13 +80,18 @@ const enroll=()=>{
         primary.value=''
         primary2.value='primary'
     }
+    form.password=''
+    form.username=''
     if(form.username && form.password){
     formRef.value.validate((valid:boolean)=>{
         if(valid){
-
+          const res=RegisterApi(form)
+          console.log(res)
+          form.password=''
+          form.username=''
         }
-    })
-}
+})
+    }
 }
 </script>
 

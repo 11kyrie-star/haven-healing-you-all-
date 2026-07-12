@@ -7,11 +7,11 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
       {
-        path:'/login',
+        path:'/',
         component:Login
       },
       {
-        path:'/',
+        path:'/layout',
         component:Layout,
         redirect:(to)=>{
            const target=to.query.target
