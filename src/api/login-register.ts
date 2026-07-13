@@ -1,7 +1,11 @@
 import request from "@/utils/request";
-export async function LoginApi(data){
+import { type res,type loginres,type form,type forgetform } from "@/types/user";
+export async function LoginApi(data:form):Promise<loginres>{
     return await request.post('/login',data)
 }
-export async function RegisterApi(data){
+export async function RegisterApi(data:form):Promise<res>{
     return await request.post('/register',data)
+}
+export async function ForgetApi(data:forgetform):Promise<res>{
+    return await request.post('/forget',data)
 }
