@@ -20,5 +20,6 @@ declare module 'vue' {
     ElSpace: typeof import('element-plus/es')['ElSpace']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Window: typeof import('./src/components/Window.vue')['default']
   }
 }

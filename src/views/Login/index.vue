@@ -55,6 +55,8 @@
 import {ref,reactive} from 'vue'
 import { LoginApi,RegisterApi,ForgetApi } from '@/api/login-register'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+const router=useRouter()
 const LoginformRef=ref()
 const RegisterformRef=ref()
 const showLogin=ref(true)
@@ -176,8 +178,12 @@ const onsubmit=()=>{
            form.email=''
            ElMessage({
             message:res.msg,
-            type:res.status==='0'? 'success':'warning'
-           })}catch{
+            type:res.status===0? 'success':'warning'
+           })
+           if(res.status===0){
+           router.push('/layout')
+           }
+        }catch{
             return
            }
         }else{
@@ -206,7 +212,7 @@ const enroll=()=>{
           form.email=''
           ElMessage({
             message:res.msg,
-            type:res.status==='0'?'success':'warning'
+            type:res.status===0?'success':'warning'
           })}catch{
             return
           }
@@ -233,7 +239,7 @@ Forform.value.validate(async(valid:boolean)=>{
         forgetform.newpassword=''
         ElMessage({
             message:res.msg,
-            type:res.status==='0'? 'success':'warning'
+            type:res.status===0? 'success':'warning'
         })
         showForget.value=false
         showLogin.value=true}catch{

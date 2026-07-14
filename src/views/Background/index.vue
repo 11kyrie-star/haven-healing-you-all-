@@ -1,11 +1,13 @@
-<template>
+﻿<template>
 <div class="bg">
     <Logo></Logo>
+    <Avatar></Avatar>
 </div>
 </template>
 
 <script setup lang="ts">
 import Logo from '@/views/Background/Components/Logo/index.vue'
+import Avatar from '@/components/Avatar.vue';
 </script>
 
 <style scoped lang="scss">
@@ -14,11 +16,24 @@ import Logo from '@/views/Background/Components/Logo/index.vue'
     height: 35vh;
     background: url('@/assets/bg.jpg') no-repeat center/cover;
     position: relative;
-
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: rgba(255, 255, 255, 0.1);}
+    filter: blur(3px);
+    // &::before{
+    //    content: '';
+    //    position: absolute;
+    //    inset: 0;
+    //    pointer-events: none;
+    //    background-color:  rgba(235, 235, 235, 0.1);
+    //    animation: sun 3s ease-in-out;
+    // }
+    // @keyframes sun{
+    //     0% {opacity: 0.5;}
+    //     100% {opacity: 0.1;}
+    // }
+    animation: sharpen 2s ease-in-out forwards;
+}
+@keyframes sharpen{
+    0% {filter:blur(3px) ;}
+    50% {filter: blur(2px);}
+    100% {filter: blur(0px);}
 }
 </style>

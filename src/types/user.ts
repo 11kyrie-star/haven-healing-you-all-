@@ -1,10 +1,10 @@
 export interface res{
-status:string,
+status:number,
 msg:string
 }
 
 export interface loginres{
-    status:string,
+    status:number,
     msg:string,
     token:string
 }
