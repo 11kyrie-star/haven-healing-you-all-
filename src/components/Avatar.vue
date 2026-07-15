@@ -1,17 +1,21 @@
 <template>
     <div class="avatar-container">
-        <div class="img">
-            <img v-if="baseUrl" class="avatar-img" :src=baseUrl>
+        <div class="img" @click="Open">
+            <img v-if="baseUrl" :src=baseUrl class="avatar-img">
             <img v-else src="@/assets/avatar.jpg" class="avatar-img">
         </div>
-        <input type="file" style="display: none;" >
-        
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 const baseUrl=ref('')
+const emit=defineEmits<{
+    open:[command:string]
+}>()
+function Open(){
+   emit('open','img')
+}
 </script>
 
 <style scoped lang="scss">

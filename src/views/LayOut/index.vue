@@ -1,13 +1,24 @@
 ﻿<template>
 <div class="layout-wrapper">
-<Background></Background>
+<Background @open="avatarway"></Background>
 <Content></Content>
+<Window :visible="showvisible" :decwindow="decwindow" @close="showvisible=false"></Window>
 </div>
 </template>
 
 <script setup lang="ts">
 import Background from "@/views/Background/index.vue"
 import Content from "@/views/Content/index.vue"
+import Window from "@/components/Window.vue";
+import { ref } from "vue";
+//用于决定弹窗的显示和隐藏
+const showvisible=ref(false)
+//用于决定哪个弹窗可以显示
+const decwindow=ref('')
+function avatarway(command:string){
+    showvisible.value=true
+    decwindow.value=command
+}
 </script>
 
 <style scoped lang="scss">

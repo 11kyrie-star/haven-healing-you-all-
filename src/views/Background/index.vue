@@ -1,13 +1,19 @@
 ﻿<template>
 <div class="bg">
     <Logo></Logo>
-    <Avatar></Avatar>
+    <Avatar @open="trans"></Avatar>
 </div>
 </template>
 
 <script setup lang="ts">
 import Logo from '@/views/Background/Components/Logo/index.vue'
 import Avatar from '@/components/Avatar.vue';
+const emit= defineEmits<{
+    open:[command:string]
+}>()
+function trans(command:string){
+  emit('open',command)
+}
 </script>
 
 <style scoped lang="scss">
