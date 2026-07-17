@@ -64,8 +64,8 @@ const showEmail=ref(false)
 const showRegister=ref(false)
 const showForget=ref(false)
 const judge=ref(true)
-const primary=ref('primary')
-const primary2=ref('')
+const primary=ref<'primary'| ''>('primary')
+const primary2=ref<''| 'primary'>('')
 
 const form=reactive({
     username:'',
@@ -180,6 +180,8 @@ const onsubmit=()=>{
             message:res.msg,
             type:res.status===0? 'success':'warning'
            })
+           console.log(res)
+           localStorage.setItem('token',res.token)
            if(res.status===0){
            router.push('/layout')
            }

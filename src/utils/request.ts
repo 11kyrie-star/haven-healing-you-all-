@@ -5,6 +5,10 @@ const request=axios.create({
     timeout:10000
 })
 request.interceptors.request.use((config)=>{
+    const token=localStorage.getItem('token')
+    if(token){
+        config.headers.token=token
+    }
     return config
 },(err)=>{
     ElMessage.error('网络连接失败')

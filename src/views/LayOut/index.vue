@@ -10,6 +10,7 @@
 import Background from "@/views/Background/index.vue"
 import Content from "@/views/Content/index.vue"
 import Window from "@/components/Window.vue";
+
 import { ref } from "vue";
 //用于决定弹窗的显示和隐藏
 const showvisible=ref(false)

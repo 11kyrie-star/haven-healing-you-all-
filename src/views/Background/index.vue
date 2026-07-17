@@ -2,17 +2,22 @@
 <div class="bg">
     <Logo></Logo>
     <Avatar @open="trans"></Avatar>
+    <Setting @open="showinfor"></Setting>
 </div>
 </template>
 
 <script setup lang="ts">
 import Logo from '@/views/Background/Components/Logo/index.vue'
 import Avatar from '@/components/Avatar.vue';
+import Setting from '@/views/Background/Components/Setting/index.vue'
 const emit= defineEmits<{
     open:[command:string]
 }>()
 function trans(command:string){
   emit('open',command)
+}
+function showinfor(command:string){
+    emit('open',command)
 }
 </script>
 
