@@ -2,6 +2,7 @@
 <div class="bg">
     <Logo></Logo>
     <Avatar @open="trans"></Avatar>
+    <Name></Name>
     <Setting @open="showinfor"></Setting>
 </div>
 </template>
@@ -10,6 +11,7 @@
 import Logo from '@/views/Background/Components/Logo/index.vue'
 import Avatar from '@/components/Avatar.vue';
 import Setting from '@/views/Background/Components/Setting/index.vue'
+import Name from '@/views/Background/Components/Name/index.vue'
 const emit= defineEmits<{
     open:[command:string]
 }>()

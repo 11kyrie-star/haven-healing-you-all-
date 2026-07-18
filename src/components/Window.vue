@@ -24,17 +24,17 @@
                 <div class="password-form">
                     <el-form label-position="left" label-suffix=":" label-width="70px">
                         <el-form-item label="原密码">
-                            <el-input style="width: 85%;" type="password"></el-input>
+                            <el-input style="width: 85%;" type="password" v-model="form.oldpassword"></el-input>
                         </el-form-item>
                         <el-form-item label="新密码">
-                            <el-input style="width: 85%;" type="password"></el-input>
+                            <el-input style="width: 85%;" type="password" v-model="form.newpassword"></el-input>
                         </el-form-item>
                     </el-form>
                 </div>
             </div>
             <div class="window-button">
-                <el-button>取消</el-button>
-                <el-button type="primary">完成</el-button>
+                <el-button @click="emit('close')">取消</el-button>
+                <el-button type="primary" @click="finish">完成</el-button>
             </div>
            </div>
         </div>
@@ -52,8 +52,15 @@ const emit=defineEmits<{
 }>()
 const form=reactive({
     username:'',
-    email:''
+    email:'',
+    oldpassword:'',
+    newpassword:''
 })
+function finish(){
+    
+    emit('close')
+
+}
 </script>
 <style scoped lang="scss">
 .window-overlay{
