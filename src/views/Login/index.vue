@@ -52,10 +52,11 @@
 </template>
 
 <script setup lang="ts">
-import {ref,reactive} from 'vue'
-import { LoginApi,RegisterApi,ForgetApi } from '@/api/login-register'
+import {ref,reactive,onMounted} from 'vue'
+import { RegisterApi,ForgetApi } from '@/api/login-register'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userinfo'
 const router=useRouter()
 const LoginformRef=ref()
 const RegisterformRef=ref()
@@ -66,7 +67,13 @@ const showForget=ref(false)
 const judge=ref(true)
 const primary=ref<'primary'| ''>('primary')
 const primary2=ref<''| 'primary'>('')
+const userstore=useUserStore()
 
+onMounted(()=>{
+    if(userstore.token){
+        router.push('/layout')
+    }
+})
 const form=reactive({
     username:'',
     password:'',
@@ -96,7 +103,7 @@ const Lorules=reactive({
         {required:true,message:'密码不能为空',trigger:'blur'},
         {
             validator:(rule:object,value:string,callback:(error?:string | Error)=>void)=>{
-               if(!value) callback() 
+               if(!value) return callback() 
                if(value.length<6){
                 callback(new Error('密码至少六位'))
                }else{
@@ -113,7 +120,7 @@ const Forrules=reactive({
     newpassword:[
         {
             validator:(rule:object,value:string,callback:(error?:string | Error)=>void)=>{
-               if(!value) callback() 
+               if(!value) return callback() 
                if(value.length<6){
                 callback(new Error('密码至少六位'))
                }else{
@@ -128,7 +135,7 @@ const Rerules=reactive({
         {
             validator:(rule:object,value:string,callback:(error?:string | Error)=>void)=>{
                 if(!value){
-                    callback(new Error('用户名不能为空'))
+                    return callback(new Error('用户名不能为空'))
                 }else if(value.length>6){
                     callback(new Error('用户名长度不能超过六位'))
                 }else{
@@ -142,7 +149,7 @@ const Rerules=reactive({
         {required:true,message:'密码不能为空',trigger:'blur'},
         {
             validator:(rule:object,value:string,callback:(error?:string | Error)=>void)=>{
-               if(!value) callback() 
+               if(!value) return callback() 
                if(value.length<6){
                 callback(new Error('密码至少六位'))
                }else{
@@ -172,17 +179,15 @@ const onsubmit=()=>{
     LoginformRef.value.validate(async(valid:boolean)=>{
         if(valid){
            try{
-           const res=await LoginApi(form)
+           userstore.login(form)
            form.password=''
            form.username=''
            form.email=''
            ElMessage({
-            message:res.msg,
-            type:res.status===0? 'success':'warning'
+            message:userstore.msg,
+            type:userstore.status===0? 'success':'warning'
            })
-           console.log(res)
-           localStorage.setItem('token',res.token)
-           if(res.status===0){
+           if(userstore.status===0){
            router.push('/layout')
            }
         }catch{

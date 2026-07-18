@@ -12,6 +12,7 @@
     position: absolute;
     left: 1%;
     top: 5%;
+    cursor: default;
     .title{
         text-align: center;
         font-size: 55px;

@@ -1,5 +1,5 @@
 ﻿<template>
-    <p>Kyrie</p>
+    <p>{{ userstore.username }}</p>
 </template>
 
 <style scoped lang="scss">
@@ -14,5 +14,11 @@ p{
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    cursor: default;
 }
 </style>
+
+<script setup lang="ts">
+import { useUserStore } from '@/stores/userinfo';
+const userstore=useUserStore()
+</script>

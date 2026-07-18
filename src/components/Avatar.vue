@@ -9,7 +9,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-const baseUrl=ref('')
+import { useUserStore } from '@/stores/userinfo';
+const userstore=useUserStore()
+const baseUrl=ref(userstore.avatar)
 const emit=defineEmits<{
     open:[command:string]
 }>()

@@ -1,6 +1,6 @@
 import request from "@/utils/request";
-import { type res,type loginres,type form,type forgetform } from "@/types/user";
-export async function LoginApi(data:form):Promise<loginres>{
+import { type res,type loginres,type form,type forgetform,type logindata } from "@/types/user";
+export async function LoginApi(data:form):Promise<loginres<logindata>>{
     return await request.post('/login',data)
 }
 export async function RegisterApi(data:form):Promise<res>{

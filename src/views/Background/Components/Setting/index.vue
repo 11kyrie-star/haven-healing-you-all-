@@ -10,6 +10,7 @@
     </div> 
     <div  class="setting-information" :class="{'show-information':showanimation}">
     <p @click="Open">修改资料</p>
+    <p @click="Open2">修改密码</p>
     <p>退出登录</p>
     </div>
   </div>
@@ -32,6 +33,9 @@ const emit=defineEmits<{open:[command:string]}>()
 function Open(){
     emit('open','information')
 }
+function Open2(){
+    emit('open','password')
+}
 </script>
 
 <style scoped lang="scss">
@@ -47,6 +51,7 @@ function Open(){
     font-size: 25px;
     animation: wrint 3s ease-in-out forwards;
     clip-path:inset( 0% 100% 0% 0%);
+    cursor: default;
 }
     .setting{
         cursor: pointer;
@@ -58,6 +63,7 @@ function Open(){
 }
     .line{
         font-size: 25px;
+        cursor: default;
     }
 }
 .setting-information{
