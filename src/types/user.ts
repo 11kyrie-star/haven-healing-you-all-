@@ -41,3 +41,11 @@ export interface changeprofile{
     username:string,
     email:string
 }
+
+export interface userinfo{
+    username:string,
+    email:string,
+    avatar:string,
+    token:string,
+    status:number
+}

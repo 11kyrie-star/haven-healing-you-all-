@@ -2,11 +2,11 @@
     <div v-if="visible" class="window-overlay" @click.self="emit('close')">
         <div class="window-card">
            <div v-show="decwindow==='img'" class="window-img">
-              <img :src=userstore.avatar?userstore.avatar:avatarStr>
+              <img :src=userstore.userinfo.avatar?userstore.userinfo.avatar:avatarStr>
            </div>
            <div v-show="decwindow==='information'" class="window-infor">
             <div class="window-img">
-                <img :src="userstore.avatar? userstore.avatar:avatarDefault ">
+                <img :src="userstore.userinfo.avatar? userstore.userinfo.avatar:avatarDefault ">
             </div>
             <div class="window-form">
                 <el-form label-position="left" label-width="70px" label-suffix=":" v-model="infoform" :rules="inforule" ref="info">
@@ -36,7 +36,7 @@
                     </el-form>
                   <div class="password-button">
                     <el-button @click="cancelpwd">取消</el-button>
-                    <el-button @click="finishpwd">完成</el-button>
+                    <el-button @click="finishpwd" type="primary" style="margin-left: 5%;">完成</el-button>
                   </div>  
                 </div>
             </div>
@@ -60,8 +60,8 @@ const cancelpwd=()=>{
     form.oldpassword=''
 }
 let infoform=reactive({
-    username:userstore.username,
-    email:userstore.email
+    username:userstore.userinfo.username,
+    email:userstore.userinfo.email
 })
 const inforule=reactive({
     username:[
@@ -126,13 +126,13 @@ function finish(){
 //判断用户名和密码邮箱是否被修改
 info.value.validate(async (valid:boolean)=>{
     if(valid){
-        if(infoform.username!==userstore.username){
+        if(infoform.username!==userstore.userinfo.username){
         number=1
     }
-    if(infoform.email!==userstore.email){
+    if(infoform.email!==userstore.userinfo.email){
         number=2
     }
-    if(infoform.username!==userstore.username && infoform.email!==userstore.email){
+    if(infoform.username!==userstore.userinfo.username && infoform.email!==userstore.userinfo.email){
        number=3
     }
     if(number===2){
@@ -257,12 +257,20 @@ if(form.oldpassword && form.newpassword){
         }
     }
     .window-password{
-        height: fit-content;
-        width: 40vw;
+        height: 80vh;
+        width: 20vw;
         background-color: white;
+        padding: 5%;
         .title{
-            margin-bottom: 8%;
+            text-align: center;
             font-weight: 800;
+            margin-bottom: 5%;
+            font-size: 30px;
+        }
+        .password-button{
+            display: flex;
+            justify-content: center;
+            gap: 13%;
         }
     }
 }

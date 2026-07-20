@@ -1,5 +1,5 @@
 ﻿<template>
-    <p>{{ userstore.username }}</p>
+    <p>{{ userstore.userinfo?.username }}</p>
 </template>
 
 <style scoped lang="scss">

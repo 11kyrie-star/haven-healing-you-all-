@@ -174,10 +174,10 @@ const onsubmit=()=>{
     LoginformRef.value.validate(async(valid:boolean)=>{
         if(valid){
            try{
-           userstore.login(form)
-           form.email=''
-           form.password=''
-           form.username=''
+           await userstore.login(form)
+           if(userstore.userinfo.status===0){
+            router.push('/layout')
+           }
         }catch{
             return
            }

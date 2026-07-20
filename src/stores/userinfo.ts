@@ -1,23 +1,25 @@
-import { ref, computed } from 'vue'
+import { reactive} from 'vue'
 import { defineStore } from 'pinia'
 import { LoginApi } from '@/api/login-register'
 import { Changeusername,Changeemail ,Changeprofile} from '@/api/userinfo'
-import type {  loginres,form ,logindata,changeres,changeprofile} from '@/types/user'
-import { useRouter } from 'vue-router'
+import type {  loginres,form ,logindata,changeres,changeprofile,userinfo} from '@/types/user'
 import { ElMessage } from 'element-plus'
-import router from '@/router'
 
-const route=useRouter()
 export const useUserStore=defineStore('user',()=>{
-    const username=ref<string>('')
-    const email=ref<string>('')
-    const avatar=ref<string>('')
+    const userinfo:userinfo=reactive({
+        username:'',
+         email:'',
+         avatar:'',
+        token:'',
+        status:0
+    })
     const login=async (data:form)=>{
        const res:loginres<logindata>=await LoginApi(data)
-       email.value=res.data.email
-       avatar.value=res.data.avatar
-       username.value=res.data.username
-       localStorage.setItem('token',res.token)
+       userinfo.email=res.data.email
+       userinfo.avatar=res.data.avatar
+       userinfo.username=res.data.username
+       userinfo.status=res.status
+       userinfo.token=res.token
        if(res.status===1){
         ElMessage({
             message:res.msg,
@@ -28,7 +30,6 @@ export const useUserStore=defineStore('user',()=>{
             message:res.msg,
             type:'success'
         })
-       router.push('/layout')
        }
     }
     const updateusername=async (data:string)=>{
@@ -40,7 +41,7 @@ export const useUserStore=defineStore('user',()=>{
             })
             return 0
         }else{
-            username.value=data
+             userinfo.username=data
             ElMessage({
                 message:res.msg,
                 type:'success'
@@ -57,7 +58,7 @@ export const useUserStore=defineStore('user',()=>{
             })
             return 0
         }else{
-            email.value=data
+            userinfo.email=data
             ElMessage({
                 message:res.msg,
                 type:'success'
@@ -74,8 +75,8 @@ export const useUserStore=defineStore('user',()=>{
             })
             return 0
         }else{
-            username.value=data.username
-            email.value=data.email
+            userinfo.username=data.username
+            userinfo.email=data.email
             ElMessage({
                 message:res.msg,
                 type:'success'
@@ -85,18 +86,16 @@ export const useUserStore=defineStore('user',()=>{
     }
     const logout=()=>{
         localStorage.removeItem('token')
-        username.value=''
-        email.value=''
-        avatar.value=''
+        userinfo.username=''
+        userinfo.email=''
+        userinfo.avatar=''
     }
     return {
-        username,
-        email,
-        avatar,
+        userinfo,
         login,
         updateusername,
         updateemail,
         updateall,
         logout
     }
-})
+},{persist:{pick:['userinfo']}})

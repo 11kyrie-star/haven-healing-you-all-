@@ -15,16 +15,23 @@ const router = createRouter({
   ],
 })
 router.beforeEach((to,from,next)=>{
-    const token=localStorage.getItem('token')
+    const user=localStorage.getItem('user')
+    let token=''
+    if(user){
+        token=JSON.parse(user as string).userinfo.token
+    }
     const judge=isTokenExpired(token as string)
-    if(!token){
-      next('/')
+    if(!token && to.path!=='/'){
+      return next('/')
     }
-    if(to.path==='/'&& !judge){
-      next('/layout')
+    if(token){
+      if(judge){
+        return next('/')
+      }
+      if(!judge && to.path==='/'){
+        next('/layout')
+      }
     }
-    if(to.path==='/' && from.path==='/layout'){
-      next('/')
-    }
+    next()
 })
 export default router

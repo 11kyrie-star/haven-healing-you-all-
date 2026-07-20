@@ -10,7 +10,7 @@
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/userinfo';
 const userstore=useUserStore()
-const baseUrl=ref(userstore.avatar)
+const baseUrl=ref(userstore.userinfo.avatar)
 const emit=defineEmits<{
     open:[command:string]
 }>()
