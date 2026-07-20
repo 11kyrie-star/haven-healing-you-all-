@@ -10,8 +10,39 @@
 import Background from "@/views/Background/index.vue"
 import Content from "@/views/Content/index.vue"
 import Window from "@/components/Window.vue";
-
-import { ref ,onMounted} from "vue";
+import { getTime } from "@/utils/token";
+import { ref ,onMounted,onUnmounted} from "vue";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+let time=0
+const route=useRouter()
+let timenum:number | null =0
+onMounted(()=>{
+const token=JSON.parse(localStorage.getItem('user')as string).userinfo.token
+time=getTime(token)
+if(time<0){
+    ElMessage({
+        message:'登录失效',
+        type:'warning'
+    })
+    localStorage.removeItem('user')
+    route.push('/')
+}
+if(time>0){
+ timenum=setTimeout(()=>{
+    localStorage.removeItem('user')
+    ElMessage({
+        message:'登录失效',
+        type:'warning'
+    })
+    route.push('/')
+},time)}
+})
+onUnmounted(()=>{
+    if(timenum!==null){
+    clearTimeout(timenum)
+    timenum=null}
+})
 //用于决定弹窗的显示和隐藏
 const showvisible=ref(false)
 //用于决定哪个弹窗可以显示

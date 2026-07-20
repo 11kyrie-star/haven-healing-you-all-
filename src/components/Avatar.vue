@@ -1,7 +1,7 @@
 <template>
     <div class="avatar-container">
         <div class="img" @click="Open">
-            <img v-if="baseUrl" :src=baseUrl class="avatar-img">
+            <img v-if="userstore.userinfo.avatar" :src=userstore.userinfo.avatar class="avatar-img">
             <img v-else src="@/assets/avatar.jpg" class="avatar-img">
         </div>
     </div>
@@ -10,7 +10,6 @@
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/userinfo';
 const userstore=useUserStore()
-const baseUrl=ref(userstore.userinfo.avatar)
 const emit=defineEmits<{
     open:[command:string]
 }>()

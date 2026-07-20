@@ -1,19 +1,27 @@
 <template>
     <div v-if="visible" class="window-overlay" @click.self="emit('close')">
         <div class="window-card">
+            <div class="window-logo">
+                <div class="title">Haven</div>
+                <div class="another-title">Heal all your wounds</div>
+            </div>
            <div v-show="decwindow==='img'" class="window-img">
               <img :src=userstore.userinfo.avatar?userstore.userinfo.avatar:avatarStr>
            </div>
            <div v-show="decwindow==='information'" class="window-infor">
             <div class="window-img">
                 <img :src="userstore.userinfo.avatar? userstore.userinfo.avatar:avatarDefault ">
+                <div class="img-button" @click="clickinput">
+                <div>点击更换头像</div>
+                <input type="file" ref="fileinput" accept="image/*" style="display: none;" @change="changefile">
+              </div>
             </div>
             <div class="window-form">
                 <el-form label-position="left" label-width="70px" label-suffix=":" v-model="infoform" :rules="inforule" ref="info">
-                    <el-form-item label="用户名" prop="username" style="margin-top: 10%;">
+                    <el-form-item label="用户名" prop="username" style="margin-top: 10%;" class="form-label">
                         <el-input v-model="infoform.username" style="width: 85%;"></el-input>
                     </el-form-item>
-                    <el-form-item label="邮箱" prop="email" style="margin-top: 10%;">
+                    <el-form-item label="邮箱" prop="email" style="margin-top: 10%;" class="form-label">
                         <el-input v-model="infoform.email" style="width: 85%;"></el-input>
                     </el-form-item>
                 </el-form>
@@ -53,12 +61,47 @@ import avatarDefault from '@/assets/avatar.jpg'
 const userstore=useUserStore()
 const avatarStr=avatarDefault
 const formpassowrd=ref()
+const fileinput=ref<HTMLInputElement>()
 const info=ref()
 const cancelpwd=()=>{
     emit('close')
     form.newpassword=''
     form.oldpassword=''
 }
+const clickinput=()=>{
+    fileinput.value?.click()
+}
+const changefile=async (even:Event)=>{
+const target=even.target as HTMLInputElement
+const file=target.files?.[0]
+const allowtype=['image/jpeg','image/png','image/gif','image/webp']
+if(!file) return
+if(!allowtype.includes(file?.type as string)){
+    return ElMessage({
+        message:'只支持 jpg/png/gif/webp 格式的图片',
+        type:'warning'
+    })
+}
+const maxsize=2*1024*1024
+if(file.size>maxsize){
+   return ElMessage({
+        message:'图片大小不能超过2MB',
+        type:'warning'
+    })
+}
+try{
+    const res=await userstore.updateav(file)
+    if(res){
+        ElMessage({
+            message:'头像更新成功',
+            type:'success'
+        })
+    }
+}catch{
+    return
+}
+}
+
 let infoform=reactive({
     username:userstore.userinfo.username,
     email:userstore.userinfo.email
@@ -134,6 +177,9 @@ info.value.validate(async (valid:boolean)=>{
     }
     if(infoform.username!==userstore.userinfo.username && infoform.email!==userstore.userinfo.email){
        number=3
+    }
+    if(infoform.username===userstore.userinfo.username && infoform.email===userstore.userinfo.email){
+        return emit('close')
     }
     if(number===2){
       try{
@@ -218,9 +264,36 @@ if(form.oldpassword && form.newpassword){
         max-height: fit-content;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         padding: 8px;
+        position: relative;
+        .window-logo{
+            width: 55%;
+            height: fit-content;
+            position: absolute;
+            left: 43%;
+            top: 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            font-family: 'Great Vibes', cursive;
+        }
     }
     .window-img{
+        height: fit-content;
         margin-bottom: 10px;
+        .img-button{
+            width: fit-content;
+            background-color: whitesmoke;
+            border: 1px rgb(213, 165, 165) solid;
+            padding: 5%;
+            margin-left: 15%;
+            border-radius: 5px;
+            font-weight: 600;
+            box-shadow: 1px 2px rgb(157, 98, 98);
+            cursor: pointer;
+        }
         img{
             width: 60vw;
             height: 50vw;
@@ -235,13 +308,22 @@ if(form.oldpassword && form.newpassword){
         flex-direction: column;
         gap: 6%;
         padding: 5px;
-        
+        background: linear-gradient(
+            45deg,
+            #fad0c4 0%, 
+            #f7b7a3 30%,
+             #c9adc6 60%, 
+              #89a1c1 100% 
+        );
+        .form-label{
+            font-weight: 1000;
+        }
         .window-img{
             background-color: rgb(234, 170, 170);
             border-radius: 8px;
             width: 33%;
             height: 25%;
-            box-shadow: 1px 2px white;
+            box-shadow: 1px 2px rgb(228, 165, 165);
             img{
                 border-radius: 8px;
                 width: 100%;

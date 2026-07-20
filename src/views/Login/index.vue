@@ -176,7 +176,7 @@ const onsubmit=()=>{
            try{
            await userstore.login(form)
            if(userstore.userinfo.status===0){
-            router.push('/layout')
+            router.replace('/layout')
            }
         }catch{
             return

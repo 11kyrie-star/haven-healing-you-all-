@@ -49,3 +49,13 @@ export interface userinfo{
     token:string,
     status:number
 }
+
+export interface updateavatar<T>{
+    status:number,
+    msg:string,
+    data:T
+}
+
+export interface avatardata{
+    avatar_url:string
+}

@@ -29,7 +29,7 @@ router.beforeEach((to,from,next)=>{
         return next('/')
       }
       if(!judge && to.path==='/'){
-        next('/layout')
+        return next('/layout')
       }
     }
     next()

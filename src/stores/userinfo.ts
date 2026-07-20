@@ -1,8 +1,8 @@
-import { reactive} from 'vue'
+﻿import { reactive} from 'vue'
 import { defineStore } from 'pinia'
 import { LoginApi } from '@/api/login-register'
-import { Changeusername,Changeemail ,Changeprofile} from '@/api/userinfo'
-import type {  loginres,form ,logindata,changeres,changeprofile,userinfo} from '@/types/user'
+import { Changeusername,Changeemail ,Changeprofile,Changeavatar} from '@/api/userinfo'
+import type {  loginres,form ,logindata,changeres,changeprofile,userinfo,updateavatar,avatardata} from '@/types/user'
 import { ElMessage } from 'element-plus'
 
 export const useUserStore=defineStore('user',()=>{
@@ -20,6 +20,7 @@ export const useUserStore=defineStore('user',()=>{
        userinfo.username=res.data.username
        userinfo.status=res.status
        userinfo.token=res.token
+      localStorage.setItem('token', res.token)
        if(res.status===1){
         ElMessage({
             message:res.msg,
@@ -90,12 +91,27 @@ export const useUserStore=defineStore('user',()=>{
         userinfo.email=''
         userinfo.avatar=''
     }
+    const updateav=async (file:File)=>{
+      const res:updateavatar<avatardata>=await Changeavatar(file)
+      if(res.status===1){
+         ElMessage({
+            message:res.msg,
+            type:'warning'
+        })
+        return 0
+      }
+      userinfo.avatar=res.data.avatar_url
+      return 1
+    }
     return {
         userinfo,
         login,
         updateusername,
         updateemail,
         updateall,
-        logout
+        logout,
+        updateav
     }
 },{persist:{pick:['userinfo']}})
+
+

@@ -16,3 +16,16 @@ export function isTokenExpired(token:string|null):boolean{
 }
     return false
 }
+
+export function getTime(token:string | null){
+    if(!token || !token.includes('.')){
+        return -1
+    }
+    const base64=token.split('.')[1]
+    if(!base64){
+        return -1
+    }
+        const tokenob=JSON.parse(atob(base64))
+        const time=tokenob.exp*1000-Date.now()
+        return time
+}
