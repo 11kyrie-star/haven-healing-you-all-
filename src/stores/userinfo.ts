@@ -3,27 +3,33 @@ import { defineStore } from 'pinia'
 import { LoginApi } from '@/api/login-register'
 import { Changeusername,Changeemail ,Changeprofile} from '@/api/userinfo'
 import type {  loginres,form ,logindata,changeres,changeprofile} from '@/types/user'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import router from '@/router'
 
+const route=useRouter()
 export const useUserStore=defineStore('user',()=>{
     const username=ref<string>('')
     const email=ref<string>('')
     const avatar=ref<string>('')
-    const status=ref<number>()
-    const msg=ref<string>('')
-    const token=ref<string | null>(localStorage.getItem('token'))
-    const isLogin=computed(()=>{
-        return token.value!=''
-    })
     const login=async (data:form)=>{
        const res:loginres<logindata>=await LoginApi(data)
-       token.value=res.token
-       msg.value=res.msg
-       status.value=res.status
        email.value=res.data.email
        avatar.value=res.data.avatar
        username.value=res.data.username
        localStorage.setItem('token',res.token)
+       if(res.status===1){
+        ElMessage({
+            message:res.msg,
+            type:'warning'
+        })
+       }else{
+        ElMessage({
+            message:res.msg,
+            type:'success'
+        })
+       router.push('/layout')
+       }
     }
     const updateusername=async (data:string)=>{
         const res:changeres=await Changeusername(data)
@@ -77,17 +83,20 @@ export const useUserStore=defineStore('user',()=>{
             return 1
         }
     }
+    const logout=()=>{
+        localStorage.removeItem('token')
+        username.value=''
+        email.value=''
+        avatar.value=''
+    }
     return {
         username,
         email,
         avatar,
-        status,
-        msg,
-        token,
-        isLogin,
         login,
         updateusername,
         updateemail,
-        updateall
+        updateall,
+        logout
     }
 })

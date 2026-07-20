@@ -59,7 +59,7 @@ const cancelpwd=()=>{
     form.newpassword=''
     form.oldpassword=''
 }
-const infoform=reactive({
+let infoform=reactive({
     username:userstore.username,
     email:userstore.email
 })
@@ -112,7 +112,7 @@ defineProps<{
 const emit=defineEmits<{
     close:[]
 }>()
-const form=reactive({
+let form=reactive({
     oldpassword:'',
     newpassword:''
 })

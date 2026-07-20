@@ -69,11 +69,6 @@ const primary=ref<'primary'| ''>('primary')
 const primary2=ref<''| 'primary'>('')
 const userstore=useUserStore()
 
-onMounted(()=>{
-    if(userstore.token){
-        router.push('/layout')
-    }
-})
 const form=reactive({
     username:'',
     password:'',
@@ -180,16 +175,9 @@ const onsubmit=()=>{
         if(valid){
            try{
            userstore.login(form)
+           form.email=''
            form.password=''
            form.username=''
-           form.email=''
-           ElMessage({
-            message:userstore.msg,
-            type:userstore.status===0? 'success':'warning'
-           })
-           if(userstore.status===0){
-           router.push('/layout')
-           }
         }catch{
             return
            }
