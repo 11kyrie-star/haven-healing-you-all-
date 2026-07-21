@@ -4,6 +4,7 @@ import { LoginApi } from '@/api/login-register'
 import { Changeusername,Changeemail ,Changeprofile,Changeavatar} from '@/api/userinfo'
 import type {  loginres,form ,logindata,changeres,changeprofile,userinfo,updateavatar,avatardata} from '@/types/user'
 import { ElMessage } from 'element-plus'
+import router from '@/router'
 
 export const useUserStore=defineStore('user',()=>{
     const userinfo:userinfo=reactive({
@@ -86,14 +87,14 @@ export const useUserStore=defineStore('user',()=>{
         }
     }
     const logout=()=>{
+        localStorage.removeItem('user')
         localStorage.removeItem('token')
-        userinfo.username=''
-        userinfo.email=''
-        userinfo.avatar=''
+        router.replace('/')
     }
     const updateav=async (file:File)=>{
       const res:updateavatar<avatardata>=await Changeavatar(file)
       if(res.status===1){
+         console.log(res)
          ElMessage({
             message:res.msg,
             type:'warning'

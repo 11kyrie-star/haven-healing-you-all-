@@ -11,7 +11,7 @@
     <div  class="setting-information" :class="{'show-information':showanimation}">
     <p @click="Open">修改资料</p>
     <p @click="Open2">修改密码</p>
-    <p>退出登录</p>
+    <p @click="logout">退出登录</p>
     </div>
   </div>
 </Teleport>
@@ -20,7 +20,12 @@
 <script setup lang="ts">
 import {Setting} from '@element-plus/icons-vue'
 import {ref} from 'vue'
+import { useUserStore } from '@/stores/userinfo'
 const showanimation=ref(false)
+const router=useUserStore()
+const logout=()=>{
+    router.logout()
+}
 function showinformation(){
 showanimation.value=true
 }

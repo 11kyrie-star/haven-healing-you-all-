@@ -17,7 +17,7 @@
               </div>
             </div>
             <div class="window-form">
-                <el-form label-position="left" label-width="70px" label-suffix=":" v-model="infoform" :rules="inforule" ref="info">
+                <el-form label-position="left" label-width="70px" label-suffix=":" :model="infoform" :rules="inforule" ref="info">
                     <el-form-item label="用户名" prop="username" style="margin-top: 10%;" class="form-label">
                         <el-input v-model="infoform.username" style="width: 85%;"></el-input>
                     </el-form-item>
@@ -32,7 +32,6 @@
             </div>
            </div>
            <div class="window-password" v-show="decwindow==='password'">
-                <div class="title">修改密码</div>
                 <div class="password-form">
                     <el-form ref="formpassword" label-position="left" label-suffix=":" label-width="70px" v-model="form" :rules="rules">
                         <el-form-item label="原密码" prop="oldpassword">
@@ -42,11 +41,12 @@
                             <el-input style="width: 85%;" type="password" v-model="form.newpassword"></el-input>
                         </el-form-item>
                     </el-form>
-                  <div class="password-button">
-                    <el-button @click="cancelpwd">取消</el-button>
-                    <el-button @click="finishpwd" type="primary" style="margin-left: 5%;">完成</el-button>
-                  </div>  
                 </div>
+                <div class="password-button">
+                    <el-button @click="cancelpwd">取消</el-button>
+                    <el-button @click="finishpwd" type="primary">完成</el-button>
+                </div>
+                <div class="hi">Hi~</div>  
             </div>
         </div>
     </div>
@@ -97,7 +97,13 @@ try{
             type:'success'
         })
     }
-}catch{
+}catch(err){
+    if(err instanceof Error && err.message==='文件读取失败'){
+        return ElMessage({
+            message:'文件读取失败',
+            type:'warning'
+        })
+    }
     return
 }
 }
@@ -185,7 +191,7 @@ info.value.validate(async (valid:boolean)=>{
       try{
         const judge=await userstore.updateemail(infoform.email)
         if(judge){
-            emit('close')
+           return  emit('close')
         }
       }catch{
             return
@@ -194,7 +200,7 @@ info.value.validate(async (valid:boolean)=>{
         try{
         const judge=await userstore.updateusername(infoform.username)
         if(judge){
-            emit('close')
+            return emit('close')
         }
         }catch{
             return
@@ -203,7 +209,7 @@ info.value.validate(async (valid:boolean)=>{
         try{
             const judge=await userstore.updateall(infoform)
             if(judge){
-            emit('close')
+            return emit('close')
         }
         }catch{
             return
@@ -265,6 +271,13 @@ if(form.oldpassword && form.newpassword){
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         padding: 8px;
         position: relative;
+        background: linear-gradient(
+            45deg,
+            #fad0c4 0%, 
+            #f7b7a3 30%,
+             #c9adc6 60%, 
+              #89a1c1 100% 
+        );
         .window-logo{
             width: 55%;
             height: fit-content;
@@ -302,19 +315,11 @@ if(form.oldpassword && form.newpassword){
     .window-infor{
         width: 30vw;
         height:80vh;
-        background-color: white;
         z-index: 6;
         display: flex;
         flex-direction: column;
         gap: 6%;
         padding: 5px;
-        background: linear-gradient(
-            45deg,
-            #fad0c4 0%, 
-            #f7b7a3 30%,
-             #c9adc6 60%, 
-              #89a1c1 100% 
-        );
         .form-label{
             font-weight: 1000;
         }
@@ -339,21 +344,27 @@ if(form.oldpassword && form.newpassword){
         }
     }
     .window-password{
-        height: 80vh;
+        height: 60vh;
         width: 20vw;
-        background-color: white;
-        padding: 5%;
-        .title{
-            text-align: center;
-            font-weight: 800;
-            margin-bottom: 5%;
-            font-size: 30px;
-        }
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8%;
         .password-button{
             display: flex;
-            justify-content: center;
-            gap: 13%;
+            margin-left: 10%;
         }
+    }
+    .hi{
+        font-family: 'Great Vibes', cursive;
+        font-size: 5rem;
+        font-weight: 600;
+        position: absolute;
+        top: 80%;
+        left: 10%;
+        transform: rotateX(60deg);
     }
 }
 </style>
