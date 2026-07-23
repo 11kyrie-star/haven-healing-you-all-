@@ -24,9 +24,10 @@ import Publish from '@/views/Content/Components/Publish/index.vue'
     z-index: 1;
     .content{
         width: 100%;
-        min-height: 90%;
+        min-height: 80%;
         display: flex;
         gap: 10%;
+        margin-top: 2%;
     }
 }
 </style>

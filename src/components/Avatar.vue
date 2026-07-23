@@ -20,8 +20,8 @@ function Open(){
 
 <style scoped lang="scss">
 .avatar-container{
-    width: fit-content;
-    height: fit-content;
+    width: 7%;
+    height: 42%;
     position: absolute;
     border-radius: 8px;
     background-color: white;
@@ -30,8 +30,8 @@ function Open(){
     top: 63%;
     z-index: 80;
     .img{
-        width: 110px;
-        height: 110px;
+        width: 100%;
+        height: 100%;
         border-radius: 8px;
         .avatar-img{
             width: 100%;
