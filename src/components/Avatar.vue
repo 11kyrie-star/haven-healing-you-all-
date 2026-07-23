@@ -26,9 +26,9 @@ function Open(){
     border-radius: 8px;
     background-color: white;
     padding: 2px;
-    box-shadow: 1px 2px #ee794e;
     left: 13%;
     top: 63%;
+    z-index: 80;
     .img{
         width: 110px;
         height: 110px;

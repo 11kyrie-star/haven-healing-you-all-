@@ -30,6 +30,7 @@ function showinfor(command:string){
     background: url('@/assets/bg.jpg') no-repeat center/cover;
     position: relative;
     filter: blur(3px);
+    z-index: 3;
     // &::before{
     //    content: '';
     //    position: absolute;

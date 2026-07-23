@@ -9,7 +9,7 @@ p{
     position: absolute;
     left: 21%;
     top: 75%;
-    font-size: 2rem;
+    font-size: 2em;
     background: linear-gradient(135deg, #D4A843 0%, #6B3FA0 100%);
     -webkit-background-clip: text;
     background-clip: text;

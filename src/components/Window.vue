@@ -1,7 +1,7 @@
 <template>
     <div v-if="visible" class="window-overlay" @click.self="emit('close')">
         <div class="window-card">
-            <div class="window-logo">
+            <div class="window-logo" v-show="decwindow!=='img'">
                 <div class="title">Haven</div>
                 <div class="another-title">Heal all your wounds</div>
             </div>
@@ -33,7 +33,7 @@
            </div>
            <div class="window-password" v-show="decwindow==='password'">
                 <div class="password-form">
-                    <el-form ref="formpassword" label-position="left" label-suffix=":" label-width="70px" v-model="form" :rules="rules">
+                    <el-form ref="formpassword" label-position="left" label-suffix=":" label-width="70px" :model="form" :rules="rules">
                         <el-form-item label="原密码" prop="oldpassword">
                             <el-input style="width: 85%;" type="password" v-model="form.oldpassword"></el-input>
                         </el-form-item>
@@ -60,7 +60,7 @@ import { ElMessage } from 'element-plus';
 import avatarDefault from '@/assets/avatar.jpg'
 const userstore=useUserStore()
 const avatarStr=avatarDefault
-const formpassowrd=ref()
+const formpassword=ref()
 const fileinput=ref<HTMLInputElement>()
 const info=ref()
 const cancelpwd=()=>{
@@ -226,7 +226,7 @@ info.value.validate(async (valid:boolean)=>{
 function finishpwd(){
     //判断用户是否要修改密码
 if(form.oldpassword && form.newpassword){
-     formpassowrd.value.validate(async (valid:boolean)=>{
+     formpassword.value.validate(async (valid:boolean)=>{
         if(valid){
             try{
               const res=await Changepassword(form)
@@ -252,6 +252,8 @@ if(form.oldpassword && form.newpassword){
             })
         }
     })
+    }else{
+        emit('close')
     }
 }
 </script>
