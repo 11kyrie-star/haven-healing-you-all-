@@ -13,48 +13,62 @@ import Window from "@/components/Window.vue";
 import { getTime } from "@/utils/token";
 import { ref ,onMounted,onUnmounted} from "vue";
 import { ElMessage } from "element-plus";
-import { useUserStore } from "@/stores/userinfo";
 import { useRouter } from "vue-router";
-const userstore=useUserStore()
-let time=0
-const route=useRouter()
-let timenum:number | null =0
-onMounted(()=>{
-try{    
-const token=userstore.userinfo.token
-time=getTime(token)
-if(time<0){
-    ElMessage({
-        message:'登录失效',
-        type:'warning'
-    })
-    localStorage.removeItem('user')
-    route.push('/')
+
+let time = 0
+const route = useRouter()
+let timenum: ReturnType<typeof setTimeout> | null = null
+
+function getTokenSafe(): string {
+  try {
+    const raw = localStorage.getItem('user')
+    if (!raw) return ''
+    const parsed = JSON.parse(raw)
+    return parsed?.userinfo?.token || ''
+  } catch {
+    return ''
+  }
 }
-if(time>0){
- timenum=setTimeout(()=>{
+
+onMounted(() => {
+  const token = getTokenSafe()
+  if (!token) {
+    ElMessage({ message: '登录失效', type: 'warning' })
     localStorage.removeItem('user')
-    ElMessage({
-        message:'登录失效',
-        type:'warning'
-    })
+    localStorage.removeItem('token')
     route.push('/')
-},time)}}catch{
+    return
+  }
+
+  time = getTime(token)
+  if (time < 0) {
+    ElMessage({ message: '登录失效', type: 'warning' })
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
     route.push('/')
-}
+    return
+  }
+
+  timenum = setTimeout(() => {
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    ElMessage({ message: '登录失效', type: 'warning' })
+    route.push('/')
+  }, time)
 })
-onUnmounted(()=>{
-    if(timenum!==null){
+
+onUnmounted(() => {
+  if (timenum !== null) {
     clearTimeout(timenum)
-    timenum=null}
+    timenum = null
+  }
 })
-//用于决定弹窗的显示和隐藏
-const showvisible=ref(false)
-//用于决定哪个弹窗可以显示
-const decwindow=ref('')
-function avatarway(command:string){
-    showvisible.value=true
-    decwindow.value=command
+
+const showvisible = ref(false)
+const decwindow = ref('')
+function avatarway(command: string) {
+  showvisible.value = true
+  decwindow.value = command
 }
 </script>
 

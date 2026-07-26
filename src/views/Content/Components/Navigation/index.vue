@@ -31,7 +31,7 @@ const actvieTap=ref('广场')
             transparent 70%              
         );
         pointer-events: none;
-        animation: sun-light 3s ease-in-out forwards;
+        animation: sun-light 2s ease-in-out forwards;
     }
     &::after{
         content: '';
@@ -45,7 +45,7 @@ const actvieTap=ref('广场')
              rgba(229, 70, 35, 0.35) 0%,
             transparent 70%              
         );
-        animation: sun-light 3s ease-in-out forwards;
+        animation: sun-light 2s ease-in-out forwards;
         pointer-events: none;
     }
     .navigation{

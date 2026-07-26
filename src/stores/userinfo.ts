@@ -1,4 +1,4 @@
-﻿import { reactive} from 'vue'
+﻿import { ref} from 'vue'
 import { defineStore } from 'pinia'
 import { LoginApi } from '@/api/login-register'
 import { Changeusername,Changeemail ,Changeprofile,Changeavatar} from '@/api/userinfo'
@@ -7,7 +7,7 @@ import { ElMessage } from 'element-plus'
 import router from '@/router'
 
 export const useUserStore=defineStore('user',()=>{
-    const userinfo:userinfo=reactive({
+    const userinfo=ref<userinfo>({
         username:'',
          email:'',
          avatar:'',
@@ -16,11 +16,11 @@ export const useUserStore=defineStore('user',()=>{
     })
     const login=async (data:form)=>{
        const res:loginres<logindata>=await LoginApi(data)
-       userinfo.email=res.data.email
-       userinfo.avatar=res.data.avatar
-       userinfo.username=res.data.username
-       userinfo.status=res.status
-       userinfo.token=res.token
+       userinfo.value.email=res.data.email
+       userinfo.value.avatar=res.data.avatar
+       userinfo.value.username=res.data.username
+       userinfo.value.status=res.status
+       userinfo.value.token=res.token
       localStorage.setItem('token', res.token)
        if(res.status===1){
         ElMessage({
@@ -43,7 +43,7 @@ export const useUserStore=defineStore('user',()=>{
             })
             return 0
         }else{
-             userinfo.username=data
+             userinfo.value.username=data
             ElMessage({
                 message:res.msg,
                 type:'success'
@@ -60,7 +60,7 @@ export const useUserStore=defineStore('user',()=>{
             })
             return 0
         }else{
-            userinfo.email=data
+            userinfo.value.email=data
             ElMessage({
                 message:res.msg,
                 type:'success'
@@ -77,8 +77,8 @@ export const useUserStore=defineStore('user',()=>{
             })
             return 0
         }else{
-            userinfo.username=data.username
-            userinfo.email=data.email
+            userinfo.value.username=data.username
+            userinfo.value.email=data.email
             ElMessage({
                 message:res.msg,
                 type:'success'
@@ -101,7 +101,7 @@ export const useUserStore=defineStore('user',()=>{
         })
         return 0
       }
-      userinfo.avatar=res.data.avatar_url
+      userinfo.value.avatar=res.data.avatar_url
       return 1
     }
     return {
@@ -114,5 +114,3 @@ export const useUserStore=defineStore('user',()=>{
         updateav
     }
 },{persist:{pick:['userinfo']}})
-
-

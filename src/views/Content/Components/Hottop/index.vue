@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 <div class="hottop-container">
     <div class="hot-title">今日热榜</div>
     <div class="hot-contain">
@@ -48,7 +48,7 @@ console.log(res)
         text-align: center;
         border-radius: 12px;
         box-shadow:
-        0 4px 0 #8b1a1a,                    // 底部厚阴影，模拟"块"的厚度
+        0 4px 0 #8b1a1a,                    // 底部厚阴影，模仿"块"的厚度
         0 6px 15px rgba(230, 57, 70, 0.4);  
         padding-top: 3%;
         font-weight: 700;
@@ -74,6 +74,7 @@ console.log(res)
     &::after  { left: 100%;  margin-left: 10px; }
     }
     .hot-contain{
+        position: relative;
         margin-top: 8%;
         border-radius: 8px 8px 0 0;
         width: 100%;
@@ -81,6 +82,18 @@ console.log(res)
         display: flex;
         flex-direction: column;
         gap: 2.3%;
+        // 遮盖层
+        &::before{
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: 10;
+          border-radius: 8px 8px 0 0;
+          background-color:rgba(235, 195, 180, 0.85);
+          pointer-events: none;
+          animation: uncover 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          animation-delay: 0.3s;
+        }
        .hot-item{
         &:nth-child(1) .top{
             color: #ff4500;
@@ -147,5 +160,9 @@ console.log(res)
 @keyframes glow{
     0%   { text-shadow: 0 0 4px #ff4500; }
   100% { text-shadow: 0 0 12px #ff6347, 0 0 24px #ff4500; }
+}
+@keyframes uncover{
+    0%   { clip-path: inset(0 0 0 0); }
+    100% { clip-path: inset(0 0 100% 0); }
 }
 </style>

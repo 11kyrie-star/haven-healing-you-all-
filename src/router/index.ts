@@ -1,6 +1,6 @@
 ﻿import { createRouter, createWebHistory } from "vue-router"
 import { isTokenExpired } from "@/utils/token"
-import { ElMessage } from "element-plus"
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -14,24 +14,38 @@ const router = createRouter({
     },
   ],
 })
-router.beforeEach((to,from,next)=>{
-    const user=localStorage.getItem('user')
-    let token=''
-    if(user){
-        token=JSON.parse(user as string).userinfo.token
+
+function getStoredToken(): string {
+  try {
+    const user = localStorage.getItem('user')
+    if (user) {
+      const parsed = JSON.parse(user)
+      return parsed?.userinfo?.token || ''
     }
-    const judge=isTokenExpired(token as string)
-    if(!token && to.path!=='/'){
-      return next('/')
-    }
-    if(token){
-      if(judge){
-        return next('/')
-      }
-      if(!judge && to.path==='/'){
-        return next('/layout')
-      }
-    }
-    next()
+  } catch {
+    // corrupted data
+  }
+  // fallback: standalone token key
+  try {
+    return localStorage.getItem('token') || ''
+  } catch {
+    return ''
+  }
+}
+
+router.beforeEach((to, from, next) => {
+  // login page always allowed
+  if (to.path === '/') {
+    return next()
+  }
+
+  const token = getStoredToken()
+  const expired = isTokenExpired(token)
+
+  if (!token || expired) {
+    return next('/')
+  }
+
+  next()
 })
 export default router
