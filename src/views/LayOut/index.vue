@@ -13,12 +13,15 @@ import Window from "@/components/Window.vue";
 import { getTime } from "@/utils/token";
 import { ref ,onMounted,onUnmounted} from "vue";
 import { ElMessage } from "element-plus";
+import { useUserStore } from "@/stores/userinfo";
 import { useRouter } from "vue-router";
+const userstore=useUserStore()
 let time=0
 const route=useRouter()
 let timenum:number | null =0
 onMounted(()=>{
-const token=JSON.parse(localStorage.getItem('user')as string).userinfo.token
+try{    
+const token=userstore.userinfo.token
 time=getTime(token)
 if(time<0){
     ElMessage({
@@ -36,7 +39,9 @@ if(time>0){
         type:'warning'
     })
     route.push('/')
-},time)}
+},time)}}catch{
+    route.push('/')
+}
 })
 onUnmounted(()=>{
     if(timenum!==null){
@@ -62,9 +67,9 @@ function avatarway(command:string){
         content: '';
         position: absolute;
         inset: 0;
-        z-index: 0;
+        z-index: 1;
         pointer-events: none;
-        height: 100%;
+        min-height:100vh;
         background: radial-gradient(ellipse 80% 50% at 70% 15%,rgba(231, 155, 34, 1) 0%,transparent 65%),
          radial-gradient(ellipse 60% 40% at 70%% 35%, rgba(220, 120, 78, 0.18) 0%, transparent 60%),
          linear-gradient(

@@ -11,5 +11,6 @@
     width: 25%;
     height: 30vh;
     background-color: white;
+    margin-right: 3%;
 }
 </style>

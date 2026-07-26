@@ -26,8 +26,8 @@ import Publish from '@/views/Content/Components/Publish/index.vue'
         width: 100%;
         min-height: 80%;
         display: flex;
-        gap: 10%;
-        margin-top: 2%;
+        gap: 7%;
+        margin-top: 3%;
     }
 }
 </style>

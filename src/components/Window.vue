@@ -35,10 +35,10 @@
                 <div class="password-form">
                     <el-form ref="formpassword" label-position="left" label-suffix=":" label-width="70px" :model="form" :rules="rules">
                         <el-form-item label="原密码" prop="oldpassword">
-                            <el-input style="width: 85%;" type="password" v-model="form.oldpassword"></el-input>
+                            <el-input style="width: 90%;" type="password" v-model="form.oldpassword"></el-input>
                         </el-form-item>
                         <el-form-item label="新密码" prop="newpassword">
-                            <el-input style="width: 85%;" type="password" v-model="form.newpassword"></el-input>
+                            <el-input style="width: 90%;" type="password" v-model="form.newpassword"></el-input>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -346,14 +346,17 @@ if(form.oldpassword && form.newpassword){
         }
     }
     .window-password{
-        height: 60vh;
-        width: 20vw;
+        height: 40vh;
+        width: 30vw;
         position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 8%;
+        .password-form{
+            margin-top: 10%;
+        }
         .password-button{
             display: flex;
             margin-left: 10%;

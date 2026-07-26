@@ -30,6 +30,7 @@ const actvieTap=ref('广场')
              rgba(219, 69, 35, 0.35)  0%,
             transparent 70%              
         );
+        pointer-events: none;
         animation: sun-light 3s ease-in-out forwards;
     }
     &::after{
@@ -45,6 +46,7 @@ const actvieTap=ref('广场')
             transparent 70%              
         );
         animation: sun-light 3s ease-in-out forwards;
+        pointer-events: none;
     }
     .navigation{
         width: 40%;
@@ -52,7 +54,7 @@ const actvieTap=ref('广场')
         display: flex;
         justify-content: space-around;
         align-items: center;
-        margin-left: 48%;
+        margin-left: 50%;
         transform: translateX(-50%);
         font-size: 1.3em;
         font-family: 'LXGW WenKai', 'Inter', sans-serif;

@@ -7,9 +7,14 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import '@/styles/reset.scss'
 import '@/styles/font.scss'
 
-const app = createApp(App)
+async function prepareapp(){
+if(import.meta.env.DEV){
+    const work=await import('@/mocks/browers.ts')
+    await work.work.start()
+}const app = createApp(App)
 
 app.use(createPinia().use(piniaPluginPersistedstate))
 app.use(router)
-
 app.mount('#app')
+}
+prepareapp()
