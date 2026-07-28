@@ -32,7 +32,7 @@ showanimation.value=true
 function closeinfor(){
     setTimeout(()=>{
         showanimation.value=false
-    },1000)
+    },2000)
 }
 const emit=defineEmits<{open:[command:string]}>()
 function Open(){
