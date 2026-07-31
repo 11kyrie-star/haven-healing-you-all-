@@ -31,7 +31,7 @@
         </div>
         <div class="show-comment"></div>
         <div class="push-comment">
-         <Editor></Editor>   
+         <Editor margintop="3vh" :showeditor=false minheight="6vh" decide="comment"></Editor>   
         </div>
     </div>
 </template>

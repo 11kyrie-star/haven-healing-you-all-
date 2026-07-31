@@ -1,5 +1,4 @@
 <template>
-<Teleport to="body">
   <div class="setting-container">
    <div class="setting-contain">
     <div class="greetings">Good MOring,Welcome to Haven</div> 
@@ -14,7 +13,6 @@
     <p @click="logout">退出登录</p>
     </div>
   </div>
-</Teleport>
 </template>
 
 <script setup lang="ts">
@@ -46,8 +44,8 @@ function Open2(){
 <style scoped lang="scss">
 .setting-container{
     width: fit-content;
-    position: fixed;
-    left: 85vw;
+    position: absolute;
+    left: 85%;
     top: 2vh;
     z-index: 1000;
     .greetings{

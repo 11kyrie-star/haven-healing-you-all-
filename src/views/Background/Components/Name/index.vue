@@ -1,5 +1,5 @@
 ﻿<template>
-    <p>{{ userstore.userinfo?.username }}</p>
+    <p :style="styleposition">{{ userstore.userinfo?.username }}</p>
 </template>
 
 <style scoped lang="scss">
@@ -7,9 +7,6 @@ p{
     width: fit-content;
     font-weight: 800;
     position: absolute;
-    left: 21%;
-    top: 75%;
-    font-size: 2em;
     background: linear-gradient(135deg, #D4A843 0%, #6B3FA0 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -20,5 +17,16 @@ p{
 
 <script setup lang="ts">
 import { useUserStore } from '@/stores/userinfo';
+import { computed } from 'vue';
 const userstore=useUserStore()
+const props=defineProps<{
+    left?:string,
+    top?:string,
+    fontsize?:string
+}>()
+const styleposition=computed(()=>({
+   left:props.left,
+   top:props.top,
+   fontSize:props.fontsize
+}))
 </script>

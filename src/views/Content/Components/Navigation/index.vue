@@ -54,7 +54,7 @@ const actvieTap=ref('广场')
         display: flex;
         justify-content: space-around;
         align-items: center;
-        margin-left: 50%;
+        margin-left: 48%;
         transform: translateX(-50%);
         font-size: 1.3em;
         font-family: 'LXGW WenKai', 'Inter', sans-serif;

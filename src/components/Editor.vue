@@ -1,22 +1,22 @@
-<template>
-<div class="editor-container">
+﻿<template>
+<div class="editor-container" :style="{'margin-top':datafa.margintop}">
     <div class="editor-body">
-       <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" ref="editorinput"></div>
-       <span class="placeholder" v-show="showplaceholder">评论</span>
-       <span class="placeholder" v-show="false">说点什么...</span>
+       <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" ref="editorinput" :style="{'min-height':datafa.minheight}"></div>
+       <span class="placeholder" v-show="showplaceholder && decide==='comment'">评论</span>
+       <span class="placeholder" v-show="showplaceholder && decide==='publish'">说点什么..</span>
     </div>
     <div class="editor-tool" v-show="showtool">
         <div class="tool-container">
             <div class="face">
-                <img src="@/assets/postface.svg" alt="" @mousedown.prevent="show" :class="{showchange:showchange}">
+                <img src="@/assets/postface.svg" alt="" @mousedown.prevent="show" :class="{showchange:showchange1}">
                 <div class="emoji"><emoji-picker :showemoji="showemoji" @select="insertemoji"></emoji-picker></div>
             </div>
             <div class="picture">
-                <img src="@/assets/postpic.svg" alt="" @mousedown.prevent="triggerinput">
+                <img src="@/assets/postpic.svg" alt="" @mousedown.prevent="triggerinput" :class="{showchange:showchange2}">
                 <input type="file" ref="inpic" style="display: none;" @change="handfilechange" accept="image/*" >
             </div>
             <div class="button">
-                <el-button type="primary">发表</el-button>
+                <el-button type="primary">发布</el-button>
             </div>
         </div>
     </div>
@@ -25,7 +25,6 @@
 
 <style scoped lang="scss">
 .editor-container{
-    margin-top: 3vh;
     width: 100%;
     min-height: 6vh;
     .editor-body{
@@ -35,7 +34,6 @@
         background-color: white;
         .editor-input{
             width: 100%;
-            min-height: 6vh;
             font-size: 0.8em;
             line-height: 4vh;
             caret-color: #333;
@@ -55,6 +53,7 @@
     }
     .editor-tool{
         margin-top: 2vh;
+        width: 100%;
         .tool-container{
             display: flex;
         }
@@ -80,26 +79,49 @@
             
         }
         .button{
-            margin-left: 65%;
+            margin-left: auto;
         }
     }
 }
 </style>
 
 <script setup lang="ts">
-import { ref,defineAsyncComponent } from 'vue';
+import { ref,defineAsyncComponent,computed } from 'vue';
 import type { EmojiExt } from 'vue3-emoji-picker';
 const EmojiPicker=defineAsyncComponent(()=>import('./EmojiPicker.vue'))
 let showplaceholder=ref(true)
 const showemoji=ref(false)
 const inpic=ref<HTMLInputElement>()
-const showchange=ref(false)
+const showchange1=ref(false)
+const showchange2=ref(false)
 let showtool=ref(false)
+const props=defineProps<{
+    margintop?:string,
+    showeditor?:boolean,
+    minheight?:string
+    decide?:string
+}>()
+const datafa=computed(()=>({
+    margintop:props.margintop,
+    showeditor:props.showeditor,
+    minheight:props.minheight,
+    decide:props.decide
+}))
+if(datafa.value.showeditor){
+    showtool.value=true
+}else{
+    showtool.value=false
+}
 const editorinput=ref()
 const ZWSP = '\u200B' 
-//触发上传照片功能
+//用于触发上传头像的功能和图片按钮的状态
 const triggerinput=()=>{
     inpic.value?.click()
+    if(!showchange2.value){
+        showchange2.value=true
+    }else{
+        showchange2.value=false
+    }
 }
 const handfilechange=()=>{
 
@@ -113,7 +135,7 @@ if(editorinput.value){
     }
 }
 }
-//插入表情
+//用于插入表情
 const insertemoji=(emoji:EmojiExt)=>{
 const emojichar=emoji.i
 const edit=editorinput.value
@@ -137,12 +159,12 @@ range.collapse(true)
 slection.removeAllRanges()
 slection.addRange(range)
 }
-//决定表情按钮的状态
+//用于决定表情按钮状态的变化
 const show=()=>{
-    if(!showchange.value){
-        showchange.value=true
+    if(!showchange1.value){
+        showchange1.value=true
     }else{
-        showchange.value=false
+        showchange1.value=false
     }
     if(showemoji.value){
         showemoji.value=false
@@ -150,15 +172,18 @@ const show=()=>{
         showemoji.value=true
     }
 }
-//输入框失焦的函数
+//失去焦点的处理函数
 const blur=()=>{
     const text=(editorinput.value?.innerText || '').replace(new RegExp(ZWSP,'g'),'').trim()
-    showplaceholder.value=(text.length===0)  
-    showtool.value=false  
+    showplaceholder.value=(text.length===0)
+    if(datafa.value.decide==='comment'){
+        showtool.value=false 
+    }
     showemoji.value=false
-    showchange.value=false
+    showchange1.value=false
+    showchange2.value=false
 }
-//输入框输入变化的函数
+//输入时的处理函数
 const input=()=>{
     const text=(editorinput.value?.innerText || '').replace(new RegExp(ZWSP,'g'),'').trim()
     showplaceholder.value=(text.length===0)    

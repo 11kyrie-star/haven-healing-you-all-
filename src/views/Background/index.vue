@@ -4,7 +4,7 @@
     <div class="avatar-wrap">
     <Avatar @open="trans" width="6vw" height="12.5vh" radius="8px"></Avatar>
     </div>
-    <Name></Name>
+    <Name left="21%" top="75%" fontsize="2em"></Name>
     <Setting @open="showinfor"></Setting>
 </div>
 </template>
