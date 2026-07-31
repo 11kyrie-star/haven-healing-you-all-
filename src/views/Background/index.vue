@@ -1,7 +1,9 @@
 ﻿<template>
 <div class="bg">
     <Logo></Logo>
-    <Avatar @open="trans"></Avatar>
+    <div class="avatar-wrap">
+    <Avatar @open="trans" width="6vw" height="12.5vh" radius="8px"></Avatar>
+    </div>
     <Name></Name>
     <Setting @open="showinfor"></Setting>
 </div>
@@ -31,19 +33,14 @@ function showinfor(command:string){
     position: relative;
     filter: blur(3px);
     z-index: 3;
-    // &::before{
-    //    content: '';
-    //    position: absolute;
-    //    inset: 0;
-    //    pointer-events: none;
-    //    background-color:  rgba(235, 235, 235, 0.1);
-    //    animation: sun 3s ease-in-out;
-    // }
-    // @keyframes sun{
-    //     0% {opacity: 0.5;}
-    //     100% {opacity: 0.1;}
-    // }
     animation: sharpen 2s ease-in-out forwards;
+    .avatar-wrap{
+        width: fit-content;
+        height: fit-content;
+        position: absolute;
+        left: 14%;
+        top: 70%;
+    }
 }
 @keyframes sharpen{
     0% {filter:blur(3px) ;}

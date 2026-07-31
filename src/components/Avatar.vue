@@ -1,5 +1,5 @@
 <template>
-    <div class="avatar-container">
+    <div class="avatar-container" :style="styleposition">
         <div class="img" @click="Open">
             <img v-if="userstore.userinfo.avatar" :src=userstore.userinfo.avatar class="avatar-img">
             <img v-else src="@/assets/avatar.jpg" class="avatar-img">
@@ -7,7 +7,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref ,computed} from 'vue';
 import { useUserStore } from '@/stores/userinfo';
 const userstore=useUserStore()
 const emit=defineEmits<{
@@ -16,18 +16,22 @@ const emit=defineEmits<{
 function Open(){
    emit('open','img')
 }
+const props=defineProps<{
+    width?:string,
+    height?:string,
+    radius?:string
+}>()
+const styleposition=computed(()=>({
+width:props.width,
+height:props.height,
+borderRadius:props.radius
+}))
 </script>
 
 <style scoped lang="scss">
 .avatar-container{
-    width: 7%;
-    height: 42%;
-    position: absolute;
-    border-radius: 8px;
     background-color: white;
     padding: 2px;
-    left: 13%;
-    top: 63%;
     z-index: 80;
     .img{
         width: 100%;

@@ -1,11 +1,13 @@
 <template>
 <div class="publish-container">
-    我是发帖区
+    <Avatar></Avatar>
+    <Editor></Editor>
 </div>
 </template>
 
 <script setup lang="ts">
-
+import Avatar from '@/components/Avatar.vue';
+import Editor from '@/components/Editor.vue';
 </script>
 
 <style scoped lang="scss">
