@@ -1,10 +1,12 @@
 <template>
 <div class="publish-container">
-    我是发表评论
+    我是发帖区
 </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+</script>
 
 <style scoped lang="scss">
 .publish-container{
