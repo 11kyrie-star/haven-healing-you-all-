@@ -1,7 +1,7 @@
 ﻿<template>
 <div class="editor-container" :style="{'margin-top':datafa.margintop}">
     <div class="editor-body">
-       <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" ref="editorinput" :style="{'min-height':datafa.minheight}"></div>
+       <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" ref="editorinput" :style="{'min-height':currentminheight}"></div>
        <span class="placeholder" v-show="showplaceholder && decide==='comment'">评论</span>
        <span class="placeholder" v-show="showplaceholder && decide==='publish'">说点什么..</span>
     </div>
@@ -13,7 +13,7 @@
             </div>
             <div class="picture">
                 <img src="@/assets/postpic.svg" alt="" @mousedown.prevent="triggerinput" :class="{showchange:showchange2}">
-                <input type="file" ref="inpic" style="display: none;" @change="handfilechange" accept="image/*" >
+                <input type="file" ref="inpic" style="display: none;" @change="handfilechange" accept="image/*">
             </div>
             <div class="button">
                 <el-button type="primary">发布</el-button>
@@ -38,10 +38,7 @@
             line-height: 4vh;
             caret-color: #333;
             outline: none;
-            transition: min-height 0.3s ease;
-            &:focus{
-                min-height: 10vh;
-            }
+            transition: min-height 0.3s ease !important;
         }
         .placeholder{
               position: absolute;  
@@ -101,6 +98,7 @@ const props=defineProps<{
     minheight?:string
     decide?:string
 }>()
+const currentminheight=ref(props.minheight)
 const datafa=computed(()=>({
     margintop:props.margintop,
     showeditor:props.showeditor,
@@ -114,9 +112,11 @@ if(datafa.value.showeditor){
 }
 const editorinput=ref()
 const ZWSP = '\u200B' 
+let isToolbar:boolean
 //用于触发上传头像的功能和图片按钮的状态
 const triggerinput=()=>{
     inpic.value?.click()
+    isToolbar=true
     if(!showchange2.value){
         showchange2.value=true
     }else{
@@ -133,6 +133,9 @@ if(editorinput.value){
     if(editorinput.value.innerText.trim()===''){
         editorinput.value.innerText=ZWSP
     }
+}
+if(props.decide==='comment'){
+    currentminheight.value= '10vh'
 }
 }
 //用于插入表情
@@ -174,10 +177,15 @@ const show=()=>{
 }
 //失去焦点的处理函数
 const blur=()=>{
+    if(isToolbar){
+        isToolbar=false
+        return
+    }
     const text=(editorinput.value?.innerText || '').replace(new RegExp(ZWSP,'g'),'').trim()
     showplaceholder.value=(text.length===0)
-    if(datafa.value.decide==='comment'){
-        showtool.value=false 
+    if(props.decide==='comment'){
+        showtool.value=false
+        currentminheight.value=datafa.value.minheight 
     }
     showemoji.value=false
     showchange1.value=false

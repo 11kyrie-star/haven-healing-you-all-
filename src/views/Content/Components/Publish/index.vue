@@ -3,8 +3,9 @@
     <div class="avatar-wrap">
     <Avatar width="5vw" height="10vh" radius="50%"></Avatar>
     </div>
+    <span class="time">{{ time }}</span>
     <Name left="25%" top="2.9vh" fontsize="1.5em"></Name>
-    <Editor margintop="2vh" minheight="20vh" decide="publish" :showeditor="true"></Editor>
+    <Editor margintop="4vh" minheight="20vh" decide="publish" :showeditor="true"></Editor>
 </div>
 </template>
 
@@ -12,6 +13,19 @@
 import Avatar from '@/components/Avatar.vue';
 import Editor from '@/components/Editor.vue';
 import Name from '@/views/Background/Components/Name/index.vue'
+import { ref,onMounted,onUnmounted } from 'vue';
+let time=ref()
+let timenum:null | number=null
+const gettime=()=>{
+    timenum=setInterval(()=>{time.value=new Date().toLocaleTimeString()},1000)
+}
+onMounted(()=>{gettime()})
+onUnmounted(()=>{
+    if(timenum!==null){
+        clearInterval(timenum)
+    }
+    timenum=null
+})
 </script>
 
 <style scoped lang="scss">
@@ -32,5 +46,10 @@ import Name from '@/views/Background/Components/Name/index.vue'
     margin-right: 3%;
     position: relative;
     align-self: flex-start;
+    .time{
+        position: absolute;
+        left: 80%;
+        top: 1vh;
+    }
 }
 </style>
