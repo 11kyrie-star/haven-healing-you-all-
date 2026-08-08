@@ -45,6 +45,7 @@ function Open2(){
 .setting-container{
     width: fit-content;
     position: absolute;
+    user-select: none;
     left: 85%;
     top: 2vh;
     z-index: 1000;

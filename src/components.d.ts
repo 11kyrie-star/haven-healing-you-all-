@@ -14,6 +14,7 @@ declare module 'vue' {
     Avatar: typeof import('./components/Avatar.vue')['default']
     Editor: typeof import('./components/Editor.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
@@ -23,6 +24,7 @@ declare module 'vue' {
     PostCard: typeof import('./components/PostCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Tag: typeof import('./components/Tag.vue')['default']
     Window: typeof import('./components/Window.vue')['default']
   }
 }

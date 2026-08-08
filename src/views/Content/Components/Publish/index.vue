@@ -1,11 +1,16 @@
 ﻿<template>
 <div class="publish-container">
     <div class="avatar-wrap">
-    <Avatar width="5vw" height="10vh" radius="50%"></Avatar>
+    <Avatar width="5vw" height="10vh" radius="50%" v-show="denoshow===0"></Avatar>
+    <div class="noname-img" v-show="denoshow===1">
+        <img src="@/assets/noname.jpeg" alt="">
+    </div>
     </div>
     <span class="time">{{ time }}</span>
-    <Name left="25%" top="2.9vh" fontsize="1.5em"></Name>
-    <Editor margintop="4vh" minheight="20vh" decide="publish" :showeditor="true"></Editor>
+    <Name left="25%" top="2.9vh" fontsize="1.5em" v-show="denoshow===0"></Name>
+    <div class="name" v-show="denoshow===1">匿名用户</div>
+    <Editor margintop="4vh" minheight="30vh" decide="publish" :showeditor="true" :deciname="denoshow"></Editor>
+    <el-checkbox v-model="checked" @change="noshow" class="show-name">匿名</el-checkbox>
 </div>
 </template>
 
@@ -15,6 +20,8 @@ import Editor from '@/components/Editor.vue';
 import Name from '@/views/Background/Components/Name/index.vue'
 import { ref,onMounted,onUnmounted } from 'vue';
 let time=ref()
+//用于判断是否匿名
+const denoshow=ref(0)
 let timenum:null | number=null
 const gettime=()=>{
     timenum=setInterval(()=>{time.value=new Date().toLocaleTimeString()},1000)
@@ -26,10 +33,19 @@ onUnmounted(()=>{
     }
     timenum=null
 })
+const checked=ref(false)
+const noshow=()=>{
+    if(!checked.value){
+        denoshow.value=0
+    }else{
+        denoshow.value=1
+    }
+}
 </script>
 
 <style scoped lang="scss">
 .publish-container{
+    min-width: 0;
     width: 30%;
     min-height: 40vh;
     padding: 5px;
@@ -50,6 +66,33 @@ onUnmounted(()=>{
         position: absolute;
         left: 80%;
         top: 1vh;
+    }
+    .show-name{
+        position: absolute;
+        left: 83%;
+        top: 10%;
+    }
+    .noname-img{
+        background-color: white;
+        width: 5vw;
+        height: 10vh;
+        border-radius: 50%;
+        padding: 2px;
+        img{
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            object-fit: cover;
+            cursor: default;
+        }
+    }
+    .name{
+        position: absolute;
+        left: 25%;
+        top: 2.9vh;
+        cursor: default;
+        font-weight: 800;
+        font-size: 1.5em;
     }
 }
 </style>

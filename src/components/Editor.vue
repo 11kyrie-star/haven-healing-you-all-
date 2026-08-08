@@ -1,22 +1,26 @@
 ﻿<template>
 <div class="editor-container" :style="{'margin-top':datafa.margintop}">
     <div class="editor-body">
-       <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" ref="editorinput" :style="{'min-height':currentminheight}"></div>
+       <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" @keydown="onkeydown" ref="editorinput" :style="{'min-height':currentminheight}"></div>
        <span class="placeholder" v-show="showplaceholder && decide==='comment'">评论</span>
-       <span class="placeholder" v-show="showplaceholder && decide==='publish'">说点什么..</span>
+       <span class="placeholder" v-show="showplaceholder && decide==='publish'">说点什么...</span>
     </div>
     <div class="editor-tool" v-show="showtool">
         <div class="tool-container">
             <div class="face">
-                <img src="@/assets/postface.svg" alt="" @mousedown.prevent="show" :class="{showchange:showchange1}">
-                <div class="emoji"><emoji-picker :showemoji="showemoji" @select="insertemoji"></emoji-picker></div>
+                <img src="@/assets/postface.svg" alt="" @mousedown.prevent="show" :class="{showchange:showchange1}" ref="facebtn">
+                <div class="emoji" ref="facetent"><emoji-picker :showemoji="showemoji" @select="insertemoji"></emoji-picker></div>
             </div>
             <div class="picture">
                 <img src="@/assets/postpic.svg" alt="" @mousedown.prevent="triggerinput" :class="{showchange:showchange2}">
                 <input type="file" ref="inpic" style="display: none;" @change="handfilechange" accept="image/*">
             </div>
+            <div class="topic" v-show="decide==='publish'">
+                <span @mousedown.prevent="tagfu" :class="{showchange:showchange3}" ref="tagbtn">#</span>
+                <tag v-show="showtag" @select="inserttag" :decide="decide!" ref="tagtent"></tag>
+            </div>
             <div class="button">
-                <el-button type="primary">发布</el-button>
+                <el-button type="primary" @click="sendpost" :loading="load">发表</el-button>
             </div>
         </div>
     </div>
@@ -38,7 +42,19 @@
             line-height: 4vh;
             caret-color: #333;
             outline: none;
+            word-break: break-all;
+            overflow-wrap: break-word;
             transition: min-height 0.3s ease !important;
+            [data-anchor]{
+                display: block;
+                width: 100%;
+                font-size: 0;
+                line-height: 0;
+                user-select: none;
+            }
+            :deep(div){
+                line-height: inherit;
+            }
         }
         .placeholder{
               position: absolute;  
@@ -53,6 +69,7 @@
         width: 100%;
         .tool-container{
             display: flex;
+            align-items: center;
         }
         .face{
             width: fit-content;
@@ -78,32 +95,121 @@
         .button{
             margin-left: auto;
         }
+         .topic{
+            align-self: center;
+            height: fit-content;
+            width: fit-content;
+            margin-left: 3%;
+            margin-bottom: 3%;
+            cursor: pointer;
+            position: relative;
+            span{
+                display: block;
+                font-weight: 300;
+                font-size: 1.5em;
+            }
+        }
     }
 }
 </style>
 
 <script setup lang="ts">
-import { ref,defineAsyncComponent,computed } from 'vue';
+import  DOMPurify from 'dompurify';
+import { onClickOutside } from '@vueuse/core';
+import { ElMessage } from 'element-plus';
+import {Close} from '@element-plus/icons-vue'
+import { ref,defineAsyncComponent,computed,createVNode,render} from 'vue';
+import { postpicApi,sendpostapi } from '@/api/aboutpost.ts';
+import { findsensitvie } from '@/utils/sensitvie.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
-const EmojiPicker=defineAsyncComponent(()=>import('./EmojiPicker.vue'))
+import Tag from '@/components/Tag.vue';
+import EmojiPicker from './EmojiPicker.vue';
 let showplaceholder=ref(true)
 const showemoji=ref(false)
 const inpic=ref<HTMLInputElement>()
 const showchange1=ref(false)
 const showchange2=ref(false)
 let showtool=ref(false)
+let showtag=ref(false)
+let showchange3=ref(false)
+const tagfu=()=>{
+    if(!showtag.value){
+        showtag.value=true
+        showchange3.value=true
+    }else{
+        showtag.value=false
+        showchange3.value=false
+    }
+}
+//如果点击表情列表和标签列表以外的地方就关闭
+const facebtn=ref()
+const facetent=ref()
+const tagbtn=ref()
+const tagtent=ref()
+onClickOutside(facetent,()=>{
+showemoji.value=false
+showchange1.value=false
+},{ignore:[facebtn]})
+onClickOutside(tagtent,()=>{
+    showtag.value=false
+    showchange3.value=false
+},{ignore:[tagbtn]})
+//插入标签
+const inserttag=(tag:string)=>{
+const edit=editorinput.value
+edit.focus()
+showplaceholder.value=false
+const selection=window.getSelection()
+let range:Range
+if(!selection){return}
+if(selection?.rangeCount>0){
+range=selection.getRangeAt(0)
+}else{
+    range=document.createRange()
+    range.selectNodeContents(edit)
+    range.collapse(false)
+}
+const hasSpan=document.createElement('span')
+hasSpan.textContent='#'
+hasSpan.style.color='#222'
+hasSpan.style.fontWeight='700'
+hasSpan.style.fontSize='1.5em'
+hasSpan.contentEditable='false'
+const tagSpan=document.createElement('span')
+tagSpan.textContent=tag
+tagSpan.style.color='#C5624D'
+tagSpan.style.padding='1px 3px'
+tagSpan.style.fontSize='1em'
+tagSpan.style.fontWeight='500'
+tagSpan.style.marginRight='3px'
+tagSpan.contentEditable='false'
+range.insertNode(hasSpan)
+range.setStartAfter(hasSpan)
+range.collapse(true)
+range.insertNode(tagSpan)
+range.setStartAfter(tagSpan)
+range.collapse(true)
+const space=document.createTextNode('\u200B')
+range.insertNode(space)
+range.setStartAfter(space)
+range.collapse(true)
+selection.removeAllRanges()
+selection.addRange(range)
+}
 const props=defineProps<{
     margintop?:string,
     showeditor?:boolean,
     minheight?:string
-    decide?:string
+    decide?:string,
+    deciname?:number
 }>()
 const currentminheight=ref(props.minheight)
 const datafa=computed(()=>({
     margintop:props.margintop,
     showeditor:props.showeditor,
     minheight:props.minheight,
-    decide:props.decide
+    decide:props.decide,
+    deciname:props.deciname
 }))
 if(datafa.value.showeditor){
     showtool.value=true
@@ -111,10 +217,16 @@ if(datafa.value.showeditor){
     showtool.value=false
 }
 const editorinput=ref()
-const ZWSP = '\u200B' 
 let isToolbar:boolean
-//用于触发上传头像的功能和图片按钮的状态
+//保存光标
+const saveRange=ref<Range | null>(null)
+//点击上传图片后的处理函数
 const triggerinput=()=>{
+    editorinput.value.focus()
+    const sel=window.getSelection()
+    if(sel && sel.rangeCount>0){
+        saveRange.value=sel.getRangeAt(0).cloneRange()
+    }
     inpic.value?.click()
     isToolbar=true
     if(!showchange2.value){
@@ -123,22 +235,221 @@ const triggerinput=()=>{
         showchange2.value=false
     }
 }
-const handfilechange=()=>{
-
+//按下某键的处理函数
+const onkeydown=(e:KeyboardEvent)=>{
+    if(e.key!=='Delete' && e.key!=='Backspace'){return}
+    const sel=window.getSelection()
+    if(!sel || sel.rangeCount===0){
+        return
+    }
+    const range=sel.getRangeAt(0)
+    if(e.key==='Delete' || e.key==='Backspace'){
+        const node=range.endContainer
+        const offset=range.endOffset
+        if(node.nodeType===Node.TEXT_NODE && offset===node.textContent?.length){
+            const next=node.parentElement?.nextElementSibling
+            if(next?.getAttribute('data-image-grid')!==null){
+                e.preventDefault()
+                return
+            }
+        }
+        const node2=range.startContainer
+        const offset2=range.startOffset
+        if(node2.nodeType===Node.TEXT_NODE && node2.textContent?.charAt(offset2-1)==='/u200B'){
+            e.preventDefault()
+            return
+        }
+    }
 }
+//
+const urlList=ref<string[]>([])
+const handfilechange=async ()=>{    
+const input=inpic.value
+if(showplaceholder.value){
+    showplaceholder.value=false
+}
+if(!input || !input.files || input.files.length===0){return}
+const file=input.files[0]
+const maxsize=10*1024*1024
+if(file?.size!>maxsize){
+    ElMessage.warning('图片大小不能超过10MB')
+    return
+}
+if(!file?.type.startsWith('image/')){
+    ElMessage.warning('请选择图片')
+}
+try{
+    const res=await postpicApi(file as File)
+    const imageurl=res.data.url
+    urlList.value.push(imageurl)
+    buildgrid()
+    showchange2.value=false
+}catch{
+    return
+}
+}
+//构造九宫格容器
+const buildgrid=()=>{
+   const edit=editorinput.value
+   if(!edit){return}
+   edit.querySelectorAll('[data-anchor]').forEach((el:HTMLElement) => el.remove())
+   const oldgrid=edit.querySelector('[data-image-grid]')
+   if(oldgrid){
+    oldgrid.querySelectorAll('.image-cell-close').forEach((item:HTMLElement)=>render(null,item))
+    oldgrid.remove()}
+   if(urlList.value.length===0){return}
+   const layout=getgridstyle(urlList.value.length)
+   const grid=document.createElement('div')
+   grid.setAttribute('data-image-grid','')
+   grid.contentEditable='false'
+   grid.style.margin='5px 0'
+   grid.style.borderRadius='8px'
+   grid.style.overflow='hidden'
+   if('special' in layout){
+    grid.style.display='grid'
+    grid.style.gridTemplateColumns='2fr 1fr'
+    grid.style.gridTemplateRows='1fr 1fr'
+    grid.style.gap='4px'
+    grid.style.aspectRatio='4/3'
+    urlList.value.forEach((item,index)=>{
+        const cell=createimgcell(item,index)
+        if(index===0){
+            cell.style.gridRow='1/3'
+        }
+        grid.appendChild(cell)
+    })
+   }else{
+    const {columns,rows,aspectRatio,gap}=getgridstyle(urlList.value.length)
+    grid.style.display='grid'
+    grid.style.gridTemplateColumns=`repeat(${columns},1fr)`
+    grid.style.gridTemplateRows=`repeat(${rows},1fr)`
+    grid.style.gap=gap!
+    urlList.value.forEach((item,index)=>{
+        const cell=createimgcell(item,index)
+        cell.style.aspectRatio=aspectRatio!
+        grid.appendChild(cell)
+    })
+   }
+   let range:Range
+   const selection = window.getSelection()
+   if(saveRange.value && edit.contains(saveRange.value.commonAncestorContainer)){
+    range=saveRange.value
+    saveRange.value=null
+   }else{
+    saveRange.value=null
+    if (!selection) { return }
+    if (selection.rangeCount > 0) {
+        range = selection.getRangeAt(0)
+    } else {
+        range = document.createRange()
+        range.selectNodeContents(edit)
+        range.collapse(false)
+    }
+   }
+   range.insertNode(grid)
+   const prev=grid.previousSibling
+   if(!prev || (prev.nodeType===Node.TEXT_NODE && prev.textContent?.length===0)){
+    const span=document.createElement('span')
+    span.setAttribute('data-anchor','')
+    span.textContent='\u2008'
+    grid.before(span)
+    range.setStart(span.firstChild!,0)
+   }else{
+    range.setStartAfter(grid)
+   }
+   range.collapse(true)
+   selection!.removeAllRanges()
+   selection!.addRange(range)
+}
+//获得九宫格样式
+const getgridstyle=(num:number):{columns?:number,rows?:number,aspectRatio?:string,gap?:string,special?:string}=>{
+   if(num===1){
+    return {
+        columns:1,
+        rows:1,
+        aspectRatio:'16/9',
+        gap:'0px'
+    }}
+    if(num===2){
+        return {
+            columns:2,
+            rows:1,
+            aspectRatio:'1/1',
+            gap:'4px'
+        }
+    }
+    if(num===3){
+        return {
+            special:'layout3'
+        }
+    }
+    if(num===4){
+         return {
+      columns: 2,
+      rows: 2,
+      aspectRatio: '1 / 1',
+      gap: '4px'
+    }
+    }
+     return {
+    columns: 3,
+    rows: Math.ceil(num / 3),
+    aspectRatio: '1 / 1',
+    gap: '4px'
+  }
+   }
+
+//创建格子
+const createimgcell=(url:string,index:number)=>{
+const cell=document.createElement('div')
+const closebtn=document.createElement('div')
+cell.addEventListener('mouseenter',()=>closebtn.style.opacity='1')
+cell.addEventListener('mouseleave',()=>closebtn.style.opacity='0')
+Object.assign(closebtn.style,{
+    position:'absolute',
+    top: '6px',
+    right: '6px',
+    width:'22px',
+    height:'22px',
+    borderRadius: '50%',
+    background: 'rgba(0,0,0,0.45)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: '1',
+    opacity: '0',
+    transition: 'opacity 0.2s ease'
+})
+closebtn.className='image-cell-close'
+const iconVNode=createVNode(Close,{style:{fontsize:'14px',color:'#fff'}})
+render(iconVNode,closebtn)
+closebtn.addEventListener('click',(e)=>{
+   e.stopPropagation()
+   urlList.value.splice(index,1)
+   buildgrid()
+})
+cell.style.overflow='hidden'
+cell.style.position='relative'
+cell.appendChild(closebtn)
+const img=document.createElement('img')
+img.src=url
+img.style.width='100%'
+img.style.height='100%'
+img.style.objectFit='cover'
+img.style.display='block'
+cell.appendChild(img)
+return cell
+}
+
 const focus=()=>{
 showplaceholder.value=false
 showtool.value=true
-if(editorinput.value){
-    if(editorinput.value.innerText.trim()===''){
-        editorinput.value.innerText=ZWSP
-    }
-}
 if(props.decide==='comment'){
     currentminheight.value= '10vh'
 }
 }
-//用于插入表情
+//插入表情
 const insertemoji=(emoji:EmojiExt)=>{
 const emojichar=emoji.i
 const edit=editorinput.value
@@ -162,7 +473,7 @@ range.collapse(true)
 slection.removeAllRanges()
 slection.addRange(range)
 }
-//用于决定表情按钮状态的变化
+//按钮状态
 const show=()=>{
     if(!showchange1.value){
         showchange1.value=true
@@ -175,13 +486,14 @@ const show=()=>{
         showemoji.value=true
     }
 }
-//失去焦点的处理函数
+//失焦
 const blur=()=>{
     if(isToolbar){
+        editorinput.value.focus()
         isToolbar=false
         return
     }
-    const text=(editorinput.value?.innerText || '').replace(new RegExp(ZWSP,'g'),'').trim()
+    const text=(editorinput.value?.innerText || '').trim()
     showplaceholder.value=(text.length===0)
     if(props.decide==='comment'){
         showtool.value=false
@@ -191,9 +503,51 @@ const blur=()=>{
     showchange1.value=false
     showchange2.value=false
 }
-//输入时的处理函数
+//输入
 const input=()=>{
-    const text=(editorinput.value?.innerText || '').replace(new RegExp(ZWSP,'g'),'').trim()
+    const text=(editorinput.value?.innerText || '')
     showplaceholder.value=(text.length===0)    
+}
+//XSS过滤
+const clean=(html:string):string=>{
+   return DOMPurify.sanitize(html,{
+    ALLOWED_TAGS:['br','span','div','img'],
+    ALLOWED_ATTR:['src','alt','contenteditable','style','class']
+   })
+}
+const load=ref(false) //按钮状态
+//发帖
+const sendpost=async ()=>{
+    if(datafa.value.decide==='publish'){
+        const edit=editorinput.value
+        if(!edit){return}
+        const text=edit.textContent.replace(/\u2008/g,'').trim()
+        if(text.length===0){
+            return ElMessage.warning('帖子内容不能为空')
+        }
+        const clone=edit.cloneNode(true) as HTMLElement
+        const grid=clone.querySelector('[data-image-grid]')
+        if(grid){grid.remove()}
+        const data=clone.innerHTML
+        const sensitive=findsensitvie(clone.textContent)
+        if(sensitive){
+            return ElMessage.warning('您的内容存在敏感词,无法发布')
+        }
+        const cleanhtml=clean(data)
+        try{
+            load.value=true
+            const res=await sendpostapi({content:cleanhtml,images:urlList.value,is_anonymous:datafa.value.deciname})
+            if(res.status===0){
+                ElMessage.success('发帖成功')
+                editorinput.value.innerHTML=''
+                urlList.value=[]
+                showplaceholder.value=true
+            }
+        }finally{
+            load.value=false
+        }
+    }else{
+        
+    }
 }
 </script>

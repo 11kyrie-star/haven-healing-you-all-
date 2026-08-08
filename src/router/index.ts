@@ -15,22 +15,9 @@ const router = createRouter({
   ],
 })
 
-function getStoredToken(): string {
-  try {
-    const user = localStorage.getItem('user')
-    if (user) {
-      const parsed = JSON.parse(user)
-      return parsed?.userinfo?.token || ''
-    }
-  } catch {
-    // corrupted data
-  }
-  // fallback: standalone token key
-  try {
-    return localStorage.getItem('token') || ''
-  } catch {
-    return ''
-  }
+function getStoredToken(): string | null{
+     const token=localStorage.getItem('token')
+     return token
 }
 
 router.beforeEach((to, from, next) => {

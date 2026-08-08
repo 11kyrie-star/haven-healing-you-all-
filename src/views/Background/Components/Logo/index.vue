@@ -13,6 +13,7 @@
     left: 1%;
     top: 5%;
     cursor: default;
+    user-select: none;
     .title{
         text-align: center;
         font-size: 55px;
