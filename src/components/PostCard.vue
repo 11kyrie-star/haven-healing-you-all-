@@ -2,30 +2,39 @@
     <div class="card-container">
         <div class="name-avatar">
             <div class="avatar">
-            <img src="@/assets/avatar.jpg" alt="">
+            <img :src=props.avatar alt="">
             </div>
             <div class="des">
-            <div class="name">花海隔云</div>
-            <div class="time">前天 18:00</div>
+            <div class="name">{{props.username }}</div>
+            <div class="time">{{timestr}}</div>
             </div>
         </div>
-        <p class="post-content">希望在8月五号之前我可以完成这个项目，然后写到简历上，加油！</p>
-        <div class="post-pic"></div>
+        <div class="post-content" v-html="props.content"></div>
+        <div class="post-pic" v-if="props.images.length">
+            <div class="image-grid"
+            :style="{display:'grid',gridTemplateColumns:gridlayout.special? '2fr 1fr':`repeat(${gridlayout.cols},1fr)`,gridTemplateRows:
+                gridlayout.special?'1fr 1fr':`repeat(${gridlayout.rows},1fr)`,gap:'4px',aspectRatio:gridlayout.special?'16/9':gridlayout.aspect
+            ,borderRadius:'8px',overflow:'hidden',marginTop:'10px',boxShadow:'box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08)'}" >
+            <div v-for="(item,index) in props.images" :style="gridlayout.special && index===0?{gridRow:'1/3'}:{}">
+              <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            </div>
+        </div>
         <div class="icon">
         <div class="looking">
             <el-icon>
                 <View style="color: rgba(128, 128, 128, 0.3);"></View>
             </el-icon>
-            <div class="looking-number">1100</div>
+            <div class="looking-number">{{ props.view_count }}</div>
         </div>
         <div class="icont-all">
             <div class="star">
             <el-icon :size="20"><Star /></el-icon>
-            <div class="star-number" style="font-size: 0.3em;font-weight: 200;">999</div>
+            <div class="star-number" style="font-size: 0.3em;font-weight: 200;">{{ props.like_count }}</div>
             </div>
             <div class="commt">
             <el-icon :size="20"><ChatSquare /></el-icon>
-            <div class="commt-number" style="font-size: 0.3em;font-weight:200;">1.1w</div>
+            <div class="commt-number" style="font-size: 0.3em;font-weight:200;">{{ props.comment_count }}</div>
             </div>
         </div>
         </div>
@@ -38,6 +47,8 @@
 
 <script setup lang="ts">
 import {View,Star,ChatSquare} from '@element-plus/icons-vue'
+import { formatPostTime } from '@/utils/time.ts';
+import { computed } from 'vue';
 import Editor from './Editor.vue';
 const props=defineProps<{
     id:number,
@@ -51,7 +62,17 @@ const props=defineProps<{
     like_count:number,
     comment_count:number
 }>()
-
+const gridlayout=computed(()=>{
+    const n=props.images.length
+    if(n===1)return {cols:1,rows:1,aspect:'16/9'}
+    if(n===2)return {cols:2,rows:1,aspect:'16/9'}
+    if(n===3)return {special:true}
+    if(n===4)return {cols:2,rows:2,aspect:'16/9'}
+    return {cols:3,rows:Math.ceil(n/3),aspect:'16/9'}
+})
+const timestr=computed(()=>{
+    return formatPostTime(props.create_at)
+})
 </script>
 
 <style scoped lang="scss">
@@ -128,17 +149,23 @@ const props=defineProps<{
     }
     .icont-all{
         display: flex;
-        margin-left: 70%;
+        margin-top: 8px;
+        margin-left:80%;
         gap: 60%;
+
       .star{
         cursor: pointer;
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
       .commt{
         cursor: pointer;
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
     }
     }

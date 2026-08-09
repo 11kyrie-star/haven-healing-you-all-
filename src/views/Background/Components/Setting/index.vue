@@ -1,7 +1,7 @@
 <template>
   <div class="setting-container">
    <div class="setting-contain">
-    <div class="greetings">Good MOring,Welcome to Haven</div> 
+    <div class="greetings">Good MOrning,Welcome to Haven</div> 
     <div class="line">|</div>   
     <el-icon class="setting" :class="{'setting-anima':showanimation}" :size="32" @mouseenter="showinformation" @mouseleave="closeinfor">
       <Setting style="color:black;"/>
