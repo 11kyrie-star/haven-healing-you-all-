@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -24,4 +24,13 @@ export async function getowntagsapi():Promise<tagsres>{
 
 export async function updateowntag(tagList:string[]):Promise<updateowntagres>{
     return await request.put('/user/tags',{tags:tagList})
+}
+
+export async function getpostapi({page,size}:{page:number,size:number}):Promise<getpost>{
+    return await request.get('/post/list',{
+        params:{
+            page,
+            size
+        }
+    })
 }

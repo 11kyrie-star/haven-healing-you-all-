@@ -176,7 +176,7 @@ const onsubmit=()=>{
            try{
            await userstore.login(form)
            if(userstore.userinfo.status===0){
-            router.replace('/layout')
+            router.replace('/layout/content')
            }
         }catch{
             return
@@ -187,6 +187,7 @@ const onsubmit=()=>{
     })
 }
 }
+//注册函数
 const enroll=()=>{
     if(showLogin.value && !showRegister.value && !showEmail.value){
         showLogin.value=false

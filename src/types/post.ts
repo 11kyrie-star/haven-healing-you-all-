@@ -25,3 +25,35 @@ export interface updateowntagres{
     status:number,
     msg:string
 }
+
+interface getpostRes<T>{
+status:number,
+msg:string,
+data:T
+}
+
+interface getpostdata{
+    list:postitem[],
+    page:number,
+    size:number
+}
+
+export interface postitem{
+    id:number,
+    user_id:number,
+    content:string,
+    images:string[],
+    tags:string[],
+    category:string,
+    view_count:number,
+    like_count:number,
+    comment_count:number,
+    hot_value:number,
+    is_public:1 | 0,
+    is_anonymous:0 | 1,
+    created_at:string,
+    username:string,
+    avatar:string
+}
+
+export type getpost=getpostRes<getpostdata>

@@ -39,6 +39,19 @@
 <script setup lang="ts">
 import {View,Star,ChatSquare} from '@element-plus/icons-vue'
 import Editor from './Editor.vue';
+const props=defineProps<{
+    id:number,
+    user_id:number,
+    avatar:string,
+    username:string,
+    create_at:string,
+    content:string,
+    images:string[],
+    view_count:number,
+    like_count:number,
+    comment_count:number
+}>()
+
 </script>
 
 <style scoped lang="scss">

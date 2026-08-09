@@ -11,6 +11,21 @@ const router = createRouter({
     {
       path: "/layout",
       component: () => import("@/views/LayOut/index.vue"),
+      children:[{
+        path:'content',
+        component:()=>import('@/views/Content/index.vue'),
+        redirect:'layout/content/square',
+        children:[{
+          path:'square',
+          component:()=>import('@/views/Content/Components/Square/index.vue')
+        },
+        {path:'help',component:()=>import('@/views/Content/Components/Help/index.vue')},
+        {path:'text',component:()=>import('@/views/Content/Components/Text/index.vue')},
+        {path:'daily',component:()=>import('@/views/Content/Components/Daily/index.vue')},
+        {path:'My',component:()=>import('@/views/Content/Components/My/index.vue')}
+      ]
+      }
+      ]
     },
   ],
 })

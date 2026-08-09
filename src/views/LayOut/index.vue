@@ -1,14 +1,13 @@
 ﻿<template>
 <div class="layout-wrapper">
 <Background @open="avatarway"></Background>
-<Content></Content>
+<RouterView></RouterView>
 <Window :visible="showvisible" :decwindow="decwindow" @close="showvisible=false"></Window>
 </div>
 </template>
 
 <script setup lang="ts">
 import Background from "@/views/Background/index.vue"
-import Content from "@/views/Content/index.vue"
 import Window from "@/components/Window.vue";
 import { getTime } from "@/utils/token";
 import { ref ,onMounted,onUnmounted} from "vue";

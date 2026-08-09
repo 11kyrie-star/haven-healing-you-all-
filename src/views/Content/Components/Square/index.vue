@@ -8,6 +8,12 @@
 
 <script setup lang="ts">
 import PostCard from '@/components/PostCard.vue';
+import { getpostapi } from '@/api/aboutpost';
+import {ref} from 'vue'
+import type { getpost,postitem } from '@/types/post';
+let res=ref<getpost>()
+let postlist=ref<postitem[]>([])
+
 </script>
 
 <style scoped lang="scss">
