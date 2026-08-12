@@ -10,6 +10,7 @@ interface commentdata{
     create_at:string,
     star_count:number,
     reply_count:number,
+    images?:string[]
 }
 
 const fakecomment:commentdata[]=[{
@@ -22,7 +23,7 @@ const fakecomment:commentdata[]=[{
     content:'非常的nice',
     create_at:'前天 18:00',
     star_count:100,
-    reply_count:1000
+    reply_count:1000,
 },{
     id:2,
     post_id:2,

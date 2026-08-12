@@ -56,7 +56,7 @@
         </div>     
         </div>
         <div class="push-comment">
-         <Editor margintop="3vh" :showeditor=false minheight="6vh" decide="comment"></Editor>   
+         <Editor margintop="3vh" :showeditor=false minheight="6vh" decide="comment" :post_id="id" @newcomment="addcomment"></Editor>   
         </div>
     </div>
 </template>
@@ -93,6 +93,10 @@ const gridlayout=computed(()=>{
 const timestr=computed(()=>{
     return formatPostTime(props.create_at)
 })
+const addcomment=(comment:comment)=>{
+    commentList.value.unshift(comment)
+    roots.value=biuldtree(commentList.value)
+}
 const commentList=ref<comment[]>([])
 const roots=ref<commentnode[]>([])
 const showcomment=ref(false)
@@ -124,6 +128,7 @@ interface commentnode{
     create_at:string,
     star_count:number,
     reply_count:number,
+    images?:string[]
     children:commentnode[],
     showreply:boolean
 }

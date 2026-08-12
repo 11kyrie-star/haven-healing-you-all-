@@ -7,11 +7,11 @@
         <div class="content">
             <div>{{ comment.content }}</div>
         </div>
-        <div class="picture">
-            <img src="@/assets/avatar.jpg" alt="">
+        <div class="picture" v-if="comment.images?.length">
+            <img :src=comment.images[0] alt="">
         </div>
         <div class="reply-btn" style="user-select: none;">回复</div>
-        <div class="time">{{ comment.create_at }}</div>
+        <div class="time">{{ timestr }}</div>
         <div class="icons-all">
             <div class="star">
                 <el-icon :size="15"><Star></Star></el-icon>
@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import {Star,ChatSquare} from '@element-plus/icons-vue'
 import {ref} from 'vue'
+import { formatPostTime } from '@/utils/time';
 const props= defineProps<{comment:commentnode,depth?:number}>()
 const emit=defineEmits<{toggleReply:[commId:number]}>()
 interface commentnode{
@@ -44,6 +45,7 @@ interface commentnode{
     create_at:string,
     star_count:number,
     reply_count:number,
+    images?:string[]
     children:commentnode[],
     showreply:boolean
 }
@@ -57,6 +59,8 @@ const handlereplyagain=(commId:number)=>{
 }
 }
 const isactive=ref(false)
+let timestr=ref()
+timestr.value=formatPostTime(props.comment.create_at)
 </script>
 
 <style scoped lang="scss">

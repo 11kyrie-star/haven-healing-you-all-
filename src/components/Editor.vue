@@ -119,11 +119,12 @@ import { onClickOutside } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
 import { ref,defineAsyncComponent,computed,createVNode,render} from 'vue';
-import { postpicApi,sendpostapi } from '@/api/aboutpost.ts';
+import { postpicApi,sendpostapi ,sendcomment} from '@/api/aboutpost.ts';
 import { findsensitvie } from '@/utils/sensitvie.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
 import EmojiPicker from './EmojiPicker.vue';
+import type { comment } from '@/types/post.ts';
 let showplaceholder=ref(true)
 const showemoji=ref(false)
 const inpic=ref<HTMLInputElement>()
@@ -132,6 +133,9 @@ const showchange2=ref(false)
 let showtool=ref(false)
 let showtag=ref(false)
 let showchange3=ref(false)
+const emit=defineEmits<{
+    newcomment:[comment:comment]
+}>()
 const tagfu=()=>{
     if(!showtag.value){
         showtag.value=true
@@ -201,7 +205,8 @@ const props=defineProps<{
     showeditor?:boolean,
     minheight?:string
     decide?:string,
-    deciname?:number
+    deciname?:number,
+    post_id?:number
 }>()
 const currentminheight=ref(props.minheight)
 const datafa=computed(()=>({
@@ -209,7 +214,8 @@ const datafa=computed(()=>({
     showeditor:props.showeditor,
     minheight:props.minheight,
     decide:props.decide,
-    deciname:props.deciname
+    deciname:props.deciname,
+    post_id:props.post_id
 }))
 if(datafa.value.showeditor){
     showtool.value=true
@@ -222,6 +228,9 @@ let isToolbar:boolean
 const saveRange=ref<Range | null>(null)
 //点击上传图片后的处理函数
 const triggerinput=()=>{
+    if(datafa.value.decide==='comment'&&urlList.value.length===1){
+        return ElMessage.warning('最多上传一张图片')
+    }
     editorinput.value.focus()
     const sel=window.getSelection()
     if(sel && sel.rangeCount>0){
@@ -261,8 +270,9 @@ const onkeydown=(e:KeyboardEvent)=>{
         }
     }
 }
-//
+//存储图片地址的数组
 const urlList=ref<string[]>([])
+//选择图片后的处理函数
 const handfilechange=async ()=>{    
 const input=inpic.value
 if(showplaceholder.value){
@@ -496,8 +506,13 @@ const blur=()=>{
     const text=(editorinput.value?.innerText || '').trim()
     showplaceholder.value=(text.length===0)
     if(props.decide==='comment'){
+        if(text.length){
+            showtool.value=true
+            currentminheight.value='10vh'
+        }else{
         showtool.value=false
         currentminheight.value=datafa.value.minheight 
+        }
     }
     showemoji.value=false
     showchange1.value=false
@@ -516,7 +531,7 @@ const clean=(html:string):string=>{
    })
 }
 const load=ref(false) //按钮状态
-//发帖
+//发帖/发表评论
 const sendpost=async ()=>{
     if(datafa.value.decide==='publish'){
         const edit=editorinput.value
@@ -546,8 +561,42 @@ const sendpost=async ()=>{
         }finally{
             load.value=false
         }
-    }else{
-        
+    }
+    if(datafa.value.decide==='comment'){
+        const edit=editorinput.value
+        if(!edit) return
+        const text=edit.textContent.replace(/\u2008/g,'').trim()
+        if(text.length===0){
+            currentminheight.value='10vh'
+            return ElMessage.warning('评论不能为空')
+        }
+        const clone=edit.cloneNode(true) as HTMLElement
+        const grid=clone.querySelector('[data-image-grid]')
+        if(grid){grid.remove()}
+        const data=clone.innerHTML
+        const sensitive=findsensitvie(clone.textContent)
+        if(sensitive){
+            return ElMessage.warning('您的内容存在敏感词,无法发布')
+        }
+        const cleanhtml=clean(data)
+        try{
+            load.value=true
+            const data={
+                post_id:props.post_id!,
+                content:cleanhtml,
+                images:urlList.value
+            }
+            const res=await sendcomment(data)
+            if(res.status===0){
+                ElMessage.success('评论成功')
+                editorinput.value.innerHTML=''
+                urlList.value=[]
+                showplaceholder.value=true
+                emit('newcomment',res.data!)
+            }
+        }finally{
+            load.value=false
+        }
     }
 }
 </script>

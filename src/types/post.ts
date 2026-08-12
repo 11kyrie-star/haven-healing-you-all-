@@ -68,11 +68,30 @@ export interface comment{
     content:string,
     create_at:string,
     star_count:number,
-    reply_count:number
+    reply_count:number,
+    images?:string[]
 }
 
 export interface commentres<T>{
     status:number,
     msg:string,
     data:T
+}
+
+export interface sendcommentres{
+    status:number,
+    msg:string,
+    data?:{
+        id:number,
+        post_id:number,
+        parent_id:number,
+        user_id:number,
+        username:string,
+        avatar:string,
+        content:string,
+        images?:string[],
+        star_count:number,
+        reply_count:number,
+        create_at:string
+    }
 }

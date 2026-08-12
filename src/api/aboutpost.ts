@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -48,4 +48,8 @@ export async function getpostcomment():Promise<commentres<comment[]>>{
 
 export async function getpostreply():Promise<commentres<comment[]>>{
     return await request1.get('/comment2')
+}
+
+export  async function sendcomment({post_id,content,images}:{post_id:number,content:string,images:string[]}):Promise<sendcommentres>{
+    return await request.post('/comment/create',{post_id,content,images})
 }
