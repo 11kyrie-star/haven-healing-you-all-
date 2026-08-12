@@ -57,3 +57,22 @@ export interface postitem{
 }
 
 export type getpost=getpostRes<getpostdata>
+
+export interface comment{
+    id:number,
+    post_id:number,
+    user_id:number,
+    parent_id:null | number,
+    avatar:string,
+    username:string,
+    content:string,
+    create_at:string,
+    star_count:number,
+    reply_count:number
+}
+
+export interface commentres<T>{
+    status:number,
+    msg:string,
+    data:T
+}

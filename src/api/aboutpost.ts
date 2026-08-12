@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -33,4 +33,19 @@ export async function getpostapi({page,size}:{page:number,size:number}):Promise<
             size
         }
     })
+}
+
+import axios from "axios";
+const request1=axios.create({
+    baseURL:'http://localhost:5173'
+})
+request1.interceptors.response.use((config)=>{
+    return config.data
+})
+export async function getpostcomment():Promise<commentres<comment[]>>{
+    return await request1.get('/comment')
+}
+
+export async function getpostreply():Promise<commentres<comment[]>>{
+    return await request1.get('/comment2')
 }
