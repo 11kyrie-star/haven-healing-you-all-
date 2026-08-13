@@ -1,5 +1,5 @@
 ﻿<template>
-<div class="editor-container" :style="{'margin-top':datafa.margintop}">
+<div class="editor-container" :style="{'margin-top':datafa.margintop}" :class="{flash:isflash}">
     <div class="editor-body">
        <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" @keydown="onkeydown" ref="editorinput" :style="{'min-height':currentminheight}"></div>
        <span class="placeholder" v-show="showplaceholder && decide==='comment'">评论</span>
@@ -20,7 +20,8 @@
                 <tag v-show="showtag" @select="inserttag" :decide="decide!" ref="tagtent"></tag>
             </div>
             <div class="button">
-                <el-button type="primary" @click="sendpost" :loading="load">发表</el-button>
+                <el-button type="primary" v-if="replybtn==='reply'" @click="sendreply" :loading="loadreply">回复</el-button>
+                <el-button type="primary" v-else @click="sendpost" :loading="load">发表</el-button>
             </div>
         </div>
     </div>
@@ -31,6 +32,13 @@
 .editor-container{
     width: 100%;
     min-height: 6vh;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+    &.flash{
+        border-color: #ef7d8e;
+        box-shadow: 0 0 12px rgba(255, 107, 129, 0.5);
+        animation: flash-border 1.2s ease;
+    }
     .editor-body{
         width: 100%;
         height: fit-content;
@@ -111,6 +119,10 @@
         }
     }
 }
+@keyframes flash-border{
+    0%   { border-color: #ee788a; box-shadow: 0 0 16px rgba(255,107,129,0.6); }
+    100% { border-color: transparent; box-shadow: none; }
+}
 </style>
 
 <script setup lang="ts">
@@ -119,7 +131,7 @@ import { onClickOutside } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
 import { ref,defineAsyncComponent,computed,createVNode,render} from 'vue';
-import { postpicApi,sendpostapi ,sendcomment} from '@/api/aboutpost.ts';
+import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
 import { findsensitvie } from '@/utils/sensitvie.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
@@ -133,6 +145,18 @@ const showchange2=ref(false)
 let showtool=ref(false)
 let showtag=ref(false)
 let showchange3=ref(false)
+//用于PostCard组件改变我们的编辑框状态
+const replyId=ref<number | null>()
+const replybtn=ref<string>()
+const flash=(replyid:number,name:string)=>{
+isflash.value=true
+replyId.value=replyid
+replybtn.value=name
+setTimeout(()=>{isflash.value=false},1200)
+}
+defineExpose({flash})
+const isflash=ref(false)
+
 const emit=defineEmits<{
     newcomment:[comment:comment]
 }>()
@@ -598,5 +622,39 @@ const sendpost=async ()=>{
             load.value=false
         }
     }
+}
+const loadreply=ref(false)
+//回复评论
+const sendreply=async ()=>{
+const edit=editorinput.value
+        if(!edit) return
+        const text=edit.textContent.replace(/\u2008/g,'').trim()
+        if(text.length===0){
+            currentminheight.value='10vh'
+            return ElMessage.warning('回复不能为空')
+        }
+        const clone=edit.cloneNode(true) as HTMLElement
+        const grid=clone.querySelector('[data-image-grid]')
+        if(grid){grid.remove()}
+        const data=clone.innerHTML
+        const sensitive=findsensitvie(clone.textContent)
+        if(sensitive){
+            return ElMessage.warning('您的内容存在敏感词,无法发布')
+        }
+        const cleanhtml=clean(data)
+        try{
+        const res=await sendreplyapi(replyId.value!,cleanhtml,urlList.value)
+        if(res.status===0){
+            ElMessage.success('回复成功')
+            urlList.value=[]
+            editorinput.value.innerHTML=''
+            replyId.value=null
+            replybtn.value=''
+            showplaceholder.value=true
+            emit('newcomment',res.data!)
+        }
+        }finally{
+            loadreply.value=false
+        }
 }
 </script>

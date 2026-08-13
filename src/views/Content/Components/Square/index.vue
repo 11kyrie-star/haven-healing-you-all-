@@ -1,7 +1,7 @@
 <template>
 <div class="post-container">
     <div class="card-item" v-for="item in postlist">
-    <PostCard :id="item.id" :user_id="item.user_id" :avatar="item.avatar" :username="item.username" :create_at="item.created_at" :content="item.content" :comment_count="item.comment_count" :view_count="item.view_count" :images="item.images" :like_count="item.like_count"></PostCard>
+    <PostCard :id="item.id" :user_id="item.user_id" :avatar="item.avatar" :username="item.username" :create_at="item.created_at" :content="item.content" :comment_count="item.comment_count" :view_count="item.view_count" :images="item.images" :like_count="item.like_count" :is_liked="item.is_liked"></PostCard>
     </div>
 </div>
 </template>

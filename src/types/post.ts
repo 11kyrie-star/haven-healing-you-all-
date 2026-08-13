@@ -53,7 +53,8 @@ export interface postitem{
     is_anonymous:0 | 1,
     created_at:string,
     username:string,
-    avatar:string
+    avatar:string,
+    is_liked:number
 }
 
 export type getpost=getpostRes<getpostdata>
@@ -69,7 +70,8 @@ export interface comment{
     create_at:string,
     star_count:number,
     reply_count:number,
-    images?:string[]
+    images?:string[],
+    is_liked:number
 }
 
 export interface commentres<T>{
@@ -92,6 +94,19 @@ export interface sendcommentres{
         images?:string[],
         star_count:number,
         reply_count:number,
-        create_at:string
+        create_at:string,
+        is_liked:number
     }
+}
+
+export interface starpostty{
+    status:number,
+    msg:string,
+    data:{is_liked:number}
+}
+
+export interface starcommentty{
+status:number,
+msg:string,
+data:{is_liked:number}
 }

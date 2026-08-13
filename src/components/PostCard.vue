@@ -41,35 +41,39 @@
         </div>
         <div class="icont-all">
             <div class="star">
-            <el-icon :size="20"><Star /></el-icon>
-            <div class="star-number" style="font-size: 0.3em;font-weight: 200;">{{ props.like_count }}</div>
+            <el-icon :size="20">
+                <Star @click="togglelike" v-if="!islkied"/>
+                <StarFilled v-else class="liked-star" @click="cancelstar"></StarFilled>
+            </el-icon>
+            <div class="star-number" style="font-size: 0.3em;font-weight: 200;">{{ likecount }}</div>
             </div>
             <div class="commt" @click="commenthandle" :class="{active:isCommentactive}">
             <el-icon :size="20"><ChatSquare /></el-icon>
-            <div class="commt-number" style="font-size: 0.3em;font-weight:200;">{{ props.comment_count }}</div>
+            <div class="commt-number" style="font-size: 0.3em;font-weight:200;">{{ commentcount }}</div>
             </div>
         </div>
         </div>
         <div class="show-comment" v-if="showcomment">
         <div class="comment-item" v-for="item in roots" :key="item.id">    
-         <CommentItem :comment="item" @toggle-reply="getreply"></CommentItem>
+         <CommentItem :comment="item" @toggle-reply="getreply" @want-reply="findeditor"></CommentItem>
         </div>     
         </div>
         <div class="push-comment">
-         <Editor margintop="3vh" :showeditor=false minheight="6vh" decide="comment" :post_id="id" @newcomment="addcomment"></Editor>   
+         <Editor ref="editref" margintop="3vh" :showeditor=false minheight="6vh" decide="comment" :post_id="id" @newcomment="addcomment"></Editor>   
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import {View,Star,ChatSquare,ArrowDown} from '@element-plus/icons-vue'
+import {View,Star,ChatSquare,ArrowDown,StarFilled} from '@element-plus/icons-vue'
 import { formatPostTime } from '@/utils/time.ts';
-import {getpostcomment,getpostreply} from '@/api/aboutpost.ts';
+import {getpostcomment,getpostreply,starpost,cancelstarpost} from '@/api/aboutpost.ts';
 import type { comment } from '@/types/post.ts';
 import { computed } from 'vue';
 import Editor from './Editor.vue';
 import CommentItem from './CommentItem.vue';
 import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
 const props=defineProps<{
     id:number,
     user_id:number,
@@ -80,8 +84,45 @@ const props=defineProps<{
     images:string[],
     view_count:number,
     like_count:number,
-    comment_count:number
+    comment_count:number,
+    is_liked:number
 }>()
+const islkied=ref(props.is_liked)
+const likecount=ref(props.like_count)
+const commentcount=ref(props.comment_count)
+//点赞函数
+const togglelike=async()=>{
+    const res=await starpost(props.id)
+    if(res.status===1){
+        return ElMessage.warning('网络异常')
+    }else{
+        islkied.value=res.data.is_liked
+        likecount.value++
+    }
+}
+//取消点赞函数
+const cancelstar=async()=>{
+    const res=await cancelstarpost(props.id)
+    if(res.status===1){
+        return ElMessage.warning('网络异常')
+    }else{
+        islkied.value=res.data.is_liked
+        likecount.value--
+    }
+}
+const data=computed(()=>({
+id:props.id,
+user_id:props.user_id,
+avatar:props.avatar,
+username:props.username,
+create_at:props.create_at,
+content:props.content,
+images:props.images,
+view_count:props.view_count,
+like_count:props.like_count,
+comment_count:props.comment_count,
+is_liked:props.is_liked
+}))
 const gridlayout=computed(()=>{
     const n=props.images.length
     if(n===1)return {cols:1,rows:1,aspect:'16/9'}
@@ -94,8 +135,23 @@ const timestr=computed(()=>{
     return formatPostTime(props.create_at)
 })
 const addcomment=(comment:comment)=>{
-    commentList.value.unshift(comment)
-    roots.value=biuldtree(commentList.value)
+    if(comment.parent_id===null){
+       commentList.value.unshift(comment)
+       roots.value=biuldtree(commentList.value)
+       commentcount.value++
+    }else{
+        const parent=findNode(roots.value,comment.parent_id!)
+        if (parent) {
+            parent.reply_count++ 
+            commentcount.value++                   
+            parent.children.unshift({
+                ...comment,
+                children: [],
+                showreply: false
+            })
+            parent.showreply=true   
+        }                    
+    }
 }
 const commentList=ref<comment[]>([])
 const roots=ref<commentnode[]>([])
@@ -103,6 +159,9 @@ const showcomment=ref(false)
 const isCommentactive=ref(false) //控制按钮的状态
 //点击评论按钮后的处理函数
 const commenthandle=async ()=>{
+if(commentcount.value===0){
+    return
+}
 if(isCommentactive.value===false){
     isCommentactive.value=true
 }else{
@@ -110,7 +169,7 @@ if(isCommentactive.value===false){
 }
 if(showcomment.value===false){
 showcomment.value=true
-const res=await getpostcomment()
+const res=await getpostcomment(props.id)
 commentList.value=res.data
 roots.value=biuldtree(commentList.value)
 }else{
@@ -130,7 +189,8 @@ interface commentnode{
     reply_count:number,
     images?:string[]
     children:commentnode[],
-    showreply:boolean
+    showreply:boolean,
+    is_liked:number
 }
 //把后端返回了数据构建成树
 function biuldtree(list:comment[]):commentnode[]{
@@ -155,12 +215,12 @@ const getreply=async (commId:number)=>{
 const node=findNode(roots.value,commId)
 if(!node) return
 if(node.children.length===0){
-const replies=(await getpostreply()).data
-node.children=replies.map((item:comment)=>({
+const replies=(await getpostreply(commId)).data
+node.children.push(...replies.map((item:comment)=>({
 ...item,
 children:[],
 showreply:false
-}))
+})))
 }
 node.showreply=true
 }
@@ -176,6 +236,13 @@ const findNode=(tree:commentnode[],id:number):commentnode | null=>{
     }
    }
    return null
+}
+const editref=ref<InstanceType<typeof Editor>>()
+//点击回复以后定位评论框
+const findeditor=(id:number,name:string)=>{
+const el=editref.value?.$el as HTMLElement | undefined
+el?.scrollIntoView({behavior:'smooth',block:'center'})
+editref.value?.flash(id,name)
 }
 </script>
 
@@ -275,6 +342,11 @@ const findNode=(tree:commentnode[],id:number):commentnode | null=>{
         justify-content: center;
         align-items: center;
         user-select: none;
+        .liked-star{
+            color: #ff6b81;
+            filter: drop-shadow(0 0 6px rgba(238, 107, 55, 0.5));
+            animation: like-pop 0.3s ease;
+        }
       }
       .commt{
         cursor: pointer;
@@ -285,11 +357,16 @@ const findNode=(tree:commentnode[],id:number):commentnode | null=>{
         user-select: none;
         &.active{
             :deep(.el-icon){
-                color: #409eff;
+                color:#ff6b81;
             }
         }
       }
     }
     }
+}
+@keyframes like-pop{
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
 }
 </style>

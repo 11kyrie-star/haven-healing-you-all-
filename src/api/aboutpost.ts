@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -35,21 +35,34 @@ export async function getpostapi({page,size}:{page:number,size:number}):Promise<
     })
 }
 
-import axios from "axios";
-const request1=axios.create({
-    baseURL:'http://localhost:5173'
-})
-request1.interceptors.response.use((config)=>{
-    return config.data
-})
-export async function getpostcomment():Promise<commentres<comment[]>>{
-    return await request1.get('/comment')
+export async function getpostcomment(postId:number,page?:number,size?:number):Promise<commentres<comment[]>>{
+    return await request.get(`comment/list/${postId}`)
 }
 
-export async function getpostreply():Promise<commentres<comment[]>>{
-    return await request1.get('/comment2')
+export async function getpostreply(parent_id:number,page?:number,size?:number):Promise<commentres<comment[]>>{
+    return await request.get(`/reply/list/${parent_id}`)
 }
 
 export  async function sendcomment({post_id,content,images}:{post_id:number,content:string,images:string[]}):Promise<sendcommentres>{
     return await request.post('/comment/create',{post_id,content,images})
+}
+
+export async function starpost(id:number):Promise<starpostty>{
+    return await request.post(`/post/${id}/like`)
+}
+
+export async function cancelstarpost(id:number):Promise<starpostty>{
+    return await request.post(`/post/${id}/unlike`)
+}
+
+export async function commentstar(commentId:number):Promise<starcommentty>{
+    return await request.post(`/comment/${commentId}/like`)
+}
+
+export async function cancelcomentstar(commentId:number):Promise<starcommentty>{
+    return await request.post(`/comment/${commentId}/unlike`)
+}
+
+export async function sendreplyapi(parent_id:number,content:string,images?:string[]):Promise<sendcommentres>{
+    return await request.post('/reply/create',{parent_id,content,images})
 }
