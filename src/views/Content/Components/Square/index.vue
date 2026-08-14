@@ -1,7 +1,7 @@
 <template>
 <div class="post-container">
-    <div class="card-item" v-for="item in postlist">
-    <PostCard :id="item.id" :user_id="item.user_id" :avatar="item.avatar" :username="item.username" :create_at="item.created_at" :content="item.content" :comment_count="item.comment_count" :view_count="item.view_count" :images="item.images" :like_count="item.like_count" :is_liked="item.is_liked"></PostCard>
+    <div class="card-item" v-for="item in postlist" :key="item.id">
+    <PostCard  :id="item.id" :user_id="item.user_id" :avatar="item.avatar" :username="item.username" :create_at="item.created_at" :content="item.content" :comment_count="item.comment_count" :view_count="item.view_count" :images="item.images" :like_count="item.like_count" :is_liked="item.is_liked"></PostCard>
     </div>
 </div>
 </template>
@@ -9,8 +9,10 @@
 <script setup lang="ts">
 import PostCard from '@/components/PostCard.vue';
 import { getpostapi } from '@/api/aboutpost';
-import {ref,onMounted} from 'vue'
-import type { getpost,postitem } from '@/types/post';
+import {ref,onMounted,watch} from 'vue'
+import type { getpost,postitem ,post} from '@/types/post';
+import { usePostFeedStore } from '@/stores/postfeed';
+const feedpost=usePostFeedStore()
 let res=ref<getpost>()
 let postlist=ref<postitem[]>([])
 onMounted(async ()=>{
@@ -18,7 +20,15 @@ onMounted(async ()=>{
     res.value=postres
     postlist.value=res.value.data.list
 })
-
+const addpost=(post:post)=>{
+    postlist.value.unshift(post)
+}
+watch(()=>feedpost.newpost,(P)=>{
+    if(P){
+        addpost(P)
+        feedpost.consume()
+    }
+})
 </script>
 
 <style scoped lang="scss">

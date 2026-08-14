@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -35,6 +35,17 @@ export async function getpostapi({page,size}:{page:number,size:number}):Promise<
     })
 }
 
+export async function getposthelpapi({page,size}:{page:number,size:number}):Promise<getpost>{
+    return await request.get('/post/list/help',{params:{page,size}})
+}
+
+export async function getposttextapi({page,size}:{page:number,size:number}):Promise<getpost>{
+    return await request.get('/post/list/text',{params:{page,size}})
+}
+
+export async function getpostdailyapi({page,size}:{page:number,size:number}):Promise<getpost>{
+    return await request.get('/post/list/daily',{params:{page,size}})
+}
 export async function getpostcomment(postId:number,page?:number,size?:number):Promise<commentres<comment[]>>{
     return await request.get(`comment/list/${postId}`)
 }

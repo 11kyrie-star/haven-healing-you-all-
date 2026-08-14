@@ -68,6 +68,7 @@
 import {View,Star,ChatSquare,ArrowDown,StarFilled} from '@element-plus/icons-vue'
 import { formatPostTime } from '@/utils/time.ts';
 import {getpostcomment,getpostreply,starpost,cancelstarpost} from '@/api/aboutpost.ts';
+import type { post } from '@/types/post.ts';
 import type { comment } from '@/types/post.ts';
 import { computed } from 'vue';
 import Editor from './Editor.vue';
@@ -86,6 +87,9 @@ const props=defineProps<{
     like_count:number,
     comment_count:number,
     is_liked:number
+}>()
+const emit=defineEmits<{
+    addpostagain:[post:post]
 }>()
 const islkied=ref(props.is_liked)
 const likecount=ref(props.like_count)
@@ -332,7 +336,7 @@ editref.value?.flash(id,name)
     .icont-all{
         display: flex;
         margin-top: 8px;
-        margin-left:80%;
+        margin-left:75%;
         gap: 60%;
         user-select: none;
       .star{

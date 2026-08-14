@@ -1,14 +1,26 @@
 <template>
 <div class="navigation-container">
     <div class="navigation">
-        <div v-for="item in ['广场','求助','文案','日常','我的']" @click="actvieTap=item" :class="{active:actvieTap===item}" :key="item">{{ item }}</div>
+        <div v-for="item in ['广场','求助','文案','日常','我的']" @click="actvieTap=item;goto(item)" :class="{active:actvieTap===item}" :key="item" >{{ item }}</div>
     </div>
 </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from 'vue'
+import { useRouter } from 'vue-router';
 const actvieTap=ref('广场')
+const router=useRouter()
+const goto=(item:string)=>{
+const pathmap:Record<string,string>={
+'广场':'square',
+'求助':'help',
+'文案':'text',
+'日常':'daily',
+'我的':'my'
+}
+router.push(`/layout/content/${pathmap[item]}`)
+}
 </script>
 
 <style scoped lang="scss">

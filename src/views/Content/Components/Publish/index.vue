@@ -9,7 +9,7 @@
     <span class="time">{{ time }}</span>
     <Name left="25%" top="2.9vh" fontsize="1.5em" v-show="denoshow===0"></Name>
     <div class="name" v-show="denoshow===1">匿名用户</div>
-    <Editor margintop="4vh" minheight="30vh" decide="publish" :showeditor="true" :deciname="denoshow"></Editor>
+    <Editor margintop="4vh" minheight="30vh" decide="publish" :showeditor="true" :deciname="denoshow" @newpost="addpost"></Editor>
     <el-checkbox v-model="checked" @change="noshow" class="show-name">匿名</el-checkbox>
 </div>
 </template>
@@ -18,7 +18,10 @@
 import Avatar from '@/components/Avatar.vue';
 import Editor from '@/components/Editor.vue';
 import Name from '@/views/Background/Components/Name/index.vue'
+import type { post } from '@/types/post';
+import { usePostFeedStore } from '@/stores/postfeed';
 import { ref,onMounted,onUnmounted } from 'vue';
+const feedpost=usePostFeedStore()
 let time=ref()
 //用于判断是否匿名
 const denoshow=ref(0)
@@ -40,6 +43,9 @@ const noshow=()=>{
     }else{
         denoshow.value=1
     }
+}
+const addpost=(post:post)=>{
+feedpost.publish(post)
 }
 </script>
 

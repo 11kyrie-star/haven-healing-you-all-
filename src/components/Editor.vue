@@ -132,6 +132,7 @@ import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
 import { ref,defineAsyncComponent,computed,createVNode,render} from 'vue';
 import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
+import type { post } from '@/types/post.ts';
 import { findsensitvie } from '@/utils/sensitvie.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
@@ -158,7 +159,8 @@ defineExpose({flash})
 const isflash=ref(false)
 
 const emit=defineEmits<{
-    newcomment:[comment:comment]
+    newcomment:[comment:comment],
+    newpost:[post:post]
 }>()
 const tagfu=()=>{
     if(!showtag.value){
@@ -581,6 +583,7 @@ const sendpost=async ()=>{
                 editorinput.value.innerHTML=''
                 urlList.value=[]
                 showplaceholder.value=true
+                emit('newpost',res.data)
             }
         }finally{
             load.value=false

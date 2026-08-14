@@ -22,7 +22,7 @@ const router = createRouter({
         {path:'help',component:()=>import('@/views/Content/Components/Help/index.vue')},
         {path:'text',component:()=>import('@/views/Content/Components/Text/index.vue')},
         {path:'daily',component:()=>import('@/views/Content/Components/Daily/index.vue')},
-        {path:'My',component:()=>import('@/views/Content/Components/My/index.vue')}
+        {path:'my',component:()=>import('@/views/Content/Components/My/index.vue')}
       ]
       }
       ]
