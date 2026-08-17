@@ -1,5 +1,5 @@
 <template>
-    <div class="card-container">
+    <div class="card-container" ref="cardRef">
         <div class="leave-word">
             <el-dropdown trigger="click">
                <span>
@@ -37,7 +37,7 @@
             <el-icon>
                 <View style="color: rgba(128, 128, 128, 0.3);"></View>
             </el-icon>
-            <div class="looking-number">{{ props.view_count }}</div>
+            <div class="looking-number">{{ viewcount}}</div>
         </div>
         <div class="icont-all">
             <div class="star">
@@ -66,14 +66,15 @@
 
 <script setup lang="ts">
 import {View,Star,ChatSquare,ArrowDown,StarFilled} from '@element-plus/icons-vue'
+import { useIntersectionObserver } from '@vueuse/core';
 import { formatPostTime } from '@/utils/time.ts';
-import {getpostcomment,getpostreply,starpost,cancelstarpost} from '@/api/aboutpost.ts';
+import {getpostcomment,getpostreply,starpost,cancelstarpost,addpostview} from '@/api/aboutpost.ts';
 import type { post } from '@/types/post.ts';
 import type { comment } from '@/types/post.ts';
 import { computed } from 'vue';
 import Editor from './Editor.vue';
 import CommentItem from './CommentItem.vue';
-import { ref } from 'vue';
+import { ref,onBeforeUnmount } from 'vue';
 import { ElMessage } from 'element-plus';
 const props=defineProps<{
     id:number,
@@ -88,6 +89,7 @@ const props=defineProps<{
     comment_count:number,
     is_liked:number
 }>()
+const viewcount=ref(props.view_count)
 const emit=defineEmits<{
     addpostagain:[post:post]
 }>()
@@ -248,6 +250,35 @@ const el=editref.value?.$el as HTMLElement | undefined
 el?.scrollIntoView({behavior:'smooth',block:'center'})
 editref.value?.flash(id,name)
 }
+//帖子浏览量+1
+const cardRef=ref()
+let countef=false
+let time:number| null=null
+const {stop}=useIntersectionObserver(cardRef,([entry])=>{
+if(countef) return stop()
+if(entry?.isIntersecting){
+     time=window.setTimeout(async()=>{
+          countef=true
+          stop()
+          const res=await addpostview(props.id)
+          if(res.status===0){
+            viewcount.value++
+          }
+     },3000)
+}else{
+    if(time){
+        clearTimeout(time)
+        time=null
+    }
+}
+},{threshold:0.8})
+onBeforeUnmount(()=>{
+    if(time){
+        clearTimeout(time)
+        time=null
+    }
+    stop()
+})
 </script>
 
 <style scoped lang="scss">

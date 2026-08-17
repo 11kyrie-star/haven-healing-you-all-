@@ -5,7 +5,7 @@
         </div>
         <div class="name">{{ comment.username }}</div>
         <div class="content">
-            <div>{{ comment.content }}</div>
+            <div v-html="comment.content"></div>
         </div>
         <div class="picture" v-if="comment.images?.length">
             <img :src=comment.images[0] alt="">

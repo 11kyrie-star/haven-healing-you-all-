@@ -532,7 +532,7 @@ const blur=()=>{
     const text=(editorinput.value?.innerText || '').trim()
     showplaceholder.value=(text.length===0)
     if(props.decide==='comment'){
-        if(text.length){
+        if(text.length || urlList.value.length){
             showtool.value=true
             currentminheight.value='10vh'
         }else{
@@ -563,7 +563,7 @@ const sendpost=async ()=>{
         const edit=editorinput.value
         if(!edit){return}
         const text=edit.textContent.replace(/\u2008/g,'').trim()
-        if(text.length===0){
+        if(text.length===0 && urlList.value.length===0){
             return ElMessage.warning('帖子内容不能为空')
         }
         const clone=edit.cloneNode(true) as HTMLElement
@@ -593,7 +593,7 @@ const sendpost=async ()=>{
         const edit=editorinput.value
         if(!edit) return
         const text=edit.textContent.replace(/\u2008/g,'').trim()
-        if(text.length===0){
+        if(text.length===0 && urlList.value.length===0){
             currentminheight.value='10vh'
             return ElMessage.warning('评论不能为空')
         }

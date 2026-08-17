@@ -148,4 +148,14 @@ msg:string,
 data:{is_liked:number}
 }
 
+export interface postviewres{
+    status:number,
+    msg:string
+}
+
+export interface changepoststatusres{
+    status:number,
+    msg:string
+}
+
 

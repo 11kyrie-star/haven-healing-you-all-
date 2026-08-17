@@ -83,7 +83,7 @@ function avatarway(command: string) {
         z-index: 1;
         pointer-events: none;
         min-height:100vh;
-        background: radial-gradient(ellipse 80% 50% at 70% 15%,rgb(231, 175, 84) 0%,transparent 65%),
+        background: radial-gradient(ellipse 80% 50% at 70% 15%,rgb(233, 189, 124) 0%,transparent 65%),
          radial-gradient(ellipse 60% 40% at 70%% 35%, rgba(220, 120, 78, 0.18) 0%, transparent 60%),
          linear-gradient(
                 180deg,

@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post,postviewres,changepoststatusres} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -76,4 +76,18 @@ export async function cancelcomentstar(commentId:number):Promise<starcommentty>{
 
 export async function sendreplyapi(parent_id:number,content:string,images?:string[]):Promise<sendcommentres>{
     return await request.post('/reply/create',{parent_id,content,images})
+}
+
+export async function addpostview(id:number):Promise<postviewres>{
+    return await request.post(`/post/${id}/view`)
+}
+
+export async function getmypost({page,size}:{page:number,size:number}):Promise<getpost>{
+    return await request.get('/post/list/mine',{
+        params:{page,size}
+    })
+}
+
+export async function changepoststatus(id:number,is_public:number):Promise<changepoststatusres>{
+return await request.put(`/post/${id}/visibility`,{is_public})
 }

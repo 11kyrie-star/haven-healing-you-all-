@@ -1,0 +1,1 @@
+<template>我是留言板组件</template>
