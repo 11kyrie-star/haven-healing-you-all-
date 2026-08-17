@@ -14,7 +14,7 @@ const router = createRouter({
       children:[{
         path:'content',
         component:()=>import('@/views/Content/index.vue'),
-        redirect:'layout/content/square',
+        redirect:'/layout/content/square',
         children:[{
           path:'square',
           component:()=>import('@/views/Content/Components/Square/index.vue')
@@ -25,7 +25,7 @@ const router = createRouter({
         {path:'mypost',component:()=>import('@/views/Content/Components/My/Components/Post/index.vue')},
         {path:'leaveword',component:()=>import('@/views/Content/Components/My/Components/Leaveword/index.vue')},
         {path:'mycomment',component:()=>import('@/views/Content/Components/My/Components/Mycomment/index.vue')},
-        {path:'mylike',component:()=>import('@/views/Content/Components/My/Components/Like.vue')}
+        {path:'mylike',component:()=>import('@/views/Content/Components/My/Components/Like/index.vue')}
       ]
       }
       ]

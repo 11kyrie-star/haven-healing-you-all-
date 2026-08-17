@@ -95,3 +95,7 @@ return await request.put(`/post/${id}/visibility`,{is_public})
 export async function deletepostapi(id:number):Promise<deletepostres>{
     return await request.delete(`/post/${id}`)
 }
+
+export async function getlikepost({page,size}:{page:number,size:number}):Promise<getpost>{
+    return await request.get('/post/list/liked')
+}
