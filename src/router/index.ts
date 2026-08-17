@@ -25,7 +25,8 @@ const router = createRouter({
         {path:'mypost',component:()=>import('@/views/Content/Components/My/Components/Post/index.vue')},
         {path:'leaveword',component:()=>import('@/views/Content/Components/My/Components/Leaveword/index.vue')},
         {path:'mycomment',component:()=>import('@/views/Content/Components/My/Components/Mycomment/index.vue')},
-        {path:'mylike',component:()=>import('@/views/Content/Components/My/Components/Like/index.vue')}
+        {path:'mylike',component:()=>import('@/views/Content/Components/My/Components/Like/index.vue')},
+        {path:'detail/:id',component:()=>import('@/views/Content/Components/Detail/index.vue')}
       ]
       }
       ]

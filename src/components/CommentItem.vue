@@ -110,12 +110,16 @@ timestr.value=formatPostTime(props.comment.create_at)
 <style scoped lang="scss">
 .comment-container{
     width: 100%;
-    min-height: 15vh;
-    padding: 5px;
-    background-color:rgba(244, 199, 199, 0.3);
+    padding: 8px 10px;
+    background-color: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(224, 167, 167, 0.18);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(120, 60, 40, 0.05);
     position: relative;
+    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    color: rgba(50, 50, 50, 0.85);
     &.nested{
-        background-color: rgba(244, 199, 199, 0.3);
+        background-color: rgba(255, 255, 255, 0.5);
         zoom: 0.7;
         padding-left: 20px;
     }
@@ -124,7 +128,13 @@ timestr.value=formatPostTime(props.comment.create_at)
         left: 90%;
         top: 5%;
         cursor: pointer;
-        transition: color 0.3s ease,font-size 0.3s ease,transform 0.3s ease,box-shadow 0.3s ease;
+        font-size: 0.8em;
+        font-weight: 600;
+        color: rgba(50, 50, 50, 0.55);
+        transition: color 0.3s ease, font-size 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        &:hover{
+            color: #c6401f;
+        }
         &.active{
             color: #f34f67;
             font-size: 1em;
@@ -133,7 +143,9 @@ timestr.value=formatPostTime(props.comment.create_at)
         }
     }
     .name{
-        color: #2d2d2d;
+        color: rgba(50, 50, 50, 0.9);
+        font-size: 0.9em;
+        font-weight: 700;
         position: absolute;
         left: 14%;
         top: 1.7vh;
@@ -144,7 +156,7 @@ timestr.value=formatPostTime(props.comment.create_at)
         height: 45px;
         border-radius: 50%;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.68);
+        box-shadow: 0 2px 8px rgba(120, 60, 40, 0.15);
         border: 2px solid rgba(255,255,255,0.9);
         position: relative;
         &::after{
@@ -162,8 +174,10 @@ timestr.value=formatPostTime(props.comment.create_at)
         }
     }
     .content{
-        color: #555555;
-        margin-top: 5px;
+        color: rgba(50, 50, 50, 0.75);
+        font-size: 0.9em;
+        line-height: 1.6;
+        margin-top: 6px;
         cursor: default;
     }
     .icons-all{
@@ -177,9 +191,15 @@ timestr.value=formatPostTime(props.comment.create_at)
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            gap: 2px;
             font-size: 0.8em;
             user-select: none;
             cursor: pointer;
+            color: rgba(50, 50, 50, 0.55);
+            transition: color 0.2s ease;
+            &:hover{
+                color: #ff6b81;
+            }
             .liked-star{
                 color: #ff6b81;
                 filter: drop-shadow(0 0 6px rgba(230, 97, 70, 0.5));
@@ -191,9 +211,15 @@ timestr.value=formatPostTime(props.comment.create_at)
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            gap: 2px;
             font-size: 0.8em;
             user-select: none;
             cursor: pointer;
+            color: rgba(50, 50, 50, 0.55);
+            transition: color 0.2s ease;
+            &:hover{
+                color: #ff6b81;
+            }
             &.active{
                 :deep(.el-icon){
                     color:#ff6b81;
@@ -202,22 +228,28 @@ timestr.value=formatPostTime(props.comment.create_at)
         }
     }
     .time{
-        color: #999999;
-        font-size: 0.8em;
+        color: rgba(128, 128, 128, 0.6);
+        font-size: 0.75em;
+        font-weight: 300;
         margin-top: 10px;
         user-select: none;
     }
     .picture{
         width: 120px;
         height: 120px;
-        border-radius: 6px;
+        border-radius: 8px;
         overflow: hidden;
         margin-top: 10px;
         cursor: pointer;
+        box-shadow: 0 2px 8px rgba(120, 60, 40, 0.12);
         img{
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        &:hover img{
+            transform: scale(1.05);
         }
     }
 }

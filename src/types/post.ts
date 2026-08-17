@@ -163,3 +163,64 @@ export interface deletepostres{
     msg:string
 }
 
+export interface mycommentpostres{
+status:number,
+msg:string,
+data:{
+    page:number,
+    size:number,
+    list:myconmentitem[]
+}
+}
+
+export interface myconmentitem{
+    id:number,
+    user_id:number,
+    content:string,
+    images:string[],
+    tags:string[],
+    category:string,
+    view_count:number,
+    like_count:number,
+    comment_count:number,
+    hot_value:number,
+    is_public:number,
+    is_anonymous:number,
+    created_at:string,
+    username:string,
+    avatar:string,
+    is_liked:number,
+    my_comment:{
+        id:number,
+        parent_id:null,
+        content:string,
+        images:string[],
+        star_count:number,
+        reply_count:number,
+        create_at:string
+    }
+}
+
+export interface detaildata{
+    status:number,
+    msg:string,
+    data:{
+        id:number,
+        user_id:number,
+        content:string,
+        tags:string[],
+        images:string[],
+        category:string,
+        view_count:number,
+        like_count:number,
+        comment_count:number,
+        hot_value:number,
+        is_public:1 | 0,
+        is_anonymous:0 | 1,
+        status:number,
+        created_at:string,
+        username:string,
+        avatar:string,
+        is_liked:number
+    }
+}

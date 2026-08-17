@@ -26,7 +26,7 @@
             <div class="image-grid"
             :style="{display:'grid',gridTemplateColumns:gridlayout.special? '2fr 1fr':`repeat(${gridlayout.cols},1fr)`,gridTemplateRows:
                 gridlayout.special?'1fr 1fr':`repeat(${gridlayout.rows},1fr)`,gap:'4px',aspectRatio:gridlayout.special?'16/9':gridlayout.aspect
-            ,borderRadius:'8px',overflow:'hidden',marginTop:'10px',boxShadow:'box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08)'}" >
+            ,borderRadius:'8px',overflow:'hidden',marginTop:'10px',boxShadow:'0 2px 12px rgba(120, 60, 40, 0.08)'}" >
             <div v-for="(item,index) in props.images" :style="gridlayout.special && index===0?{gridRow:'1/3'}:{}">
               <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;">
             </div>
@@ -286,17 +286,25 @@ onBeforeUnmount(()=>{
     width: 30vw;
     min-height: 40vh;
     margin-top: 3vh;
-    background-color:rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 12px;
     box-shadow:0 2px 12px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.3s,transform 0.3s;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
     padding: 3%;
     position: relative;
+    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    color: rgba(50, 50, 50, 0.85);
     .leave-word{
         position: absolute;
         cursor: pointer;
         left: 90%;
         top: 15px;
+        color: rgba(50, 50, 50, 0.55);
+        transition: color 0.2s ease;
+        &:hover{
+            color: #c6401f;
+        }
     }
     &:hover{
         transform: translateY(-3px);
@@ -306,12 +314,15 @@ onBeforeUnmount(()=>{
         width: fit-content;
         height: fit-content;
         display: flex;
-        gap: 3%;
+        align-items: center;
+        gap: 10px;
          .avatar{
         width: 4vw;
         height: 8vh;
         background-color: white;
         border-radius: 55%;
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 2px 8px rgba(120, 60, 40, 0.15);
         user-select: none;
         img{
             width:100%;
@@ -327,23 +338,33 @@ onBeforeUnmount(()=>{
         display: flex;
         flex-direction: column;
         align-items: center;
+        gap: 2px;
         .name{
           user-select: none;
           margin-top: 2px;  
           flex-shrink: 0;
-          font-size: 1.2em;
+          font-size: 1.05em;
+          font-weight: 700;
+          color: rgba(50, 50, 50, 0.9);
        }
        .time{
         user-select: none;
         flex-shrink: 0;
-        font-size: 0.8em;
+        font-size: 0.75em;
         font-weight: 300;
+        color: rgba(128, 128, 128, 0.6);
        }
     }
     }
     .post-content{
-        margin-top: 10px;
+        margin-top: 12px;
         cursor: default;
+        font-size: 0.95em;
+        line-height: 1.7;
+        word-break: break-word;
+    }
+    .show-comment{
+        margin-top: 10px;
     }
     .icon{
          display: flex;
@@ -357,18 +378,20 @@ onBeforeUnmount(()=>{
           display: flex;
           justify-content: center;
           align-items: center;
+          gap: 4px;
           .looking-number{
             cursor: default;
-            font-size: 0.5em;
-            color:rgba(128, 128, 128, 0.3) ;
+            font-size: 0.8em;
+            color:rgba(128, 128, 128, 0.45);
             user-select: none;
           }
     }
     .icont-all{
         display: flex;
+        align-items: center;
         margin-top: 8px;
-        margin-left:75%;
-        gap: 60%;
+        margin-left: auto;
+        gap: 24px;
         user-select: none;
       .star{
         cursor: pointer;
@@ -377,6 +400,12 @@ onBeforeUnmount(()=>{
         justify-content: center;
         align-items: center;
         user-select: none;
+        gap: 2px;
+        color: rgba(50, 50, 50, 0.55);
+        transition: color 0.2s ease;
+        &:hover{
+            color: #ff6b81;
+        }
         .liked-star{
             color: #ff6b81;
             filter: drop-shadow(0 0 6px rgba(238, 107, 55, 0.5));
@@ -390,6 +419,12 @@ onBeforeUnmount(()=>{
         justify-content: center;
         align-items: center;
         user-select: none;
+        gap: 2px;
+        color: rgba(50, 50, 50, 0.55);
+        transition: color 0.2s ease;
+        &:hover{
+            color: #ff6b81;
+        }
         &.active{
             :deep(.el-icon){
                 color:#ff6b81;

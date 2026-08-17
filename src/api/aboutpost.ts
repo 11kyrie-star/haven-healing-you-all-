@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post,postviewres,changepoststatusres,deletepostres} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post,postviewres,changepoststatusres,deletepostres,mycommentpostres,detaildata} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -98,4 +98,12 @@ export async function deletepostapi(id:number):Promise<deletepostres>{
 
 export async function getlikepost({page,size}:{page:number,size:number}):Promise<getpost>{
     return await request.get('/post/list/liked')
+}
+
+export async function getmycommentpost({page,size}:{page:number,size:number}):Promise<mycommentpostres>{
+    return await request.get('/comment/mine')
+}
+
+export async function detailpostapi(id:number):Promise<detaildata>{
+    return await request.get(`/post/detail/${id}`)
 }
