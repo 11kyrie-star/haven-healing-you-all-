@@ -7,9 +7,9 @@
                </span>
                <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item>删除</el-dropdown-item>
-                    <el-dropdown-item @click="Changestatus" v-show="status">私密</el-dropdown-item>
-                    <el-dropdown-item @click="Changepublic">公开</el-dropdown-item>
+                    <el-dropdown-item @click="deletepost">删除</el-dropdown-item>
+                    <el-dropdown-item @click="Changestatus" v-if="status">私密</el-dropdown-item>
+                    <el-dropdown-item @click="Changepublic" v-if="!status">公开</el-dropdown-item>
                 </el-dropdown-menu>
                </template>
             </el-dropdown>
@@ -71,7 +71,7 @@
 import {View,Star,ChatSquare,ArrowDown,StarFilled,Lock} from '@element-plus/icons-vue'
 import { useIntersectionObserver } from '@vueuse/core';
 import { formatPostTime } from '@/utils/time.ts';
-import {getpostcomment,getpostreply,starpost,cancelstarpost,addpostview,changepoststatus} from '@/api/aboutpost.ts';
+import {getpostcomment,getpostreply,starpost,cancelstarpost,addpostview,changepoststatus,deletepostapi} from '@/api/aboutpost.ts';
 import type { post } from '@/types/post.ts';
 import type { comment } from '@/types/post.ts';
 import { computed } from 'vue';
@@ -91,11 +91,13 @@ const props=defineProps<{
     like_count:number,
     comment_count:number,
     is_liked:number,
-    is_public:1 |0
+    is_public:1 |0,
+    index:number
 }>()
 const viewcount=ref(props.view_count)
 const emit=defineEmits<{
-    addpostagain:[post:post]
+    addpostagain:[post:post],
+    delete:[id:number]
 }>()
 const islkied=ref(props.is_liked)
 const likecount=ref(props.like_count)
@@ -298,6 +300,13 @@ const Changepublic=async()=>{
         status.value=1
     }
 }
+//删除帖子
+const deletepost=async()=>{
+const res=await deletepostapi(props.id)
+if(res.status===0){
+    emit('delete',props.index)
+}
+}
 </script>
 
 <style scoped lang="scss">
@@ -314,7 +323,7 @@ const Changepublic=async()=>{
     .status{
         position: absolute;
         left: 78%;
-        top: 1%;
+        top: 2.2%;
         color: #7c8bb5;
         display: flex;
         justify-content: center;

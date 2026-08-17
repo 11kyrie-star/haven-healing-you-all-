@@ -158,4 +158,8 @@ export interface changepoststatusres{
     msg:string
 }
 
+export interface deletepostres{
+    status:number,
+    msg:string
+}
 

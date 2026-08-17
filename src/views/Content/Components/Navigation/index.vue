@@ -4,7 +4,7 @@
         <div v-for="item in ['广场','求助','文案','日常']" @click="goto(item)" :class="{active:actvieTap===item}" :key="item" >{{ item }}</div>
         <div @click="toggleMenu"><span  style="user-select: none;" :class="{active:actvieTap==='我的'}">{{ mylabel }}</span><el-icon :size="15" class="arrow" :class="{'arrow-open':menuVisible}"><ArrowDown></ArrowDown></el-icon></div>
         <Transition name="menu-drop">
-            <div v-show="menuVisible" class="menu">
+            <div v-show="menuVisible" class="menu" style="user-select: none;">
                 <div class="item" v-for="item in ['留言板','帖子','喜欢','评论']" @click="ChangeMy(item)">{{ item }}</div>
             </div>
         </Transition>
@@ -43,9 +43,9 @@ const mypages=['leaveword','mypost','mylike','mycomment']
 const currentkey=computed(()=>(
 route.path.split('/').pop() || 'square'
 ))
-const actvieTap=computed(()=>(mypages.includes(currentkey.value)?'我的':pathmap[currentkey.value] || '广场'))
 //将pathmap进行对调
 const labelmap=Object.fromEntries(Object.entries(pathmap).map(([label,path])=>[path,label]))
+const actvieTap=computed(()=>(mypages.includes(currentkey.value)?'我的':labelmap[currentkey.value] || '广场'))
 const mylabel=computed(()=>(mypages.includes(currentkey.value)?labelmap[currentkey.value]:'我的'))
 </script>
 

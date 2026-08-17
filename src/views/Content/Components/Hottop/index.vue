@@ -1,6 +1,6 @@
 ﻿<template>
 <div class="hottop-container">
-    <div class="hot-title">今日热榜</div>
+    <div class="hot-title" style="user-select: none;">今日热榜</div>
     <div class="hot-contain">
         <div class="hot-item" v-for="item in hotlist" :key="item.id"><div class="top">{{ item.id }}</div><p class="hot-post">{{ item.post }}</p><div class="hot-number">{{ item.hot }}</div><img src="@/assets/fire.svg" alt=""></div>
     </div>      

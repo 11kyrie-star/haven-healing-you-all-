@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post,postviewres,changepoststatusres} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post,postviewres,changepoststatusres,deletepostres} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -90,4 +90,8 @@ export async function getmypost({page,size}:{page:number,size:number}):Promise<g
 
 export async function changepoststatus(id:number,is_public:number):Promise<changepoststatusres>{
 return await request.put(`/post/${id}/visibility`,{is_public})
+}
+
+export async function deletepostapi(id:number):Promise<deletepostres>{
+    return await request.delete(`/post/${id}`)
 }
