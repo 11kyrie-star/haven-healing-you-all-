@@ -28,9 +28,22 @@
 
 <script setup lang="ts">
 import {ref} from 'vue'
-const content=ref<string | null>()
-const submit=()=>{
-    
+import { findsensitvie } from '@/utils/sensitvie';
+import { ElMessage } from 'element-plus';
+import { leavewordapi } from '@/api/aboutpost';
+import { useRoute } from 'vue-router';
+const route=useRoute()
+const id=Number(route.params.id)
+const content=ref<string | null>(null)
+const submit=async()=>{
+    if(findsensitvie(content.value!)){
+        return ElMessage.warning('你的留言存在敏感词汇')
+    }
+    const res=await leavewordapi(id,content.value!)
+    if(res.status===0){
+        ElMessage.success('留言成功')
+        content.value=''
+    }
 }
 </script>
 

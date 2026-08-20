@@ -108,6 +108,6 @@ export async function detailpostapi(id:number):Promise<detaildata>{
     return await request.get(`/post/detail/${id}`)
 }
 
-export async function leavewordapi(id:number,content:string,images:string[]):Promise<leavewordres>{
+export async function leavewordapi(id:number,content:string,images?:string[]):Promise<leavewordres>{
     return await request.post(`/post/${id}/message`)
 }

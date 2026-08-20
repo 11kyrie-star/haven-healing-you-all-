@@ -1,6 +1,7 @@
 <template>
     <div class="post-container">
       <Ban></Ban>
+      <Bubbles></Bubbles>
     </div>
 </template>
 
@@ -27,4 +28,5 @@
 
 <script setup lang="ts">
 import Ban from './Components/Ban.vue';
+import Bubbles from './Components/Bubbles.vue';
 </script>

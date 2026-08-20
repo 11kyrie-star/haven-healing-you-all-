@@ -12,7 +12,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Avatar: typeof import('./components/Avatar.vue')['default']
-    Comment: typeof import('./components/CommentItem.vue/index.js')['default']
     CommentItem: typeof import('./components/CommentItem.vue')['default']
     Editor: typeof import('./components/Editor.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
