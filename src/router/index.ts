@@ -1,5 +1,6 @@
 ﻿import { createRouter, createWebHistory } from "vue-router"
 import { isTokenExpired } from "@/utils/token"
+import { useCrumbStore } from "@/stores/crumb"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -26,7 +27,8 @@ const router = createRouter({
         {path:'leaveword',component:()=>import('@/views/Content/Components/My/Components/Leaveword/index.vue')},
         {path:'mycomment',component:()=>import('@/views/Content/Components/My/Components/Mycomment/index.vue')},
         {path:'mylike',component:()=>import('@/views/Content/Components/My/Components/Like/index.vue')},
-        {path:'detail/:id',component:()=>import('@/views/Content/Components/Detail/index.vue')}
+        {path:'detail/:id',component:()=>import('@/views/Content/Components/Detail/index.vue')},
+        {path:'leaveban/:id',component:()=>import('@/views/Content/Components/LeaveWordBan/index.vue')}
       ]
       }
       ]
@@ -38,7 +40,7 @@ function getStoredToken(): string | null{
      const token=localStorage.getItem('token')
      return token
 }
-
+//路由守卫
 router.beforeEach((to, from, next) => {
   // login page always allowed
   if (to.path === '/') {
@@ -53,5 +55,23 @@ router.beforeEach((to, from, next) => {
   }
 
   next()
+})
+//面包屑历史栈
+const labelMap:Record<string,string>={
+  square:'广场',help:'求助',text:'文案',daily:'日常',mypost:'帖子',mylike:'喜欢',mycomment:'评论',leaveword:'留言',detail:'详情',leaveban:'留言板'
+}
+const toplevel=['square','help','text','daily','mylike','mycomment','mypost','leaveword']
+router.afterEach((to)=>{
+const store=useCrumbStore()
+const pattern=to.matched[to.matched.length-1]?.path ?? ''
+const key=pattern.split('/')[3]
+const exist=store.stack.findIndex(c=>c.path===to.path)
+if(exist!==-1){
+  store.stack=store.stack.slice(0,exist+1)
+}else if(toplevel.includes(key!)) {
+  store.stack=[{label:labelMap[key!]!,path:to.path}]
+}else{
+  store.stack.push({label:labelMap[key!]!,path:to.path})
+}
 })
 export default router

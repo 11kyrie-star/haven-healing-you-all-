@@ -1,7 +1,7 @@
 <template>
     <div class="content-container">
         <Navigation></Navigation>
-        <Nav :show="detail==='detail'"></Nav>
+        <Nav :data="cumbs"></Nav>
        <div class="content">
         <Hottop></Hottop>
         <RouterView></RouterView>
@@ -15,13 +15,10 @@ import Navigation from '@/views/Content/Components/Navigation/index.vue'
 import Hottop from '@/views/Content/Components/Hottop/index.vue'
 import Publish from '@/views/Content/Components/Publish/index.vue'
 import Nav from '@/views/Content/Components/AnotherNaviigation/index.vue'
-import { useRoute } from 'vue-router';
-import {computed,provide} from 'vue'
-const route=useRoute()
-const detail=computed(()=>{
-const arr=route.path.split('/').filter(Boolean)
-return arr.length>=2? arr.at(-2) : ''
-})
+import { useCrumbStore } from '@/stores/crumb'
+import {computed} from 'vue'
+const store=useCrumbStore()
+const cumbs=computed(()=>(store.stack))
 </script>
 
 <style scoped lang="scss">

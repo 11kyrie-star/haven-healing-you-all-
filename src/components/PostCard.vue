@@ -7,7 +7,7 @@
                </span>
                <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item>给作者留言</el-dropdown-item>
+                    <el-dropdown-item @click="leave">给作者留言</el-dropdown-item>
                 </el-dropdown-menu>
                </template>
             </el-dropdown>
@@ -76,6 +76,7 @@ import Editor from './Editor.vue';
 import CommentItem from './CommentItem.vue';
 import { ref,onBeforeUnmount,inject } from 'vue';
 import { ElMessage } from 'element-plus';
+import { useRouter } from 'vue-router';
 const props=defineProps<{
     id:number,
     user_id:number,
@@ -290,6 +291,11 @@ const change=()=>{
     activereplyid.value=null
     const el=editref.value?.$el as HTMLElement | undefined
     el?.scrollIntoView({behavior:'smooth',block:'center'}) 
+}
+const router=useRouter()
+//留言
+const leave=()=>{
+router.push(`/layout/content/leaveban/${props.id}`)
 }
 </script>
 

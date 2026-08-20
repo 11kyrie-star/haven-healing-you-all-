@@ -5,7 +5,7 @@
         <div @click="toggleMenu"><span  style="user-select: none;" :class="{active:actvieTap==='我的'}">{{ mylabel }}</span><el-icon :size="15" class="arrow" :class="{'arrow-open':menuVisible}"><ArrowDown></ArrowDown></el-icon></div>
         <Transition name="menu-drop">
             <div v-show="menuVisible" class="menu" style="user-select: none;">
-                <div class="item" v-for="item in ['留言板','帖子','喜欢','评论']" @click="ChangeMy(item)">{{ item }}</div>
+                <div class="item" v-for="item in ['留言','帖子','喜欢','评论']" @click="ChangeMy(item)">{{ item }}</div>
             </div>
         </Transition>
     </div>
@@ -27,7 +27,7 @@ const pathmap:Record<string,string>={
 '求助':'help',
 '文案':'text',
 '日常':'daily',
-'留言板':'leaveword',
+'留言':'leaveword',
 '帖子':'mypost',
 '喜欢':'mylike',
 '评论':'mycomment'

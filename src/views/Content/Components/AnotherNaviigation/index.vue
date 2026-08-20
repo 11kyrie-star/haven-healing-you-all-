@@ -1,8 +1,9 @@
 <template>
-    <div class="nav-container" v-if="props.show">
-        <div class="comment" @click="back">评论</div>
-        <div style="cursor: default;">></div>
-        <div style="cursor: default; font-weight: 700;">详情</div>
+    <div class="nav-container" v-show="data.length>1">
+        <template v-for="(item,index) in data">
+            <div class="back" :class="{current:index===data.length-1}" @click="go(item.path)">{{ item.label }}</div>
+            <div v-show="index<data.length-1" style="cursor: default;">></div>
+        </template>
     </div>
 </template>
 
@@ -13,14 +14,17 @@
     height: fit-content;
     position: absolute;
     left: 31%;
-    gap: 10px;
+    gap: 15px;
     top: 6%;
     font-family: 'LXGW WenKai', 'Inter', sans-serif;
     font-size: 1.1em;
     user-select: none;
-    .comment{
+    .back{
         cursor: pointer;
         &:hover{
+            font-weight: 700;
+        }
+        &.current{
             font-weight: 700;
         }
     }
@@ -29,10 +33,10 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import {ref} from 'vue'
+import {ref,computed} from 'vue'
 const router=useRouter()
-const back=()=>{
-    router.push('/layout/content/mycomment')
+const go=(path:string)=>{
+    router.push(path)
 }
-const props=defineProps<{show:boolean}>()
+const props=defineProps<{data:{label:string,path:string}[]}>()
 </script>
