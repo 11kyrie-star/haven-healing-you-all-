@@ -7,6 +7,7 @@
 <style scoped lang="scss">
 .emoji-container{
     position: absolute;
+    z-index: 9999;
 }
 </style>
 

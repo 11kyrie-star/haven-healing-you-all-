@@ -27,19 +27,18 @@
         </div>
     </div>
     <div v-if="comment.showreply && comment.children.length">
-           <CommentItem v-for="children in comment.children" :comment="children" :key="children.id" :depth="(depth??0)+1" @toggle-reply="(id:number)=>emit('toggleReply',id)" @want-reply="(id:number,reply:string)=>emit('wantReply',id,reply)"></CommentItem>
+           <CommentItem v-for="children in comment.children" :comment="children" :key="children.id" :activereplyid="activereplyid" :depth="(depth??0)+1" @toggle-reply="(id:number)=>emit('toggleReply',id)" @want-reply="(id:number,reply:string)=>emit('wantReply',id,reply)"></CommentItem>
     </div>
 </template>
 
 <script setup lang="ts">
 import {Star,ChatSquare,StarFilled} from '@element-plus/icons-vue'
 import { commentstar ,cancelcomentstar} from '@/api/aboutpost';
-import {ref} from 'vue'
+import {ref,computed} from 'vue'
 import { formatPostTime } from '@/utils/time';
 import { ElMessage } from 'element-plus';
-import { id } from 'element-plus/es/locales.mjs';
-const props= defineProps<{comment:commentnode,depth?:number}>()
-const emit=defineEmits<{toggleReply:[commId:number],wantReply:[commId:number,reply:string]}>()
+const props= defineProps<{comment:commentnode,depth?:number,activereplyid:number | null}>()
+const emit=defineEmits<{toggleReply:[commId:number],wantReply:[commId:number,reply:string],cancel:[]}>()
 interface commentnode{
     id:number,
     post_id:number,
@@ -92,14 +91,13 @@ const handlereplyagain=(commId:number)=>{
     props.comment.showreply=false
 }
 }
-const replyactive=ref(false)
+const replyactive=computed(()=>(props.activereplyid===props.comment.id))
 //点击回复按钮
 const handlereplebtn=()=>{
-    if(replyactive.value===false){
-      replyactive.value=true
+    if(!replyactive.value){
       emit('wantReply',props.comment.id,'reply')
     }else{
-      replyactive.value=false
+      emit('cancel')
     }
 }
 const isactive=ref(false)

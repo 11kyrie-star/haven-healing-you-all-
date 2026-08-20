@@ -20,8 +20,8 @@
                 <tag v-show="showtag" @select="inserttag" :decide="decide!" ref="tagtent"></tag>
             </div>
             <div class="button">
-                <el-button type="primary" v-if="replybtn==='reply'" @click="sendreply" :loading="loadreply">回复</el-button>
-                <el-button type="primary" v-else @click="sendpost" :loading="load">发表</el-button>
+                <el-button type="primary" v-show="replybtn==='reply'" @click="sendreply" :loading="loadreply">回复</el-button>
+                <el-button type="primary" v-show="showpublishbtn" @click="sendpost" :loading="load">发表</el-button>
             </div>
         </div>
     </div>
@@ -131,8 +131,8 @@ import { onClickOutside } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
 import { ref,defineAsyncComponent,computed,createVNode,render} from 'vue';
-import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
-import type { post } from '@/types/post.ts';
+import { postpicApi,sendpostapi ,sendcomment,sendreplyapi,leavewordapi} from '@/api/aboutpost.ts';
+import type { post,leavewordpost } from '@/types/post.ts';
 import { findsensitvie } from '@/utils/sensitvie.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
@@ -146,16 +146,27 @@ const showchange2=ref(false)
 let showtool=ref(false)
 let showtag=ref(false)
 let showchange3=ref(false)
-//用于PostCard组件改变我们的编辑框状态
+const showpublishbtn=ref(true)
+//用于PostCard组件改变我们的编辑框状态,回复功能用
 const replyId=ref<number | null>()
 const replybtn=ref<string>()
 const flash=(replyid:number,name:string)=>{
 isflash.value=true
 replyId.value=replyid
 replybtn.value=name
+showpublishbtn.value=false
+currentminheight.value='10vh'
+showtool.value=true
 setTimeout(()=>{isflash.value=false},1200)
 }
-defineExpose({flash})
+
+//从回复变回评论
+const Change=()=>{
+showpublishbtn.value=true
+replybtn.value=''
+blur()
+}
+defineExpose({flash,Change})
 const isflash=ref(false)
 
 const emit=defineEmits<{
@@ -255,6 +266,9 @@ const saveRange=ref<Range | null>(null)
 //点击上传图片后的处理函数
 const triggerinput=()=>{
     if(datafa.value.decide==='comment'&&urlList.value.length===1){
+        return ElMessage.warning('最多上传一张图片')
+    }
+    if(replybtn.value==='reply'&&urlList.value.length===1){
         return ElMessage.warning('最多上传一张图片')
     }
     editorinput.value.focus()
@@ -477,7 +491,7 @@ img.style.display='block'
 cell.appendChild(img)
 return cell
 }
-
+//聚焦
 const focus=()=>{
 showplaceholder.value=false
 showtool.value=true
@@ -646,6 +660,7 @@ const edit=editorinput.value
         }
         const cleanhtml=clean(data)
         try{
+        loadreply.value=true
         const res=await sendreplyapi(replyId.value!,cleanhtml,urlList.value)
         if(res.status===0){
             ElMessage.success('回复成功')
@@ -653,6 +668,7 @@ const edit=editorinput.value
             editorinput.value.innerHTML=''
             replyId.value=null
             replybtn.value=''
+            showpublishbtn.value=true
             showplaceholder.value=true
             emit('newcomment',res.data!)
         }

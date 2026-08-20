@@ -16,7 +16,7 @@ import Hottop from '@/views/Content/Components/Hottop/index.vue'
 import Publish from '@/views/Content/Components/Publish/index.vue'
 import Nav from '@/views/Content/Components/AnotherNaviigation/index.vue'
 import { useRoute } from 'vue-router';
-import {computed} from 'vue'
+import {computed,provide} from 'vue'
 const route=useRoute()
 const detail=computed(()=>{
 const arr=route.path.split('/').filter(Boolean)

@@ -57,7 +57,7 @@
         </div>
         <div class="show-comment" v-if="showcomment">
         <div class="comment-item" v-for="item in roots" :key="item.id">    
-         <CommentItem :comment="item" @toggle-reply="getreply" @want-reply="findeditor"></CommentItem>
+         <CommentItem :comment="item" :activereplyid="activereplyid" @toggle-reply="getreply" @want-reply="findeditor" @cancel="change"></CommentItem>
         </div>     
         </div>
         <div class="push-comment">
@@ -94,6 +94,8 @@ const props=defineProps<{
     is_public:1 |0,
     index:number
 }>()
+//用于记录回复评论的id
+const activereplyid=ref<number | null>(null)
 const viewcount=ref(props.view_count)
 const emit=defineEmits<{
     addpostagain:[post:post],
@@ -164,6 +166,7 @@ const addcomment=(comment:comment)=>{
             parent.showreply=true   
         }                    
     }
+    activereplyid.value=null
 }
 const commentList=ref<comment[]>([])
 const roots=ref<commentnode[]>([])
@@ -252,9 +255,16 @@ const findNode=(tree:commentnode[],id:number):commentnode | null=>{
 const editref=ref<InstanceType<typeof Editor>>()
 //点击回复以后定位评论框
 const findeditor=(id:number,name:string)=>{
+    activereplyid.value=id
 const el=editref.value?.$el as HTMLElement | undefined
 el?.scrollIntoView({behavior:'smooth',block:'center'})
 editref.value?.flash(id,name)
+}
+//用户第二次点击回复按钮
+const change=()=>{
+    editref.value?.Change()
+    const el=editref.value?.$el as HTMLElement | undefined
+    el?.scrollIntoView({behavior:'smooth',block:'center'}) 
 }
 //帖子浏览量+1
 const cardRef=ref()

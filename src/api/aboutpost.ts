@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post,postviewres,changepoststatusres,deletepostres,mycommentpostres,detaildata} from "@/types/post";
+import type { postpic,postpicdata,sendpost,tagsres,updateowntagres,getpost,comment,commentres,sendcommentres,starpostty,starcommentty, post,postviewres,changepoststatusres,deletepostres,mycommentpostres,detaildata,leavewordres} from "@/types/post";
 export async function postpicApi(file:File):Promise<postpic<postpicdata>>{
     const data=new FormData()
     data.append('image',file)
@@ -106,4 +106,8 @@ export async function getmycommentpost({page,size}:{page:number,size:number}):Pr
 
 export async function detailpostapi(id:number):Promise<detaildata>{
     return await request.get(`/post/detail/${id}`)
+}
+
+export async function leavewordapi(id:number,content:string,images:string[]):Promise<leavewordres>{
+    return await request.post(`/post/${id}/message`)
 }

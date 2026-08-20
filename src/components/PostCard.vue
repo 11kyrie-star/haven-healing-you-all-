@@ -55,7 +55,7 @@
         </div>
         <div class="show-comment" v-if="showcomment">
         <div class="comment-item" v-for="item in roots" :key="item.id">    
-         <CommentItem :comment="item" @toggle-reply="getreply" @want-reply="findeditor"></CommentItem>
+         <CommentItem :comment="item" :activereplyid="activereplyid" @toggle-reply="getreply" @want-reply="findeditor" @cancel="change"></CommentItem>
         </div>     
         </div>
         <div class="push-comment">
@@ -69,12 +69,12 @@ import {View,Star,ChatSquare,ArrowDown,StarFilled} from '@element-plus/icons-vue
 import { useIntersectionObserver } from '@vueuse/core';
 import { formatPostTime } from '@/utils/time.ts';
 import {getpostcomment,getpostreply,starpost,cancelstarpost,addpostview} from '@/api/aboutpost.ts';
-import type { post } from '@/types/post.ts';
+import { type post } from '@/types/post.ts';
 import type { comment } from '@/types/post.ts';
 import { computed } from 'vue';
 import Editor from './Editor.vue';
 import CommentItem from './CommentItem.vue';
-import { ref,onBeforeUnmount } from 'vue';
+import { ref,onBeforeUnmount,inject } from 'vue';
 import { ElMessage } from 'element-plus';
 const props=defineProps<{
     id:number,
@@ -89,6 +89,8 @@ const props=defineProps<{
     comment_count:number,
     is_liked:number
 }>()
+//记录当前回复评论的id
+const activereplyid=ref<number | null>(null)
 const viewcount=ref(props.view_count)
 const emit=defineEmits<{
     addpostagain:[post:post]
@@ -140,6 +142,7 @@ const gridlayout=computed(()=>{
 const timestr=computed(()=>{
     return formatPostTime(props.create_at)
 })
+//添加评论
 const addcomment=(comment:comment)=>{
     if(comment.parent_id===null){
        commentList.value.unshift(comment)
@@ -158,6 +161,7 @@ const addcomment=(comment:comment)=>{
             parent.showreply=true   
         }                    
     }
+    activereplyid.value=null
 }
 const commentList=ref<comment[]>([])
 const roots=ref<commentnode[]>([])
@@ -246,6 +250,7 @@ const findNode=(tree:commentnode[],id:number):commentnode | null=>{
 const editref=ref<InstanceType<typeof Editor>>()
 //点击回复以后定位评论框
 const findeditor=(id:number,name:string)=>{
+    activereplyid.value=id
 const el=editref.value?.$el as HTMLElement | undefined
 el?.scrollIntoView({behavior:'smooth',block:'center'})
 editref.value?.flash(id,name)
@@ -279,6 +284,13 @@ onBeforeUnmount(()=>{
     }
     stop()
 })
+//用户第二次点击回复按钮
+const change=()=>{
+    editref.value?.Change()
+    activereplyid.value=null
+    const el=editref.value?.$el as HTMLElement | undefined
+    el?.scrollIntoView({behavior:'smooth',block:'center'}) 
+}
 </script>
 
 <style scoped lang="scss">
@@ -290,7 +302,7 @@ onBeforeUnmount(()=>{
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 12px;
     box-shadow:0 2px 12px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    transition: box-shadow 0.3s ease,top 0.3s ease;
     padding: 3%;
     position: relative;
     font-family: 'LXGW WenKai', 'Inter', sans-serif;
@@ -307,7 +319,7 @@ onBeforeUnmount(()=>{
         }
     }
     &:hover{
-        transform: translateY(-3px);
+        top: -3px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     }
     .name-avatar{

@@ -1,3 +1,5 @@
+import type { InjectionKey, ShallowRef } from "vue"
+
 export interface postpic<T>{
     status:number,
     msg:string,
@@ -222,5 +224,32 @@ export interface detaildata{
         username:string,
         avatar:string,
         is_liked:number
+    }
+}
+//留言功能相关数据
+export interface leavewordpost{
+    id:number,
+    user_id:number,
+    username:string,
+    avatar:string,
+    create_at:string,
+    content:string,
+    images:string[]
+}
+
+
+export interface leavewordres{
+    status:number,
+    msg:string,
+    data:{
+        id:number,
+        post_id:number,
+        sender_id:number,
+        sender_username:string,
+        sender_avatar:string,
+        content:string,
+        images:string[],
+        status:number,
+        create_at:string
     }
 }
