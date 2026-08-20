@@ -253,3 +253,38 @@ export interface leavewordres{
         create_at:string
     }
 }
+
+//获取我的留言相关数据
+export interface myleaveworddata{
+    id:number,
+    user_id:number,
+    content:string,
+    images:string[],
+    tags:string[],
+    category:string,
+    view_count:number,
+    like_count:number,
+    comment_count:number,
+    hot_value:number,
+    is_public:1 | 0,
+    is_anonymous:0 | 1,
+    created_at:string,
+    username:string,
+    avatar:string,
+    is_liked:number,
+    my_message:{
+        id:number,
+        content:string,
+        create_at:string
+    }
+}
+
+export interface myleavewordres{
+    status:number,
+    msg:string,
+    data:{
+        page:number,
+        size:number,
+        list:myleaveworddata[]
+    }
+}
