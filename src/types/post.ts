@@ -288,3 +288,37 @@ export interface myleavewordres{
         list:myleaveworddata[]
     }
 }
+
+export interface taleaveworddata{
+id:number,
+content:string,
+username:string,
+avatar:string,
+view_count:string,
+like_count:number,
+comment_count:number,
+is_liked:number,
+is_public:1 | 0,
+is_anonymous:0 | 1,
+tags:string[],
+category:string,
+created_at:string,
+message:{
+    id:number,
+    content:string,
+    create_at:string,
+    sender_id:number,
+    sender_username:string,
+    sender_avatar:string
+}
+}
+
+export interface taleavewordres{
+    status:number,
+    msg:string,
+    data:{
+        page:number,
+        size:number,
+        list:taleaveworddata[]
+    }
+}

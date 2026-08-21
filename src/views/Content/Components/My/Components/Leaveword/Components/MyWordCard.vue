@@ -17,7 +17,7 @@
             <div class="content" v-html="item.content"></div>
             <div class="ellipsis">......</div>
             <div class="time">{{ posttime }}</div>
-            <div class="detail">详情</div>
+            <div class="detail" @click="pushdetail">详情</div>
         </div>
     </div>
 </template>
@@ -215,8 +215,13 @@
 <script setup lang="ts">
 import type { myleaveworddata } from '@/types/post';
 import { formatPostTime } from '@/utils/time';
+import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 const props=defineProps<{item:myleaveworddata}>()
 const mywordtime=ref(formatPostTime(props.item.my_message.create_at))
 const posttime=ref(formatPostTime(props.item.created_at))
+const router=useRouter()
+const pushdetail=()=>{
+    router.push(`/layout/content/detail/${props.item.id}`)
+}
 </script>

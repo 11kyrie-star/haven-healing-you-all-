@@ -54,6 +54,7 @@ const mylabel=computed(()=>(mypages.includes(currentkey.value)?labelmap[currentk
     width: 100%;
     height: 5vh;
     background-color: white;
+    user-select: none;
     position: relative;
     z-index: 10;
     &::before{

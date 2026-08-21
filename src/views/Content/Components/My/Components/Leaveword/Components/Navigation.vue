@@ -2,8 +2,8 @@
     <div class="nav-container">
         <input type="radio" name="word-tab" id="tab-mine" class="nav-radio" checked />
         <input type="radio" name="word-tab" id="tab-theirs" class="nav-radio" />
-        <label for="tab-mine" class="nav-item nav-item-mine">我对TA说</label>
-        <label for="tab-theirs" class="nav-item nav-item-theirs">Ta对我说</label>
+        <label for="tab-mine" class="nav-item nav-item-mine" @click="pushme">我对TA说</label>
+        <label for="tab-theirs" class="nav-item nav-item-theirs" @click="pushta">Ta对我说</label>
         <span class="nav-slider"></span>
     </div>
 </template>
@@ -92,3 +92,14 @@
     left: 75%;
 }
 </style>
+
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+const router=useRouter()
+const pushme=()=>{
+    router.push('/layout/content/leaveword/myword')
+}
+const pushta=()=>{
+    router.push('/layout/content/leaveword/taword')
+}
+</script>

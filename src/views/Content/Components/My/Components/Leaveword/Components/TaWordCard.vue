@@ -3,21 +3,21 @@
         <div class="msg">
             <span class="chip">TA</span>
             <div class="msg-content">
-                <div class="text">哈喽啊</div>
+                <div class="text" v-html="props.item.message.content"></div>
             </div>
-            <span class="time">前天 18:00</span>
+            <span class="time">{{ tamessagetime }}</span>
         </div>
         <div class="post">
             <div class="namepic">
                 <div class="avatar">
-                    <img src="@/assets/avatar.jpg" alt="TA的头像" />
+                    <img :src=props.item.avatar />
                 </div>
-                <div class="name">李诗雅</div>
+                <div class="name">{{ props.item.username }}</div>
             </div>
-            <div class="content">你好</div>
+            <div class="content" v-html="props.item.content"></div>
             <div class="ellipsis">......</div>
-            <div class="time">前天 18:00</div>
-            <div class="detail">详情</div>
+            <div class="time">{{ myposttime }}</div>
+            <div class="detail" @click="push">详情</div>
         </div>
     </div>
 </template>
@@ -202,14 +202,14 @@
 </style>
 
 <script setup lang="ts">
-interface WordCardItem {
-    word_content: string
-    word_create_at: string
-    id: number
-    username: string
-    avatar: string
-    content: string
-    created_at: string
+import { formatPostTime } from '@/utils/time';
+import type { taleaveworddata } from '@/types/post';
+import { useRouter } from 'vue-router';
+const props=defineProps<{item:taleaveworddata}>()
+const tamessagetime=formatPostTime(props.item.message.create_at)
+const myposttime=formatPostTime(props.item.created_at)
+const router=useRouter()
+const push=()=>{
+router.push(`/layout/content/detail/${props.item.id}`)
 }
-defineProps<{ item: WordCardItem }>()
 </script>

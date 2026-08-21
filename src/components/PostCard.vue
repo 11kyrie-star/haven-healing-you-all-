@@ -304,15 +304,28 @@ router.push(`/layout/content/leaveban/${props.id}`)
     width: 30vw;
     min-height: 40vh;
     margin-top: 3vh;
-    background-color: rgba(255, 255, 255, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-    box-shadow:0 2px 12px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.3s ease,top 0.3s ease;
+    background:
+        radial-gradient(circle at 90% 6%, rgba(233, 189, 124, 0.18) 0%, transparent 40%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 243, 234, 0.58) 100%);
+    border: 1px solid rgba(224, 128, 113, 0.35);
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(120, 60, 40, 0.1), 0 8px 24px rgba(224, 128, 113, 0.14);
+    backdrop-filter: blur(8px);
+    transition: box-shadow 0.3s ease, top 0.3s ease, border-color 0.3s ease;
     padding: 3%;
     position: relative;
     font-family: 'LXGW WenKai', 'Inter', sans-serif;
     color: rgba(50, 50, 50, 0.85);
+    &::before{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        height: 3px;
+        border-radius: 0 0 6px 6px;
+        background: linear-gradient(90deg, rgba(233, 189, 124, 0.6), rgba(224, 128, 113, 0.7), rgba(250, 130, 145, 0.55));
+    }
     .leave-word{
         position: absolute;
         cursor: pointer;
@@ -326,7 +339,8 @@ router.push(`/layout/content/leaveban/${props.id}`)
     }
     &:hover{
         top: -3px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        border-color: rgba(224, 128, 113, 0.5);
+        box-shadow: 0 6px 18px rgba(224, 128, 113, 0.24), 0 14px 34px rgba(120, 60, 40, 0.16);
     }
     .name-avatar{
         width: fit-content;
@@ -456,5 +470,4 @@ router.push(`/layout/content/leaveban/${props.id}`)
     0%   { transform: scale(1); }
     50%  { transform: scale(1.3); }
     100% { transform: scale(1); }
-}
-</style>
+}</style>
