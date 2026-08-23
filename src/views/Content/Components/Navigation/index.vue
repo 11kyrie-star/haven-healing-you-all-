@@ -9,6 +9,13 @@
             </div>
         </Transition>
     </div>
+    <div class="publish-note">
+        <div class="note-tabs">
+            <div class="note-tab" :class="{active: sideTap==='发帖区'}" @click="switchSide('发帖区', $event)">发帖区</div>
+            <div class="note-tab" :class="{active: sideTap==='消息通知'}" @click="switchSide('消息通知', $event)">消息通知</div>
+            <div class="slide-bar" ref="slideBarRef"></div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -16,8 +23,12 @@
 import {ref,computed} from 'vue'
 import { useRouter,useRoute } from 'vue-router';
 import {ArrowDown} from '@element-plus/icons-vue'
+import { usePanelStore } from '@/stores/panle';
+const sideTap=ref('发帖区')
+const slideBarRef=ref()
 const router=useRouter()
 const route=useRoute()
+const store=usePanelStore()
 const menuVisible=ref(false)
 const toggleMenu=()=>{
     menuVisible.value=!menuVisible.value
@@ -47,6 +58,22 @@ route.path.split('/').pop() || 'square'
 const labelmap=Object.fromEntries(Object.entries(pathmap).map(([label,path])=>[path,label]))
 const actvieTap=computed(()=>(mypages.includes(currentkey.value)?'我的':labelmap[currentkey.value] || '广场'))
 const mylabel=computed(()=>(mypages.includes(currentkey.value)?labelmap[currentkey.value]:'我的'))
+//滑条功能的实现
+const switchSide=(name:string,e:MouseEvent)=>{
+    sideTap.value=name
+    moveSlide(e.currentTarget as HTMLElement)
+    if(name==='发帖区'){
+       store.setpanle('publish')
+    }else{
+        store.setpanle('notification')
+    }
+}
+const moveSlide=(el:HTMLElement)=>{
+const bar=slideBarRef.value
+if(!bar){return}
+bar.style.width=`${el.offsetWidth}px`
+bar.style.transform=`translateX(${el.offsetLeft}px)`
+}
 </script>
 
 <style scoped lang="scss">
@@ -150,6 +177,53 @@ const mylabel=computed(()=>(mypages.includes(currentkey.value)?labelmap[currentk
            }
         }  
     }
+    .publish-note{
+        position: absolute;
+        top: 0;
+        right: 2%;
+        width: 30%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .note-tabs{
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            .note-tab{
+                cursor: pointer;
+                font-size: 1.3em;
+                font-family: 'LXGW WenKai', 'Inter', sans-serif;
+                text-shadow: 0 0 1px rgba(224, 167, 167, 0.1);
+                color: rgba(50, 50, 50, 0.85);
+                padding: 0 2px;
+                user-select: none;
+                transition: font-weight 0.2s ease, color 0.2s ease;
+                &:hover{
+                    font-weight: 700;
+                }
+                &.active{
+                    font-weight: 700;
+                }
+            }
+            .slide-bar{
+                position: absolute;
+                bottom: 0.7vh;
+                left: 0;
+                width: 0;
+                height: 3px;
+                border-radius: 999px;
+                background: linear-gradient(90deg, rgba(233, 189, 124, 0.95), rgba(224, 128, 113, 0.95), rgba(250, 130, 145, 0.85));
+                box-shadow: 0 0 8px rgba(224, 128, 113, 0.55);
+                transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+                will-change: transform, width;
+                pointer-events: none;
+            }
+        }
+    }
+
     .active{
         font-weight: 700;
     }

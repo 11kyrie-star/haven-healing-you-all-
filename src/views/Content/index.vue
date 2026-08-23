@@ -5,7 +5,7 @@
        <div class="content">
         <Hottop></Hottop>
         <RouterView></RouterView>
-        <Publish></Publish>
+        <component :is="isView"></component>
        </div>
     </div>
 </template>
@@ -14,11 +14,36 @@
 import Navigation from '@/views/Content/Components/Navigation/index.vue'
 import Hottop from '@/views/Content/Components/Hottop/index.vue'
 import Publish from '@/views/Content/Components/Publish/index.vue'
+import Message from '@/views/Content/Components/Message/index.vue'
 import Nav from '@/views/Content/Components/AnotherNaviigation/index.vue'
 import { useCrumbStore } from '@/stores/crumb'
-import {computed} from 'vue'
+import { useNotificationStore } from '@/stores/note_pub'
+import { usePanelStore } from '@/stores/panle'
+import { ws } from '@/utils/ws'
+import type { NotificationItem } from '@/types/note'
+import { getunreadnote } from '@/api/note'
+import {computed,onMounted,ref} from 'vue'
 const store=useCrumbStore()
+const notestore=useNotificationStore()
+const panlestore=usePanelStore()
 const cumbs=computed(()=>(store.stack))
+const list=ref<NotificationItem[]>([])
+onMounted(async()=>{
+    ws.connect()
+    const res=await getunreadnote()
+    if(res.status===0){
+        list.value=res.data.list
+        notestore.init(list.value)
+    }
+    ws.onMessage((msg)=>{
+        notestore.add(msg)
+    })
+})
+const panelmap={
+    publish:Publish,
+    notification:Message
+}
+const isView=computed(()=>panelmap[panlestore.active]??Publish)
 </script>
 
 <style scoped lang="scss">
