@@ -24,6 +24,7 @@ export interface getunreadnoteres{
     data:{
         page:number,
         size:number,
+        hasMore:boolean,
         list:NotificationItem[]
     }
 }

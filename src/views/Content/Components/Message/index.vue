@@ -2,7 +2,7 @@
     <div class="message-container">
         <div class="message-list">
             <Card v-for="item in store.list" :key="item.id" :item="item" />
-            <div class="empty" v-if="!store.list.length" style="user-select: none;">
+            <div class="empty" v-if="empty && !loading" style="user-select: none;">
                 <div class="empty-illustration">
                     <div class="halo halo-1"></div>
                     <div class="halo halo-2"></div>
@@ -32,26 +32,63 @@
                 <p class="empty-sub" style="cursor: default;">通知加载失败，请检查网络后<br />再试一次</p>
                 <div class="empty-tip" style="cursor: default;" @click="reload">刷新重试</div>
             </div>
+        <div ref="sentry" v-if="hasMore" class="load-more" style="cursor: default; user-select: none;">
+            <span v-if="loading" class="spinner"></span>
+            {{ loading?'加载中...':'上拉加载更多' }}
+        </div>
+        <div v-else-if="!empty &&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
-import Card from './Components/Card.vue'
+<script setup lang="ts">import Card from './Components/Card.vue'
 import type { NotificationItem } from '@/types/note.ts';
 import { Bell, WarningFilled } from '@element-plus/icons-vue'
 import { useNotificationStore } from '@/stores/note_pub.ts';
+import { getunreadnote } from '@/api/note.ts';
+import { useIntersectionObserver } from '@vueuse/core';
 import { ref,onMounted } from 'vue';
 const store=useNotificationStore()
-const isEmpty=ref(false)
-if(store.list.length===0){isEmpty.value=true}
-const reload=()=>{
-    window.location.reload()
+const empty=ref(false)
+const hasMore=ref(true)
+const loading=ref(false)
+const sentry=ref<HTMLElement | null>()
+const page=ref(1)
+const size=10
+const loadmore=async()=>{
+if(loading.value || !hasMore.value){return}
+if(store.connect){store.connect=false}
+loading.value=true
+try{
+    const res=await getunreadnote({page:page.value,size:size})
+    if(res.status===0){
+        if(page.value===1){
+            store.init(res.data.list)
+            if(store.list.length===0){
+                empty.value=true
+            }
+        }else{
+            store.list.push(...res.data.list)
+        }
+        hasMore.value=res.data.hasMore
+        page.value++
+    }
+}catch{
+    store.connect=true
+}finally{
+    loading.value=false
+}
 }
 onMounted(()=>{
+    loadmore()
     store.MarkAllread()
 })
-</script>
+useIntersectionObserver(sentry,([entry])=>{
+if(entry?.isIntersecting){loadmore()}
+},{rootMargin:'0px 0px 40% 0px'})
+const reload=()=>{
+    window.location.reload()
+}</script>
 
 <style scoped lang="scss">
 .message-container {
@@ -95,6 +132,32 @@ onMounted(()=>{
         &::-webkit-scrollbar-track {
             background: transparent;
         }
+    .load-more{
+        width: 100%;
+        padding: 20px 0 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13px;
+        color: rgba(224, 128, 113, 0.85);
+        letter-spacing: 2px;
+        user-select: none;
+        flex-shrink: 0;
+        .spinner{
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(224, 128, 113, 0.2);
+            border-top-color: rgba(224, 128, 113, 0.9);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        &.end{
+            color: rgba(128, 128, 128, 0.45);
+            font-size: 12px;
+            letter-spacing: 3px;
+        }
+    }
     }
 
     .empty {
@@ -231,6 +294,9 @@ onMounted(()=>{
     }
 }
 
+@keyframes spin{
+    to { transform: rotate(360deg); }
+}
 @keyframes empty-float {
     0%, 100% {
         transform: translateY(0);

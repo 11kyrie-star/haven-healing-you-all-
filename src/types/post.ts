@@ -172,6 +172,7 @@ msg:string,
 data:{
     page:number,
     size:number,
+    hasMore:boolean
     list:myconmentitem[]
 }
 }
@@ -286,6 +287,7 @@ export interface myleavewordres{
     data:{
         page:number,
         size:number,
+        hasMore:boolean,
         list:myleaveworddata[]
     }
 }
@@ -320,6 +322,7 @@ export interface taleavewordres{
     data:{
         page:number,
         size:number,
+        hasMore:boolean,
         list:taleaveworddata[]
     }
 }

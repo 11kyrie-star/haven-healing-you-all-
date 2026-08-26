@@ -34,6 +34,11 @@
         <p class="state-sub" style="cursor: default;">帖子加载失败，请检查网络后<br />再试一次</p>
         <div class="state-tip" style="cursor: pointer;" @click="reload">刷新重试</div>
     </div>
+    <div ref="sentry" v-if="hasMore" class="load-more" style="cursor: default; user-select: none;">
+        <span v-if="loading" class="spinner"></span>
+        {{ loading?'加载中...':'上拉加载更多' }}
+    </div>
+    <div v-else-if="isEmpty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
 </div>
 </template>
 
@@ -41,6 +46,7 @@
 import PostCard from '@/views/Content/Components/My/Components/Post/Components/PostCard.vue';
 import { getmypost } from '@/api/aboutpost';
 import {ref,onMounted,watch} from 'vue'
+import { useIntersectionObserver } from '@vueuse/core';
 import type { getpost,postitem ,post} from '@/types/post';
 import { usePostFeedStore } from '@/stores/postfeed';
 import { Document, WarningFilled } from '@element-plus/icons-vue'
@@ -51,21 +57,33 @@ let postlist=ref<postitem[]>([])
 // 状态页开关（初始均为 false，默认不展示，请自行编写切换逻辑）：
 const isEmpty=ref(false)      // 请求成功且 postlist 为空时置 true
 const hasError=ref(false)     // 请求失败时置 true
-
-onMounted(async ()=>{
-    try{
-    const postres=await getmypost({page:1,size:10})
+const hasMore=ref(true)
+const loading=ref(false)
+const sentry=ref<HTMLElement | null>()
+const page=ref(1)
+const size=10
+const loadmore=async()=>{
+if(loading.value || !hasMore.value){return}
+if(hasError.value){hasError.value=false}
+loading.value=true
+try{
+    const postres=await getmypost({page:page.value,size:size})
     if(postres.status===0){
     res.value=postres
-    postlist.value=res.value.data.list
+    postlist.value.push(...res.value.data.list)
+    hasMore.value=res.value.data.hasMore
+    page.value++
     if(postlist.value.length===0){
         isEmpty.value=true
     }
     }
     }catch{
         hasError.value=true
+    }finally{
+        loading.value=false
     }
-})
+}
+onMounted(loadmore)
 const addpost=(post:post)=>{
     postlist.value.unshift(post)
 }
@@ -81,6 +99,9 @@ const deletepost=(index:number)=>{
 const reload=()=>{
     window.location.reload()
 }
+useIntersectionObserver(sentry,([entry])=>{
+if(entry?.isIntersecting){loadmore()}
+},{rootMargin:'0px 0px 40% 0px'})
 </script>
 
 <style scoped lang="scss">
@@ -228,6 +249,39 @@ const reload=()=>{
             }
         }
     }
+    .load-more{
+    width: 100%;
+    padding: 20px 0 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(224, 128, 113, 0.85);
+    letter-spacing: 2px;
+    user-select: none;
+    flex-shrink: 0;
+
+    /* 加载中的旋转小圆点 */
+    .spinner{
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(224, 128, 113, 0.2);
+        border-top-color: rgba(224, 128, 113, 0.9);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    /* 没有更多数据时的弱化样式 */
+    &.end{
+        color: rgba(128, 128, 128, 0.45);
+        font-size: 12px;
+        letter-spacing: 3px;
+    }
+}
+}
+@keyframes spin{
+    to { transform: rotate(360deg); }
 }
 
 @keyframes post-float {

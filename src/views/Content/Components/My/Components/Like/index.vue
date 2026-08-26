@@ -35,14 +35,19 @@
         <p class="state-sub" style="cursor: default;">帖子加载失败，请检查网络后<br />再试一次</p>
         <div class="state-tip" @click="reload" style="cursor: pointer;">刷新重试</div>
     </div>
+    <div ref="sentry" v-if="hasMore" class="load-more" style="cursor: default; user-select: none;">
+        <span v-if="loading" class="spinner"></span>
+        {{ loading?'加载中...':'上拉加载更多' }}
+    </div>
+    <div v-else-if="!isEmpty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
 </div>
 </template>
 
-<script setup lang="ts">
-import PostCard from '@/views/Content/Components/My/Components/Like/Components/PostCard.vue';
+<script setup lang="ts">import PostCard from '@/views/Content/Components/My/Components/Like/Components/PostCard.vue';
 import { getlikepost } from '@/api/aboutpost';
 import {ref,onMounted} from 'vue'
 import { useRouter } from 'vue-router';
+import { useIntersectionObserver } from '@vueuse/core';
 import type { getpost,postitem ,post} from '@/types/post';
 import { StarFilled, WarningFilled } from '@element-plus/icons-vue'
 let res=ref<getpost>()
@@ -51,21 +56,36 @@ const router=useRouter()
 // 状态页开关（初始均为 false，默认不展示，请自行编写切换逻辑）：
 const isEmpty=ref(false)      // 请求成功且 postlist 为空时置 true
 const hasError=ref(false)     // 请求失败时置 true
-
-onMounted(async ()=>{
-    try{
-    const postres=await getlikepost({page:1,size:10})
+const hasMore=ref(true)
+const loading=ref(false)
+const sentry=ref<HTMLElement | null>()
+const page=ref(1)
+const size=10
+const loadmore=async()=>{
+if(loading.value || !hasMore.value){return}
+if(hasError.value){hasError.value=false}
+loading.value=true
+try{
+    const postres=await getlikepost({page:page.value,size:size})
     if(postres.status===0){
        res.value=postres
-       postlist.value=res.value.data.list
+       postlist.value.push(...res.value.data.list)
+       hasMore.value=res.value.data.list.length===size
+       page.value++
        if(postlist.value.length===0){
         isEmpty.value=true
        }
     }
-    }catch{
-       hasError.value=true
-    }
-})
+}catch{
+    hasError.value=true
+}finally{
+    loading.value=false
+}
+}
+onMounted(loadmore)
+useIntersectionObserver(sentry,([entry])=>{
+if(entry?.isIntersecting){loadmore()}
+},{rootMargin:'0px 0px 40% 0px'})
 const deletepost=(index:number)=>{
     postlist.value.splice(index,1)
 }
@@ -74,8 +94,7 @@ const reload=()=>{
 }
 const push=()=>{
     router.push('/layout/content/square')
-}
-</script>
+}</script>
 
 <style scoped lang="scss">
 .post-container{
@@ -233,8 +252,37 @@ const push=()=>{
             }
         }
     }
+    .load-more{
+        width: 100%;
+        padding: 20px 0 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13px;
+        color: rgba(224, 128, 113, 0.85);
+        letter-spacing: 2px;
+        user-select: none;
+        flex-shrink: 0;
+        .spinner{
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(224, 128, 113, 0.2);
+            border-top-color: rgba(224, 128, 113, 0.9);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        &.end{
+            color: rgba(128, 128, 128, 0.45);
+            font-size: 12px;
+            letter-spacing: 3px;
+        }
+    }
 }
 
+@keyframes spin{
+    to { transform: rotate(360deg); }
+}
 @keyframes like-float {
     0%, 100% {
         transform: translateY(0);

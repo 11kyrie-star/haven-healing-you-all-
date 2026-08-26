@@ -24,7 +24,7 @@
         <span v-if="loading" class="spinner"></span>
         {{ loading?'加载中...':'上拉加载更多' }}
     </div>
-    <div v-else-if="!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
+    <div v-else-if="!empty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
 </div>
 </template>
 

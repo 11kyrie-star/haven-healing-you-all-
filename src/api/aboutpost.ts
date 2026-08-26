@@ -97,11 +97,11 @@ export async function deletepostapi(id:number):Promise<deletepostres>{
 }
 
 export async function getlikepost({page,size}:{page:number,size:number}):Promise<getpost>{
-    return await request.get('/post/list/liked')
+    return await request.get('/post/list/liked',{params:{page,size}})
 }
 
 export async function getmycommentpost({page,size}:{page:number,size:number}):Promise<mycommentpostres>{
-    return await request.get('/comment/mine')
+    return await request.get('/comment/mine',{params:{page,size}})
 }
 
 export async function detailpostapi(id:number):Promise<detaildata>{
@@ -113,9 +113,9 @@ export async function leavewordapi(id:number,content:string,images?:string[]):Pr
 }
 
 export async function myleaveword({page,size}:{page:number,size:number}):Promise<myleavewordres>{
-    return await request.get('/message/mine')
+    return await request.get('/message/mine',{params:{page,size}})
 }
 
 export async function taleaveword({page,size}:{page:number,size:number}):Promise<taleavewordres>{
-    return await request.get('/message/to-me')
+    return await request.get('/message/to-me',{params:{page,size}})
 }

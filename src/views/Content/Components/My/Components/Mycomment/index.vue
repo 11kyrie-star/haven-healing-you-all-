@@ -33,36 +33,56 @@
             <p class="state-sub" style="cursor: default;">评论加载失败，请检查网络后<br />再试一次</p>
             <div class="state-tip" style="cursor: pointer;" @click="reload">刷新重试</div>
         </div>
+        <div ref="sentry" v-if="hasMore" class="load-more" style="cursor: default; user-select: none;">
+        <span v-if="loading" class="spinner"></span>
+        {{ loading?'加载中...':'上拉加载更多' }}
     </div>
+    <div v-else-if="!isEmpty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
+</div>
 </template>
 
-<script setup lang="ts">
-import PostCard from '@/views/Content/Components/My/Components/Mycomment/Components/PostCard.vue'
+<script setup lang="ts">import PostCard from '@/views/Content/Components/My/Components/Mycomment/Components/PostCard.vue';
 import type { myconmentitem } from '@/types/post';
 import { getmycommentpost } from '@/api/aboutpost';
 import { ref,onMounted } from 'vue';
-import { ChatDotRound, WarningFilled } from '@element-plus/icons-vue'
-const list=ref<myconmentitem[]>([])
+import { useIntersectionObserver } from '@vueuse/core';
+import { ChatDotRound, WarningFilled } from '@element-plus/icons-vue';
+const list=ref<myconmentitem[]>([]);
 
-const hasError=ref(false)     // 请求失败时置 true
-const isEmpty=ref(false)
-onMounted(async()=>{
-    try{
-    const res=await getmycommentpost({page:1,size:10})
-    console.log(res)
+const hasError=ref(false);     // 请求失败时置 true
+const isEmpty=ref(false);
+const hasMore=ref(true);
+const loading=ref(false);
+const sentry=ref<HTMLElement | null>();
+const page=ref(1);
+const size=10;
+const loadmore=async()=>{
+if(loading.value || !hasMore.value){return}
+if(hasError.value){hasError.value=false}
+loading.value=true
+try{
+    const res=await getmycommentpost({page:page.value,size:size})
     if(res.status===0){
-        list.value=res.data.list
+        list.value.push(...res.data.list)
+        hasMore.value=res.data.list.length===size
+        page.value++
         if(list.value.length===0){
             isEmpty.value=true
         }
-    }}catch{
-        hasError.value=true
     }
-})
+}catch{
+    hasError.value=true
+}finally{
+    loading.value=false
+}
+}
+onMounted(loadmore)
+useIntersectionObserver(sentry,([entry])=>{
+if(entry?.isIntersecting){loadmore()}
+},{rootMargin:'0px 0px 40% 0px'})
 const reload=()=>{
     window.location.reload()
-}
-</script>
+}</script>
 
 <style scoped lang="scss">
 .post-container{
@@ -222,8 +242,37 @@ const reload=()=>{
             }
         }
     }
+    .load-more{
+        width: 100%;
+        padding: 20px 0 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13px;
+        color: rgba(224, 128, 113, 0.85);
+        letter-spacing: 2px;
+        user-select: none;
+        flex-shrink: 0;
+        .spinner{
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(224, 128, 113, 0.2);
+            border-top-color: rgba(224, 128, 113, 0.9);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        &.end{
+            color: rgba(128, 128, 128, 0.45);
+            font-size: 12px;
+            letter-spacing: 3px;
+        }
+    }
 }
 
+@keyframes spin{
+    to { transform: rotate(360deg); }
+}
 @keyframes state-float {
     0%, 100% {
         transform: translateY(0);
