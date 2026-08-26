@@ -27,7 +27,7 @@
 <style scoped lang="scss">
 .post-container{
     width: 40%;
-    min-height: 80%;
+    min-height: 40%;
     position: relative;
     overflow: hidden;
     padding: 4vh 2.5vw 3vh;
@@ -131,7 +131,6 @@
         position: relative;
         z-index: 1;
         width: 100%;
-        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;

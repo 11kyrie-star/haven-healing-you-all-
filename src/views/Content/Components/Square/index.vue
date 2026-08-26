@@ -3,16 +3,35 @@
     <div class="card-item" v-for="item in postlist" :key="item.id">
     <PostCard  :id="item.id" :user_id="item.user_id" :avatar="item.avatar" :username="item.username" :create_at="item.created_at" :content="item.content" :comment_count="item.comment_count" :view_count="item.view_count" :images="item.images" :like_count="item.like_count" :is_liked="item.is_liked"></PostCard>
     </div>
-    <div ref="sentry" v-if="hasMore" class="load-more">
+    <!-- 空状态：还没有帖子 -->
+    <div v-if="empty" class="empty-state">
+        <div class="empty-icon">
+            <el-icon :size="30"><Box /></el-icon>
+        </div>
+        <div class="empty-title">还没有帖子</div>
+        <div class="empty-desc">快来发布第一条动态吧</div>
+    </div>
+    <!-- 网络异常 -->
+    <div v-else-if="error" class="error-state" style="user-select: none;">
+        <div class="error-icon">
+            <el-icon :size="30"><WarningFilled /></el-icon>
+        </div>
+        <div class="error-title" style="cursor: default;">网络开小差了</div>
+        <div class="error-desc" style="cursor: default;">加载失败，请检查网络后重试</div>
+        <button class="retry-btn" @click="loadmore" style="cursor: pointer;">重新加载</button>
+    </div>
+    <div ref="sentry" v-if="hasMore" class="load-more" style="cursor: default; user-select: none;">
         <span v-if="loading" class="spinner"></span>
         {{ loading?'加载中...':'上拉加载更多' }}
     </div>
-    <div v-else-if="!hasMore" class="load-more">到底啦....</div>
+    <div v-else-if="!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
 </div>
 </template>
 
 <script setup lang="ts">
 import PostCard from '@/components/PostCard.vue';
+import { Box, WarningFilled } from '@element-plus/icons-vue';
+
 import { getpostapi } from '@/api/aboutpost';
 import {ref,onMounted,watch} from 'vue'
 import { useIntersectionObserver } from '@vueuse/core';
@@ -24,11 +43,14 @@ let postlist=ref<postitem[]>([])
 let page=ref(1)
 const size=10
 const sentry=ref<HTMLElement | null>()
+const error=ref(false)
+const empty=ref(false)
 //数据加载
 const loading=ref(false)
 const hasMore=ref(true)
 const loadmore=async()=>{
 if(loading.value || !hasMore){return}
+if(error.value){error.value=false}
 loading.value=true
 try{
 const postres=await getpostapi({page:page.value,size:size})
@@ -37,9 +59,12 @@ const postres=await getpostapi({page:page.value,size:size})
        postlist.value.push(...res.value.data.list)
        page.value++
        hasMore.value=res.value.data.hasMore
+       if(postlist.value.length===0){
+        empty.value=true
+       }
     }
 }catch{
-
+    error.value=true
 }finally{
     loading.value=false
 }
@@ -115,8 +140,123 @@ if(entry?.isIntersecting){loadmore()}
     }
 }
 
+/* 空状态：还没有帖子 */
+.empty-state{
+    width: 100%;
+    padding: 80px 20px 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+
+    .empty-icon{
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(224, 128, 113, 0.85);
+        background:
+            radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9) 0%, transparent 45%),
+            linear-gradient(135deg, rgba(233, 189, 124, 0.45), rgba(250, 130, 145, 0.35));
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 6px 16px rgba(120, 60, 40, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        animation: floaty 3s ease-in-out infinite;
+    }
+
+    .empty-title{
+        font-size: 15px;
+        font-weight: 500;
+        color: rgba(120, 90, 80, 0.8);
+        letter-spacing: 2px;
+    }
+
+    .empty-desc{
+        font-size: 12px;
+        color: rgba(128, 110, 100, 0.55);
+        letter-spacing: 1px;
+    }
+}
+
+/* 网络异常状态 */
+.error-state{
+    width: 100%;
+    padding: 80px 20px 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+
+    .error-icon{
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(224, 128, 113, 0.9);
+        background:
+            radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9) 0%, transparent 45%),
+            linear-gradient(135deg, rgba(250, 130, 145, 0.4), rgba(224, 128, 113, 0.35));
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 6px 16px rgba(224, 128, 113, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .error-title{
+        font-size: 15px;
+        font-weight: 500;
+        color: rgba(120, 90, 80, 0.8);
+        letter-spacing: 2px;
+    }
+
+    .error-desc{
+        font-size: 12px;
+        color: rgba(128, 110, 100, 0.55);
+        letter-spacing: 1px;
+    }
+
+    .retry-btn{
+        margin-top: 8px;
+        padding: 8px 32px;
+        font-size: 13px;
+        letter-spacing: 3px;
+        color: #fff;
+        background: linear-gradient(135deg, rgba(224, 128, 113, 0.95), rgba(250, 130, 145, 0.9));
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(224, 128, 113, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        transition: all 0.25s ease;
+
+        &:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(224, 128, 113, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        &:active{
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(224, 128, 113, 0.3);
+        }
+    }
+}
 @keyframes spin{
     to { transform: rotate(360deg); }
+}
+
+@keyframes floaty{
+    0%, 100%{
+        transform: translateY(0);
+    }
+    50%{
+        transform: translateY(-6px);
+    }
 }
 }
 </style>
