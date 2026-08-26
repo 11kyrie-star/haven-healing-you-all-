@@ -3,6 +3,7 @@ import type { NotificationItem } from "@/types/note";
 import {ref} from 'vue'
 export const useNotificationStore=defineStore('notification',()=>{
     const list=ref<NotificationItem[]>([])
+    const connect=ref<boolean>(false)
     const unread=ref(0)
     function add(item:NotificationItem){
         unread.value++
@@ -15,5 +16,5 @@ export const useNotificationStore=defineStore('notification',()=>{
         list.value=items
         unread.value=items.filter((item)=>!item.is_read).length
     }
-    return {list,unread,MarkAllread,init,add}
+    return {list,unread,MarkAllread,init,add,connect}
 })

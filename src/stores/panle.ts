@@ -6,4 +6,4 @@ const setpanle=(name:'publish' | 'notification')=>{
     active.value=name
 }
 return {active,setpanle}
-},{persist:true})
+})

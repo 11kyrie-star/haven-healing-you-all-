@@ -29,6 +29,7 @@ const panlestore=usePanelStore()
 const cumbs=computed(()=>(store.stack))
 const list=ref<NotificationItem[]>([])
 onMounted(async()=>{
+    try{
     ws.connect()
     const res=await getunreadnote()
     if(res.status===0){
@@ -37,7 +38,9 @@ onMounted(async()=>{
     }
     ws.onMessage((msg)=>{
         notestore.add(msg)
-    })
+    })}catch{
+        notestore.connect=true
+    }
 })
 const panelmap={
     publish:Publish,

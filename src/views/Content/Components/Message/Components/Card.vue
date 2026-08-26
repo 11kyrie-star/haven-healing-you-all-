@@ -34,25 +34,7 @@
 </template>
 
 <script lang="ts">
-export type NotificationType = 'like' | 'comment' | 'reply' | 'message'
 
-export interface NotificationItem {
-    id: number
-    type: NotificationType
-    is_read: boolean
-    create_at: string
-    actor_name: string
-    actor_avatar: string
-    content: string
-    target_id: number
-    post: {
-        id: number
-        username: string
-        avatar: string
-        content: string
-        images?: string[]
-    }
-}
 </script>
 
 <script setup lang="ts">
@@ -61,7 +43,7 @@ import { formatPostTime } from '@/utils/time'
 import { useRouter } from 'vue-router'
 import { computed } from 'vue'
 import type { Component } from 'vue'
-
+import type { NotificationType,NotificationItem } from '@/types/note'
 const props = defineProps<{ item: NotificationItem }>()
 
 // 类型 -> 图标 映射表

@@ -12,7 +12,7 @@
     <div class="publish-note">
         <div class="note-tabs">
             <div class="note-tab" :class="{active: sideTap==='发帖区'}" @click="switchSide('发帖区', $event)">发帖区</div>
-            <div class="note-tab" :class="{active: sideTap==='消息通知'}" @click="switchSide('消息通知', $event)">消息通知</div>
+            <div class="note-tab" :class="{active: sideTap==='消息通知'}" @click="switchSide('消息通知', $event)">消息通知<span class="note-badge" v-if="notestore.unread>0">{{ notestore.unread>99?'99+':notestore.unread }}</span></div>
             <div class="slide-bar" ref="slideBarRef"></div>
         </div>
     </div>
@@ -24,11 +24,15 @@ import {ref,computed} from 'vue'
 import { useRouter,useRoute } from 'vue-router';
 import {ArrowDown} from '@element-plus/icons-vue'
 import { usePanelStore } from '@/stores/panle';
+import { useNotificationStore } from '@/stores/note_pub';
 const sideTap=ref('发帖区')
+// 未读消息数量（目前写死，请替换为真实未读数）：
+const unreadCount=ref(5)
 const slideBarRef=ref()
 const router=useRouter()
 const route=useRoute()
 const store=usePanelStore()
+const notestore=useNotificationStore()
 const menuVisible=ref(false)
 const toggleMenu=()=>{
     menuVisible.value=!menuVisible.value
@@ -38,19 +42,24 @@ const pathmap:Record<string,string>={
 '求助':'help',
 '文案':'text',
 '日常':'daily',
-'留言':'leaveword',
+'我对TA说':'myword',
 '帖子':'mypost',
 '喜欢':'mylike',
-'评论':'mycomment'
+'评论':'mycomment',
+'TA对我说':'taword'
 }
 const goto=(item:string)=>{
 router.push(`/layout/content/${pathmap[item]}`)
 }
 const ChangeMy=(item:string)=>{
-    router.push(`/layout/content/${pathmap[item]}`)
+    if(item==='留言'){
+        router.push('/layout/content/leaveword')
+    }else{
+        router.push(`/layout/content/${pathmap[item]}`)
+    }
     menuVisible.value=!menuVisible.value
 }
-const mypages=['leaveword','mypost','mylike','mycomment']
+const mypages=['myword','mypost','mylike','mycomment','taword']
 const currentkey=computed(()=>(
 route.path.split('/').pop() || 'square'
 ))
@@ -74,6 +83,7 @@ if(!bar){return}
 bar.style.width=`${el.offsetWidth}px`
 bar.style.transform=`translateX(${el.offsetLeft}px)`
 }
+
 </script>
 
 <style scoped lang="scss">
@@ -193,6 +203,7 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
             align-items: center;
             gap: 50px;
             .note-tab{
+                position: relative;
                 cursor: pointer;
                 font-size: 1.3em;
                 font-family: 'LXGW WenKai', 'Inter', sans-serif;
@@ -206,6 +217,28 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
                 }
                 &.active{
                     font-weight: 700;
+                }
+                .note-badge{
+                    position: absolute;
+                    top: 0.3vh;
+                    right: -1.2em;
+                    min-width: 1.15em;
+                    height: 1.15em;
+                    padding: 0 0.32em;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.62em;
+                    font-weight: 700;
+                    font-style: normal;
+                    line-height: 1;
+                    color: #fff;
+                    background: linear-gradient(135deg, #ff5a5f 0%, #e03131 100%);
+                    border: 1.5px solid #fff;
+                    border-radius: 999px;
+                    box-shadow: 0 2px 6px rgba(224, 49, 49, 0.45);
+                    pointer-events: none;
                 }
             }
             .slide-bar{

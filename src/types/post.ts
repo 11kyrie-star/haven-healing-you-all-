@@ -74,7 +74,8 @@ data:T
 interface getpostdata{
     list:postitem[],
     page:number,
-    size:number
+    size:number,
+    hasMore:boolean
 }
 
 export interface postitem{

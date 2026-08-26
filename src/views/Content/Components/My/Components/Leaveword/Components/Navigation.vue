@@ -3,7 +3,7 @@
         <input type="radio" name="word-tab" id="tab-mine" class="nav-radio" checked />
         <input type="radio" name="word-tab" id="tab-theirs" class="nav-radio" />
         <label for="tab-mine" class="nav-item nav-item-mine" @click="pushme">我对TA说</label>
-        <label for="tab-theirs" class="nav-item nav-item-theirs" @click="pushta">Ta对我说</label>
+        <label for="tab-theirs" class="nav-item nav-item-theirs" @click="pushta">TA对我说</label>
         <span class="nav-slider"></span>
     </div>
 </template>

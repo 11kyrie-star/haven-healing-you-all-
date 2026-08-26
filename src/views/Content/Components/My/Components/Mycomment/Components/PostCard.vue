@@ -2,7 +2,6 @@
     <div class="postcard-container">
         <div class="myword">
         <div class="name" style="cursor: default;"><span class="me">我</span>:</div>
-        <div class="another" v-show="false" style="cursor: default;"><span class="me">我 </span><span class="reply">回复 </span><span class="outhor">他</span>:</div>
         <div class="content">
             <div class="text" style="cursor: default;" v-html="props.item.my_comment.content" v-show="props.item.my_comment.content.trim().length"></div>
             <div class="img"><img :src=props.item.my_comment.images[0] alt=""></div>
