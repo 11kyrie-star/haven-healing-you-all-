@@ -28,6 +28,8 @@
     width: 100%;
     min-height: 20vh;
     padding: 14px 16px;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 20vh;
     background-color: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 12px;
