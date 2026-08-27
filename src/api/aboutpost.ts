@@ -46,12 +46,12 @@ export async function getposttextapi({page,size}:{page:number,size:number}):Prom
 export async function getpostdailyapi({page,size}:{page:number,size:number}):Promise<getpost>{
     return await request.get('/post/list/daily',{params:{page,size}})
 }
-export async function getpostcomment(postId:number,page?:number,size?:number):Promise<commentres<comment[]>>{
-    return await request.get(`comment/list/${postId}`)
+export async function getpostcomment(postId:number,page?:number,size?:number):Promise<commentres>{
+    return await request.get(`comment/list/${postId}`,{params:{page,size}})
 }
 
-export async function getpostreply(parent_id:number,page?:number,size?:number):Promise<commentres<comment[]>>{
-    return await request.get(`/reply/list/${parent_id}`)
+export async function getpostreply(parent_id:number,page?:number,size?:number):Promise<commentres>{
+    return await request.get(`/reply/list/${parent_id}`,{params:{page,size}})
 }
 
 export  async function sendcomment({post_id,content,images}:{post_id:number,content:string,images:string[]}):Promise<sendcommentres>{

@@ -55,8 +55,14 @@
         </div>
         <div class="show-comment" v-if="showcomment">
         <div class="comment-item" v-for="item in roots" :key="item.id">    
-         <CommentItem :comment="item" :activereplyid="activereplyid" @toggle-reply="getreply" @want-reply="findeditor" @cancel="change"></CommentItem>
+         <CommentItem :comment="item" :activereplyid="activereplyid" :has-morereplys="hasMorereplys" :replys-error="replysError" :replys-loading="replysLoading" @toggle-reply="getreply" @want-reply="findeditor" @cancel="change"></CommentItem>
         </div>     
+        <!-- 加载更多评论 -->
+        <div class="load-more-comments" v-if="hasMoreComments" @click="loadMoreComments" :class="{loading: commentsLoading, error: commentsError}" style="user-select: none;">
+            <span v-if="commentsLoading" class="spinner"></span>
+            <span style="cursor: default;">{{ commentsError ? '加载失败，点击重试' : (commentsLoading ? '评论加载中...' : '加载更多评论') }}</span>
+            <el-icon :size="14" class="load-more-arrow" style="cursor: pointer;"><ArrowDown /></el-icon>
+        </div>
         </div>
         <div class="push-comment">
          <Editor ref="editref" margintop="3vh" :showeditor=false minheight="6vh" decide="comment" :post_id="id" @newcomment="addcomment"></Editor>   
@@ -168,8 +174,9 @@ const commentList=ref<comment[]>([])
 const roots=ref<commentnode[]>([])
 const showcomment=ref(false)
 const isCommentactive=ref(false) //控制按钮的状态
+
 //点击评论按钮后的处理函数
-const commenthandle=async ()=>{
+const commenthandle=()=>{
 if(commentcount.value===0){
     return
 }
@@ -180,9 +187,7 @@ if(isCommentactive.value===false){
 }
 if(showcomment.value===false){
 showcomment.value=true
-const res=await getpostcomment(props.id)
-commentList.value=res.data
-roots.value=biuldtree(commentList.value)
+loadMoreComments()
 }else{
     showcomment.value=false
 }
@@ -222,16 +227,35 @@ function biuldtree(list:comment[]):commentnode[]{
     return roots.value
 }
 //点到回复评论的函数
+let replypage=ref(1)
+let replysize=10
+const replysLoading=ref(false)
+const replysError=ref(false)
+const hasMorereplys=ref(true)
 const getreply=async (commId:number)=>{
 const node=findNode(roots.value,commId)
 if(!node) return
+if(replysLoading.value || !hasMorereplys.value) return
+if(replysError.value){replysError.value=false}
+replysLoading.value=true
 if(node.children.length===0){
-const replies=(await getpostreply(commId)).data
-node.children.push(...replies.map((item:comment)=>({
+try{
+const res=(await getpostreply(commId,replypage.value,replysize))
+if(res.status===0){
+    const replies=res.data.list
+    node.children.push(...replies.map((item:comment)=>({
 ...item,
 children:[],
 showreply:false
 })))
+    replypage.value++
+    hasMorereplys.value=res.data.hasMore
+}
+}catch{
+    replysError.value=true
+}finally{
+    replysLoading.value=false
+}
 }
 node.showreply=true
 }
@@ -297,6 +321,29 @@ const router=useRouter()
 const leave=()=>{
 router.push(`/layout/content/leaveban/${props.id}`)
 }
+let page=ref(1)
+const size=10
+const commentsLoading=ref(false)
+const commentsError=ref(false)
+const hasMoreComments=ref(true)
+const loadMoreComments=async()=>{
+    if(commentsLoading.value || !hasMoreComments.value){return}
+    if(commentsError.value){commentsError.value=false}
+    commentsLoading.value=true
+    try{
+        const res=await getpostcomment(props.id,page.value,size)
+        if(res.status===0){
+        commentList.value=res.data.list
+        roots.value=biuldtree(commentList.value)
+        page.value++
+        hasMoreComments.value=res.data.hasMore
+        }
+    }catch{
+        commentsError.value=true
+    }finally{
+        commentsLoading.value=false
+    }
+}
 </script>
 
 <style scoped lang="scss">
@@ -340,7 +387,7 @@ router.push(`/layout/content/leaveban/${props.id}`)
         }
     }
     &:hover{
-        top: -3px;
+        top: -2px;
         border-color: rgba(224, 128, 113, 0.5);
         box-shadow: 0 6px 18px rgba(224, 128, 113, 0.24), 0 14px 34px rgba(120, 60, 40, 0.16);
     }

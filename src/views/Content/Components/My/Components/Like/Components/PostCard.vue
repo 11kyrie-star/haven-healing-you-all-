@@ -55,8 +55,14 @@
         </div>
         <div class="show-comment" v-if="showcomment">
         <div class="comment-item" v-for="item in roots" :key="item.id">    
-         <CommentItem :comment="item" :activereplyid="activereplyid" @toggle-reply="getreply" @want-reply="findeditor" @cancel="change"></CommentItem>
+         <CommentItem :comment="item" :activereplyid="activereplyid" :has-morereplys="hasMorereplys" :replys-error="replysError" :replys-loading="replysLoading" @toggle-reply="getreply" @want-reply="findeditor" @cancel="change"></CommentItem>
         </div>     
+        <!-- 加载更多评论 -->
+        <div class="load-more-comments" v-if="hasMoreComments" @click="loadMoreComments" :class="{loading: commentsLoading, error: commentsError}" style="user-select: none;">
+            <span v-if="commentsLoading" class="spinner"></span>
+            <span style="cursor: default;">{{ commentsError ? '加载失败，点击重试' : (commentsLoading ? '评论加载中...' : '加载更多评论') }}</span>
+            <el-icon :size="14" class="load-more-arrow" style="cursor: pointer;"><ArrowDown /></el-icon>
+        </div>
         </div>
         <div class="push-comment">
          <Editor ref="editref" margintop="3vh" :showeditor=false minheight="6vh" decide="comment"  @newcomment="addcomment"></Editor>   
@@ -161,7 +167,7 @@ const roots=ref<commentnode[]>([])
 const showcomment=ref(false)
 const isCommentactive=ref(false) //控制按钮的状态
 //点击评论按钮后的处理函数
-const commenthandle=async ()=>{
+const commenthandle=()=>{
 if(commentcount.value===0){
     return
 }
@@ -172,9 +178,7 @@ if(isCommentactive.value===false){
 }
 if(showcomment.value===false){
 showcomment.value=true
-const res=await getpostcomment(props.id)
-commentList.value=res.data
-roots.value=biuldtree(commentList.value)
+loadMoreComments()
 }else{
     showcomment.value=false
 }
@@ -214,16 +218,35 @@ function biuldtree(list:comment[]):commentnode[]{
     return roots.value
 }
 //点到回复评论的函数
+let replypage=ref(1)
+let replysize=10
+const replysLoading=ref(false)
+const replysError=ref(false)
+const hasMorereplys=ref(true)
 const getreply=async (commId:number)=>{
 const node=findNode(roots.value,commId)
 if(!node) return
+if(replysLoading.value || !hasMorereplys.value) return
+if(replysError.value){replysError.value=false}
+replysLoading.value=true
 if(node.children.length===0){
-const replies=(await getpostreply(commId)).data
-node.children.push(...replies.map((item:comment)=>({
+try{
+const res=(await getpostreply(commId,replypage.value,replysize))
+if(res.status===0){
+    const replies=res.data.list
+    node.children.push(...replies.map((item:comment)=>({
 ...item,
 children:[],
 showreply:false
 })))
+    replypage.value++
+    hasMorereplys.value=res.data.hasMore
+}
+}catch{
+    replysError.value=true
+}finally{
+    replysLoading.value=false
+}
 }
 node.showreply=true
 }
@@ -283,6 +306,29 @@ onBeforeUnmount(()=>{
     }
     stop()
 })
+let page=ref(1)
+const size=10
+const commentsLoading=ref(false)
+const commentsError=ref(false)
+const hasMoreComments=ref(true)
+const loadMoreComments=async()=>{
+    if(commentsLoading.value || !hasMoreComments.value){return}
+    if(commentsError.value){commentsError.value=false}
+    commentsLoading.value=true
+    try{
+        const res=await getpostcomment(props.id,page.value,size)
+        if(res.status===0){
+        commentList.value=res.data.list
+        roots.value=biuldtree(commentList.value)
+        page.value++
+        hasMoreComments.value=res.data.hasMore
+        }
+    }catch{
+        commentsError.value=true
+    }finally{
+        commentsLoading.value=false
+    }
+}
 </script>
 
 <style scoped lang="scss">
@@ -386,6 +432,75 @@ onBeforeUnmount(()=>{
     .show-comment{
         margin-top: 10px;
     }
+    /* 加载更多评论按钮 */
+    .load-more-comments{
+        margin: 12px auto 2px;
+        width: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 20px;
+        font-size: 0.82em;
+        letter-spacing: 1px;
+        color: rgba(224, 128, 113, 0.85);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 243, 234, 0.55));
+        border: 1px solid rgba(224, 128, 113, 0.35);
+        border-radius: 999px;
+        cursor: pointer;
+        user-select: none;
+        box-shadow: 0 2px 8px rgba(224, 128, 113, 0.15);
+        transition: all 0.25s ease;
+
+        .spinner{
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+            border: 2px solid rgba(224, 128, 113, 0.2);
+            border-top-color: rgba(224, 128, 113, 0.9);
+            border-radius: 50%;
+            animation: load-more-spin 0.8s linear infinite;
+        }
+        .load-more-arrow{
+            transition: transform 0.25s ease;
+        }
+        &:hover{
+            color: #fff;
+            background: linear-gradient(135deg, rgba(224, 128, 113, 0.95), rgba(250, 130, 145, 0.9));
+            border-color: rgba(224, 128, 113, 0.5);
+            box-shadow: 0 4px 14px rgba(224, 128, 113, 0.35);
+            transform: translateY(-1px);
+            .load-more-arrow{
+                transform: translateY(2px);
+            }
+        }
+        &:active{
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(224, 128, 113, 0.25);
+        }
+        /* 加载中：转圈提示+禁用 */
+        &.loading{
+            color: rgba(224, 128, 113, 0.9);
+            cursor: default;
+            pointer-events: none;
+        }
+        /* 网络异常：加载失败可点击重试 */
+        &.error{
+            color: #c6401f;
+            background: linear-gradient(135deg, rgba(255, 235, 232, 0.85), rgba(255, 243, 234, 0.6));
+            border-color: rgba(219, 69, 35, 0.45);
+            box-shadow: 0 2px 10px rgba(219, 69, 35, 0.2);
+            .load-more-arrow{
+                transform: translateY(2px);
+            }
+            &:hover{
+                color: #fff;
+                background: linear-gradient(135deg, rgba(219, 69, 35, 0.95), rgba(250, 130, 145, 0.9));
+                border-color: rgba(219, 69, 35, 0.5);
+                box-shadow: 0 4px 14px rgba(219, 69, 35, 0.35);
+            }
+        }
+    }
     .icon{
          display: flex;
          align-items: center;   
@@ -454,6 +569,10 @@ onBeforeUnmount(()=>{
     }
     }
 }
+@keyframes load-more-spin{
+    to { transform: rotate(360deg); }
+}
+
 @keyframes like-pop{
     0%   { transform: scale(1); }
     50%  { transform: scale(1.3); }

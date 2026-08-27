@@ -27,17 +27,23 @@
         </div>
     </div>
     <div v-if="comment.showreply && comment.children.length">
-           <CommentItem v-for="children in comment.children" :comment="children" :key="children.id" :activereplyid="activereplyid" :depth="(depth??0)+1" @toggle-reply="(id:number)=>emit('toggleReply',id)" @want-reply="(id:number,reply:string)=>emit('wantReply',id,reply)"></CommentItem>
+           <CommentItem v-for="children in comment.children" :comment="children" :key="children.id" :activereplyid="activereplyid" :depth="(depth??0)+1" :replys-error="props.replysError" :replys-loading="props.replysLoading" :has-morereplys="props.hasMorereplys" @toggle-reply="(id:number)=>emit('toggleReply',id)" @want-reply="(id:number,reply:string)=>emit('wantReply',id,reply)"></CommentItem>
+    <!-- 加载更多回复 -->
+    <div class="load-more-comments" v-if="props.hasMorereplys" @click="loadMorereplys" :class="{loading: props.replysLoading, error: props.replysError}" style="user-select: none;">
+        <span v-if="props.replysLoading" class="spinner"></span>
+        <span style="cursor: default;">{{ replysError ? '加载失败，点击重试' : (replysLoading ? '加载中...' : '加载更多回复') }}</span>
+        <el-icon :size="14" class="load-more-arrow" style="cursor: pointer;"><ArrowDown /></el-icon>
+    </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import {Star,ChatSquare,StarFilled} from '@element-plus/icons-vue'
+import {Star,ChatSquare,StarFilled,ArrowDown} from '@element-plus/icons-vue'
 import { commentstar ,cancelcomentstar} from '@/api/aboutpost';
 import {ref,computed} from 'vue'
 import { formatPostTime } from '@/utils/time';
 import { ElMessage } from 'element-plus';
-const props= defineProps<{comment:commentnode,depth?:number,activereplyid:number | null}>()
+const props= defineProps<{comment:commentnode,depth?:number,activereplyid:number | null,replysLoading:boolean,replysError:boolean,hasMorereplys:boolean}>()
 const emit=defineEmits<{toggleReply:[commId:number],wantReply:[commId:number,reply:string],cancel:[]}>()
 interface commentnode{
     id:number,
@@ -101,8 +107,13 @@ const handlereplebtn=()=>{
     }
 }
 const isactive=ref(false)
+
+
 let timestr=ref()
 timestr.value=formatPostTime(props.comment.create_at)
+const loadMorereplys=()=>{
+    emit('toggleReply',props.comment.id)
+}
 </script>
 
 <style scoped lang="scss">
@@ -116,6 +127,8 @@ timestr.value=formatPostTime(props.comment.create_at)
     position: relative;
     font-family: 'LXGW WenKai', 'Inter', sans-serif;
     color: rgba(50, 50, 50, 0.85);
+    content-visibility: auto;
+    contain-intrinsic-size: auto 20vh;
     &.nested{
         background-color: rgba(255, 255, 255, 0.5);
         zoom: 0.7;
@@ -251,6 +264,80 @@ timestr.value=formatPostTime(props.comment.create_at)
         }
     }
 }
+
+/* 加载更多回复按钮 */
+.load-more-comments{
+    margin: 12px auto 2px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 20px;
+    font-size: 0.82em;
+    letter-spacing: 1px;
+    color: rgba(224, 128, 113, 0.85);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 243, 234, 0.55));
+    border: 1px solid rgba(224, 128, 113, 0.35);
+    border-radius: 999px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 2px 8px rgba(224, 128, 113, 0.15);
+    transition: all 0.25s ease;
+
+    .spinner{
+        width: 12px;
+        height: 12px;
+        flex-shrink: 0;
+        border: 2px solid rgba(224, 128, 113, 0.2);
+        border-top-color: rgba(224, 128, 113, 0.9);
+        border-radius: 50%;
+        animation: load-more-spin 0.8s linear infinite;
+    }
+    .load-more-arrow{
+        transition: transform 0.25s ease;
+    }
+    &:hover{
+        color: #fff;
+        background: linear-gradient(135deg, rgba(224, 128, 113, 0.95), rgba(250, 130, 145, 0.9));
+        border-color: rgba(224, 128, 113, 0.5);
+        box-shadow: 0 4px 14px rgba(224, 128, 113, 0.35);
+        transform: translateY(-1px);
+        .load-more-arrow{
+            transform: translateY(2px);
+        }
+    }
+    &:active{
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(224, 128, 113, 0.25);
+    }
+    /* 加载中：转圈提示+禁用 */
+    &.loading{
+        color: rgba(224, 128, 113, 0.9);
+        cursor: default;
+        pointer-events: none;
+    }
+    /* 网络异常：加载失败可点击重试 */
+    &.error{
+        color: #c6401f;
+        background: linear-gradient(135deg, rgba(255, 235, 232, 0.85), rgba(255, 243, 234, 0.6));
+        border-color: rgba(219, 69, 35, 0.45);
+        box-shadow: 0 2px 10px rgba(219, 69, 35, 0.2);
+        .load-more-arrow{
+            transform: translateY(2px);
+        }
+        &:hover{
+            color: #fff;
+            background: linear-gradient(135deg, rgba(219, 69, 35, 0.95), rgba(250, 130, 145, 0.9));
+            border-color: rgba(219, 69, 35, 0.5);
+            box-shadow: 0 4px 14px rgba(219, 69, 35, 0.35);
+        }
+    }
+}
+@keyframes load-more-spin{
+    to { transform: rotate(360deg); }
+}
+
 @keyframes like-pop{
     0%   { transform: scale(1); }
     50%  { transform: scale(1.3); }

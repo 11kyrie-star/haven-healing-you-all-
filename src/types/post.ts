@@ -114,10 +114,15 @@ export interface comment{
     is_liked:number
 }
 
-export interface commentres<T>{
+export interface commentres{
     status:number,
     msg:string,
-    data:T
+    data:{
+        page:number,
+        size:number,
+        hasMore:boolean,
+        list:comment[]
+    }
 }
 
 export interface sendcommentres{
