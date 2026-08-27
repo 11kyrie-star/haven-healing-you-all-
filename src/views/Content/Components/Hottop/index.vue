@@ -47,20 +47,24 @@ console.log(res)
     .hot-title{
         cursor: default;
         margin-top: 4%;
-        width: 35%;
-        height: 8%;
-        background-color: rgb(230, 30, 30);
-        color: #ff8c00;
+        width: fit-content;
+        min-width: 32%;
+        padding: 1.4% 6% 1.6%;
+        box-sizing: border-box;
+        background:
+            radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9) 0%, transparent 45%),
+            linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(250, 205, 190, 0.32));
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(6px);
+        color: #c06553;
         align-self: center;
         text-align: center;
-        border-radius: 12px;
-        box-shadow:
-        0 4px 0 #8b1a1a,                    // 底部厚阴影，模仿"块"的厚度
-        0 6px 15px rgba(230, 57, 70, 0.4);  
-        padding-top: 3%;
+        border-radius: 999px;
+        box-shadow: 0 2px 10px rgba(224, 128, 113, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6);
         font-weight: 700;
         font-size: 1.5em;
-        text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); // 文字凹陷感
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
         letter-spacing: 3px;
         position: relative;
         &::before,
@@ -72,9 +76,9 @@ console.log(res)
         height:10%;
         transform: translateY(-50%);
         background:
-            radial-gradient(ellipse 50% 90% at 50% 70%, #e63946 0%, transparent 70%),
-            radial-gradient(ellipse 35% 80% at 50% 60%, #ff8c00 0%, transparent 65%),
-            radial-gradient(ellipse 20% 60% at 50% 45%, #ffd700 0%, transparent 55%),
+            radial-gradient(ellipse 50% 90% at 50% 70%, #e8a79e 0%, transparent 70%),
+            radial-gradient(ellipse 35% 80% at 50% 60%, #eec09a 0%, transparent 65%),
+            radial-gradient(ellipse 20% 60% at 50% 45%, #f7e0c0 0%, transparent 55%),
             radial-gradient(ellipse 10% 35% at 50% 30%, #fff 0%, transparent 50%);
     }
     &::before { right: 100%; margin-right: 10px; }
@@ -103,13 +107,13 @@ console.log(res)
         }
        .hot-item{
         &:nth-child(1) .top{
-            color: #ff4500;
+            color: #d95f4e;
         }
         &:nth-child(2) .top{
-            color:  #ff8c00;
+            color: #e08d5a;
         }
         &:nth-child(3) .top{
-            color:#ffa500;
+            color:#cfa04e;
         }
         width: 100%;
         flex: 0.8fr;
@@ -144,7 +148,7 @@ console.log(res)
             margin-left: 40%;
             font-size: 1.3em;
             animation: plus 1.5s ease-in-out infinite,glow 3s ease-in-out infinite alternate;
-            background: linear-gradient(180deg,#ff4500, #ff8c00);
+            background: linear-gradient(180deg, #e06052, #f2a65e);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -165,8 +169,8 @@ console.log(res)
     50% {transform: translateY(-4px);}
 }
 @keyframes glow{
-    0%   { text-shadow: 0 0 4px #ff4500; }
-  100% { text-shadow: 0 0 12px #ff6347, 0 0 24px #ff4500; }
+    0%   { text-shadow: 0 0 4px #e08071; }
+  100% { text-shadow: 0 0 12px #fa8291, 0 0 24px #e06052; }
 }
 @keyframes uncover{
     0%   { clip-path: inset(0 0 0 0); }
