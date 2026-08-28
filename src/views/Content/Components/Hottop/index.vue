@@ -2,21 +2,70 @@
 <div class="hottop-container">
     <div class="hot-title" style="user-select: none;">今日热榜</div>
     <div class="hot-contain" style="user-select: none;">
-        <div class="hot-item" v-for="item in hotlist" :key="item.id"><div class="top">{{ item.id }}</div><p class="hot-post">{{ item.post }}</p><div class="hot-number">{{ item.hot }}</div><img src="@/assets/fire.svg" alt=""></div>
-    </div>      
+        <div class="hot-item" v-for="(item,index) in hotlist" :key="item.id"><div class="top">{{ index+1 }}</div><p class="hot-post" @click="pushdetail(item.id)">{{ limitHotText(item.content) }}</p><div class="hot-number">{{ item.hot_value }}</div><img src="@/assets/fire.svg" alt=""></div>
+        <!-- 加载中 -->
+        <div class="hot-state" v-if="loading">
+            <span class="hot-spinner"></span>
+            <p class="hot-state-title">热榜加载中...</p>
+        </div>
+        <!-- 空状态 -->
+        <div class="hot-state" v-if="isEmpty" style="user-select: none;">
+            <div class="hot-state-icon">
+                <el-icon :size="34"><TrendCharts /></el-icon>
+            </div>
+            <p class="hot-state-title" style="cursor: default;">暂无热榜数据</p>
+            <p class="hot-state-sub" style="cursor: default;">过一会儿再来看看吧</p>
+        </div>
+        <!-- 网络异常 -->
+        <div class="hot-state hot-error" v-if="hasError" style="user-select: none;">
+            <div class="hot-state-icon">
+                <el-icon :size="34"><WarningFilled /></el-icon>
+            </div>
+            <p class="hot-state-title" style="cursor: default;">网络开小差了</p>
+            <p class="hot-state-sub" style="cursor: default;">热榜加载失败，请检查网络后重试</p>
+            <div class="hot-state-btn" style="cursor: pointer;" @click="reload">刷新重试</div>
+        </div>
+    </div>
 </div>
 </template>
 
 <script setup lang="ts">
 import { ref,onMounted } from 'vue';
 import { gethotdata } from '@/api/hottop';
-import type { hotdatares } from '@/types/hot';
-let hotlist=ref<hotdatares[]>([])
-onMounted(async()=>{
+import type { hotlist } from '@/types/hot';
+import { useThrottleFn } from '@vueuse/core';
+import { useRouter } from 'vue-router';
+import { TrendCharts, WarningFilled } from '@element-plus/icons-vue';
+const router=useRouter()
+let hotlist=ref<hotlist[]>([])
+const hasError=ref(false)
+const loading=ref(false)
+const isEmpty=ref(false)
+const loadhot=async()=>{
+if(loading.value || isEmpty.value){return}
+if(hasError.value){hasError.value=false}
+loading.value=true
+try{
 const res=await gethotdata()
-hotlist.value=res.data
-console.log(res)
-})
+if(res.status===0){
+hotlist.value=res.data.list
+}
+}catch{
+hasError.value=true
+}finally{
+loading.value=false
+}
+}
+onMounted(loadhot)
+const reload=useThrottleFn(()=>{loadhot()},1000)
+const pushdetail=(id:number)=>{
+router.push(`/layout/content/detail/${id}`)
+}
+//限制热榜标题字数：最多 8 个字，达到 8 个字以上就加省略号
+const limitHotText=(str:string,max:number=8)=>{
+    const text=String(str||'').replace(/<[^>]+>/g,'') //去掉富文本里的HTML标签，避免把标签当字数
+    return text.length>=max ? text.slice(0,max)+'...' : text
+}
 </script>
 
 <style scoped lang="scss">
@@ -135,12 +184,12 @@ console.log(res)
             color:#6b4e31 ;
         }
         .hot-post{
+            width: 100%;
             font-size: 1em;
             font-weight: 300;
             place-self: center;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            overflow: hidden;        /* 兜底：异常超长也不撑破布局 */
+            white-space: nowrap;     /* 保持单行 */
             cursor: pointer;
         }
         .hot-number{
@@ -157,7 +206,91 @@ console.log(res)
             cursor: default;
         }
        }
+        .hot-state{
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 30px 16px 40px;
+            text-align: center;
+            color: rgba(128, 110, 100, 0.6);
+
+            .hot-spinner{
+                width: 30px;
+                height: 30px;
+                border: 3px solid rgba(224, 128, 113, 0.2);
+                border-top-color: rgba(224, 128, 113, 0.9);
+                border-radius: 50%;
+                animation: hot-spin 0.8s linear infinite;
+            }
+            .hot-state-icon{
+                width: 72px;
+                height: 72px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: rgba(224, 128, 113, 0.85);
+                background:
+                    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9) 0%, transparent 45%),
+                    linear-gradient(135deg, rgba(233, 189, 124, 0.5), rgba(250, 130, 145, 0.38));
+                border: 1px solid rgba(255, 255, 255, 0.7);
+                box-shadow: 0 6px 16px rgba(120, 60, 40, 0.12),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                animation: hot-float 3s ease-in-out infinite;
+            }
+            .hot-state-title{
+                font-size: 1em;
+                font-weight: 700;
+                letter-spacing: 2px;
+                color: rgba(120, 90, 80, 0.8);
+            }
+            .hot-state-sub{
+                font-size: 0.82em;
+                line-height: 1.8;
+                letter-spacing: 1px;
+                color: rgba(128, 110, 100, 0.55);
+            }
+            .hot-state-btn{
+                margin-top: 4px;
+                padding: 6px 20px;
+                font-size: 0.82em;
+                letter-spacing: 3px;
+                color: #c6401f;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 243, 234, 0.5));
+                border: 1px solid rgba(224, 128, 113, 0.35);
+                border-radius: 999px;
+                box-shadow: 0 2px 8px rgba(224, 128, 113, 0.18);
+                transition: all 0.25s ease;
+                &:hover{
+                    color: #fff;
+                    background: linear-gradient(135deg, rgba(224, 128, 113, 0.95), rgba(250, 130, 145, 0.9));
+                    box-shadow: 0 4px 14px rgba(224, 128, 113, 0.35);
+                }
+            }
+            &.hot-error{
+                .hot-state-icon{
+                    color: rgba(219, 69, 35, 0.9);
+                    background:
+                        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9) 0%, transparent 45%),
+                        linear-gradient(135deg, rgba(250, 130, 145, 0.4), rgba(224, 128, 113, 0.35));
+                    box-shadow: 0 6px 16px rgba(224, 128, 113, 0.18),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                }
+            }
+        }
     }
+}
+
+@keyframes hot-spin{
+    to { transform: rotate(360deg); }
+}
+
+@keyframes hot-float{
+    0%, 100%{ transform: translateY(0); }
+    50%{ transform: translateY(-6px); }
 }
 
 @keyframes plus{
