@@ -74,10 +74,17 @@ const key=pattern.split('/')[3]
 const exist=store.stack.findIndex(c=>c.path===to.path)
 if(exist!==-1){
   store.stack=store.stack.slice(0,exist+1)
-}else if(toplevel.includes(key!)) {
-  store.stack=[{label:labelMap[key!]!,path:to.path}]
-}else{
-  store.stack.push({label:labelMap[key!]!,path:to.path})
+  return
 }
+ if(toplevel.includes(key!)) {
+  return store.stack=[{label:labelMap[key!]!,path:to.path,key:key!}]
+}
+const anexist=store.stack.findIndex(c=>c.key===key)
+if(anexist!==-1){
+  store.stack[anexist]!.path=to.path
+  store.stack.slice(0,anexist+1)
+  return
+}
+store.stack.push({label:labelMap[key!]!,path:to.path,key:key!})
 })
 export default router

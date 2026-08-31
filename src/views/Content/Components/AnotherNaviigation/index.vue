@@ -38,5 +38,5 @@ const router=useRouter()
 const go=(path:string)=>{
     router.push(path)
 }
-const props=defineProps<{data:{label:string,path:string}[]}>()
+const props=defineProps<{data:{label:string,path:string,key:string}[]}>()
 </script>

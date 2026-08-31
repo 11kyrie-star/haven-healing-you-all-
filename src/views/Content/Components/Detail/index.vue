@@ -186,14 +186,20 @@ import PostCard from '@/components/PostCard.vue';
 import { useRoute } from 'vue-router';
 import { detailpostapi } from '@/api/aboutpost';
 import type { detaildata } from '@/types/post';
-import {ref,onMounted} from 'vue'
+import {ref,onMounted,watch} from 'vue'
+import router from '@/router';
 const route=useRoute()
-const id=Number(route.params.id)
 const post=ref<detaildata['data']>()
-onMounted(async ()=>{
+const reload=async(rowid:string | undefined | string[])=>{
+if(rowid===undefined){return}
+const id=Number(rowid)
 const res=await detailpostapi(id)
 if(res.status===0){
     post.value=res.data
 }
+}
+onMounted( ()=>{
+reload(route.params.id)
 })
+watch(()=>route.params.id,(newId)=>{reload(newId)})
 </script>

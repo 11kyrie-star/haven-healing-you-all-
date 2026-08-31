@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
 export const useCrumbStore=defineStore('crumb',{
-    state:()=>({stack:[] as {label:string;path:string}[]}),
+    state:()=>({stack:[] as {label:string;path:string,key:string}[]}),
     persist:true
 })
