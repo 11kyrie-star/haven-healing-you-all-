@@ -28,7 +28,7 @@
                 gridlayout.special?'1fr 1fr':`repeat(${gridlayout.rows},1fr)`,gap:'4px',aspectRatio:gridlayout.special?'16/9':gridlayout.aspect
             ,borderRadius:'8px',overflow:'hidden',marginTop:'10px',boxShadow:'0 2px 12px rgba(120, 60, 40, 0.08)'}" >
             <div v-for="(item,index) in props.images" :style="gridlayout.special && index===0?{gridRow:'1/3'}:{}">
-              <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;">
+              <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;" @click="openwindow(item)">
             </div>
             </div>
         </div>
@@ -78,6 +78,7 @@ import {getpostcomment,getpostreply,starpost,cancelstarpost,addpostview} from '@
 import type { post } from '@/types/post.ts';
 import type { comment } from '@/types/post.ts';
 import { computed } from 'vue';
+import { useWindowStore } from '@/stores/window';
 import Editor from '@/components/Editor.vue';
 import CommentItem from '@/components/CommentItem.vue';
 import { ref,onBeforeUnmount } from 'vue';
@@ -97,6 +98,11 @@ const props=defineProps<{
     is_liked:number,
     index:number
 }>()
+//打开弹窗展示图片
+const windowstore=useWindowStore()
+const openwindow=(item:string)=>{
+windowstore.open('postimg',item)
+}
 //用于记录回复评论的id
 const activereplyid=ref<number | null>(null)
 const viewcount=ref(props.view_count)

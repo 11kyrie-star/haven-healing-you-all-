@@ -1,8 +1,8 @@
 ﻿<template>
 <div class="layout-wrapper">
-<Background @open="avatarway"></Background>
+<Background></Background>
 <RouterView></RouterView>
-<Window :visible="showvisible" :decwindow="decwindow" @close="showvisible=false"></Window>
+<Window></Window>
 </div>
 </template>
 
@@ -13,7 +13,6 @@ import { getTime } from "@/utils/token";
 import { ref ,onMounted,onUnmounted} from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-
 let time = 0
 const route = useRouter()
 let timenum: ReturnType<typeof setTimeout> | null = null
@@ -63,12 +62,6 @@ onUnmounted(() => {
   }
 })
 
-const showvisible = ref(false)
-const decwindow = ref('')
-function avatarway(command: string) {
-  showvisible.value = true
-  decwindow.value = command
-}
 </script>
 
 <style scoped lang="scss">

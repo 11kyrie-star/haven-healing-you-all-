@@ -2,7 +2,7 @@
 <div class="bg">
     <Logo></Logo>
     <div class="avatar-wrap">
-    <Avatar @open="trans" width="6vw" height="12.5vh" radius="8px"></Avatar>
+    <Avatar width="6vw" height="12.5vh" radius="8px"></Avatar>
     </div>
     <Name left="21%" top="75%" fontsize="2em"></Name>
     <Setting @open="showinfor"></Setting>
@@ -17,9 +17,6 @@ import Name from '@/views/Background/Components/Name/index.vue'
 const emit= defineEmits<{
     open:[command:string]
 }>()
-function trans(command:string){
-  emit('open',command)
-}
 function showinfor(command:string){
     emit('open',command)
 }

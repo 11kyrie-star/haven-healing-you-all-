@@ -30,7 +30,7 @@
                 gridlayout.special?'1fr 1fr':`repeat(${gridlayout.rows},1fr)`,gap:'4px',aspectRatio:gridlayout.special?'16/9':gridlayout.aspect
             ,borderRadius:'8px',overflow:'hidden',marginTop:'10px',boxShadow:'0 2px 12px rgba(120, 60, 40, 0.08)'}" >
             <div v-for="(item,index) in props.images" :style="gridlayout.special && index===0?{gridRow:'1/3'}:{}">
-              <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;">
+              <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;" @click="openwindow(item)">
             </div>
             </div>
         </div>
@@ -80,6 +80,7 @@ import { formatPostTime } from '@/utils/time.ts';
 import {getpostcomment,getpostreply,starpost,cancelstarpost,addpostview,changepoststatus,deletepostapi} from '@/api/aboutpost.ts';
 import type { post } from '@/types/post.ts';
 import type { comment } from '@/types/post.ts';
+import { useWindowStore } from '@/stores/window';
 import { computed } from 'vue';
 import Editor from '@/components/Editor.vue';
 import CommentItem from '@/components/CommentItem.vue';
@@ -100,6 +101,11 @@ const props=defineProps<{
     is_public:1 |0,
     index:number
 }>()
+//打开弹窗显示照片
+const windowstore=useWindowStore()
+const openwindow=(postimg:string)=>{
+    windowstore.open('postimg',postimg)
+}
 //用于记录回复评论的id
 const activereplyid=ref<number | null>(null)
 const viewcount=ref(props.view_count)

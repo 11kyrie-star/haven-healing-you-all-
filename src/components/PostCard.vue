@@ -28,7 +28,7 @@
                 gridlayout.special?'1fr 1fr':`repeat(${gridlayout.rows},1fr)`,gap:'4px',aspectRatio:gridlayout.special?'16/9':gridlayout.aspect
             ,borderRadius:'8px',overflow:'hidden',marginTop:'10px',boxShadow:'0 2px 12px rgba(120, 60, 40, 0.08)'}" >
             <div v-for="(item,index) in props.images" :style="gridlayout.special && index===0?{gridRow:'1/3'}:{}">
-              <img :src="item" alt="帖子图片" loading="lazy" decoding="async"  style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;">
+              <img :src="item" alt="帖子图片" loading="lazy" decoding="async"  style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;" @click="openWindow(item)">
             </div>
             </div>
         </div>
@@ -83,6 +83,7 @@ import CommentItem from './CommentItem.vue';
 import { ref,onBeforeUnmount,inject } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
+import { useWindowStore } from '@/stores/window.ts';
 const props=defineProps<{
     id:number,
     user_id:number,
@@ -343,6 +344,11 @@ const loadMoreComments=async()=>{
     }finally{
         commentsLoading.value=false
     }
+}
+//点击照片打开弹窗
+const windowstore=useWindowStore()
+const openWindow=(img:string)=>{
+windowstore.open('postimg',img)
 }
 </script>
 

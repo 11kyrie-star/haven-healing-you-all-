@@ -19,6 +19,8 @@
 import {Setting} from '@element-plus/icons-vue'
 import {ref} from 'vue'
 import { useUserStore } from '@/stores/userinfo'
+import { useWindowStore } from '@/stores/window'
+const windowstore=useWindowStore()
 const showanimation=ref(false)
 const router=useUserStore()
 const logout=()=>{
@@ -32,12 +34,11 @@ function closeinfor(){
         showanimation.value=false
     },2000)
 }
-const emit=defineEmits<{open:[command:string]}>()
 function Open(){
-    emit('open','information')
+    windowstore.open('information')
 }
 function Open2(){
-    emit('open','password')
+    windowstore.open('password')
 }
 </script>
 

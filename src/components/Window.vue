@@ -1,14 +1,17 @@
 <template>
-    <div v-if="visible" class="window-overlay" @click.self="emit('close')">
+    <div v-if="windowstore.visible" class="window-overlay" @click.self="closewindow">
         <div class="window-card">
-            <div class="window-logo" v-show="decwindow!=='img'">
+            <div class="window-logo" v-show="windowstore.decwindow==='information' || windowstore.decwindow==='password'">
                 <div class="title">Haven</div>
                 <div class="another-title">Heal all your wounds</div>
             </div>
-           <div v-show="decwindow==='img'" class="window-img">
+           <div v-if="windowstore.decwindow==='img'" class="window-img">
               <img :src=userstore.userinfo.avatar?userstore.userinfo.avatar:avatarStr>
            </div>
-           <div v-show="decwindow==='information'" class="window-infor">
+           <div v-else-if="windowstore.decwindow==='postimg'" class="window-img">
+              <img :src="windowstore.postimg">
+           </div>
+           <div v-else-if="windowstore.decwindow==='information'" class="window-infor">
             <div class="window-img">
                 <img :src="userstore.userinfo.avatar? userstore.userinfo.avatar:avatarDefault ">
                 <div class="img-button" @click="clickinput">
@@ -31,7 +34,7 @@
                 <el-button type="primary" @click="finish">完成</el-button>
             </div>
            </div>
-           <div class="window-password" v-show="decwindow==='password'">
+           <div class="window-password" v-else-if="windowstore.decwindow==='password'">
                 <div class="password-form">
                     <el-form ref="formpassword" label-position="left" label-suffix=":" label-width="70px" :model="form" :rules="rules">
                         <el-form-item label="原密码" prop="oldpassword">
@@ -57,14 +60,16 @@ import {reactive,ref} from 'vue'
 import { useUserStore } from '@/stores/userinfo';
 import { Changepassword } from '@/api/userinfo';
 import { ElMessage } from 'element-plus';
+import { useWindowStore } from '@/stores/window';
 import avatarDefault from '@/assets/avatar.jpg'
 const userstore=useUserStore()
 const avatarStr=avatarDefault
 const formpassword=ref()
 const fileinput=ref<HTMLInputElement>()
 const info=ref()
+const windowstore=useWindowStore()
 const cancelpwd=()=>{
-    emit('close')
+    windowstore.close()
     form.newpassword=''
     form.oldpassword=''
 }
@@ -154,19 +159,12 @@ newpassword:[{
     }
 }]
 })
-defineProps<{
-    visible:boolean
-    decwindow:string
-}>()
-const emit=defineEmits<{
-    close:[]
-}>()
 let form=reactive({
     oldpassword:'',
     newpassword:''
 })
 function cancel(){
-    emit('close')
+    windowstore.close()
     form.oldpassword=''
     form.newpassword=''
 }
@@ -185,13 +183,13 @@ info.value.validate(async (valid:boolean)=>{
        number=3
     }
     if(infoform.username===userstore.userinfo.username && infoform.email===userstore.userinfo.email){
-        return emit('close')
+        return windowstore.close()
     }
     if(number===2){
       try{
         const judge=await userstore.updateemail(infoform.email)
         if(judge){
-           return  emit('close')
+           return  windowstore.close()
         }
       }catch{
             return
@@ -200,7 +198,7 @@ info.value.validate(async (valid:boolean)=>{
         try{
         const judge=await userstore.updateusername(infoform.username)
         if(judge){
-            return emit('close')
+            return windowstore.close()
         }
         }catch{
             return
@@ -209,7 +207,7 @@ info.value.validate(async (valid:boolean)=>{
         try{
             const judge=await userstore.updateall(infoform)
             if(judge){
-            return emit('close')
+            return windowstore.close()
         }
         }catch{
             return
@@ -235,7 +233,7 @@ if(form.oldpassword && form.newpassword){
                 message:res.msg,
                 type:'success'
               })
-            emit('close')  
+            windowstore.close() 
             }else{
                 ElMessage({
                     message:res.msg,
@@ -253,8 +251,11 @@ if(form.oldpassword && form.newpassword){
         }
     })
     }else{
-        emit('close')
+        windowstore.close()
     }
+}
+const closewindow=()=>{
+    windowstore.close()
 }
 </script>
 <style scoped lang="scss">

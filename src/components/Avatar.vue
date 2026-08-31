@@ -9,12 +9,11 @@
 <script setup lang="ts">
 import { ref ,computed} from 'vue';
 import { useUserStore } from '@/stores/userinfo';
+import { useWindowStore } from '@/stores/window';
 const userstore=useUserStore()
-const emit=defineEmits<{
-    open:[command:string]
-}>()
+const windowstore=useWindowStore()
 function Open(){
-   emit('open','img')
+   windowstore.open('img')
 }
 const props=defineProps<{
     width?:string,
