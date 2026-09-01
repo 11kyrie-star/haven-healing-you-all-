@@ -1,5 +1,6 @@
 ﻿<template>
 <div class="bg">
+    <Search></Search>
     <Logo></Logo>
     <div class="avatar-wrap">
     <Avatar width="6vw" height="12.5vh" radius="8px"></Avatar>
@@ -14,6 +15,7 @@ import Logo from '@/views/Background/Components/Logo/index.vue'
 import Avatar from '@/components/Avatar.vue';
 import Setting from '@/views/Background/Components/Setting/index.vue'
 import Name from '@/views/Background/Components/Name/index.vue'
+import Search from '@/views/Background/Components/Search/index.vue'
 const emit= defineEmits<{
     open:[command:string]
 }>()

@@ -155,6 +155,8 @@ const limitHotText=(str:string,max:number=8)=>{
           animation-delay: 0.3s;
         }
        .hot-item{
+        content-visibility: auto;
+        contain-intrinsic-size: auto 10vh;
         &:nth-child(1) .top{
             color: #d95f4e;
         }

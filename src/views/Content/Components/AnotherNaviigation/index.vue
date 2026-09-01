@@ -15,10 +15,11 @@
     position: absolute;
     left: 31%;
     gap: 15px;
-    top: 6%;
+    top: 6vh;
     font-family: 'LXGW WenKai', 'Inter', sans-serif;
     font-size: 1.1em;
     user-select: none;
+    z-index: 4;
     .back{
         cursor: pointer;
         &:hover{

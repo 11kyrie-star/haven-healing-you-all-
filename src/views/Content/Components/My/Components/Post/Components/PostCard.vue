@@ -30,7 +30,7 @@
                 gridlayout.special?'1fr 1fr':`repeat(${gridlayout.rows},1fr)`,gap:'4px',aspectRatio:gridlayout.special?'16/9':gridlayout.aspect
             ,borderRadius:'8px',overflow:'hidden',marginTop:'10px',boxShadow:'0 2px 12px rgba(120, 60, 40, 0.08)'}" >
             <div v-for="(item,index) in props.images" :style="gridlayout.special && index===0?{gridRow:'1/3'}:{}">
-              <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;" @click="openwindow(item)">
+              <img :src="item" alt="" style="width: 100%; height: 100%; object-fit: cover;cursor: pointer;" loading="lazy" decoding="async" @click="openwindow(item)">
             </div>
             </div>
         </div>

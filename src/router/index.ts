@@ -24,6 +24,7 @@ const router = createRouter({
         {path:'text',component:()=>import('@/views/Content/Components/Text/index.vue')},
         {path:'daily',component:()=>import('@/views/Content/Components/Daily/index.vue')},
         {path:'mypost',component:()=>import('@/views/Content/Components/My/Components/Post/index.vue')},
+        {path:'search/:keyword',component:()=>import('@/views/Content/Components/Search/index.vue')},
         {path:'leaveword',component:()=>import('@/views/Content/Components/My/Components/Leaveword/index.vue'),
           redirect:'/layout/content/leaveword/myword',
           children:[{
@@ -64,7 +65,7 @@ router.beforeEach((to, from, next) => {
 })
 //面包屑历史栈
 const labelMap:Record<string,string>={
-  square:'广场',help:'求助',text:'文案',daily:'日常',mypost:'帖子',mylike:'喜欢',mycomment:'评论',leaveword:'留言',detail:'详情',leaveban:'留言板'
+  square:'广场',help:'求助',text:'文案',daily:'日常',mypost:'帖子',mylike:'喜欢',mycomment:'评论',leaveword:'留言',detail:'详情',leaveban:'留言板',search:'相关内容'
 }
 const toplevel=['square','help','text','daily','mylike','mycomment','mypost','leaveword']
 router.afterEach((to)=>{
@@ -82,7 +83,7 @@ if(exist!==-1){
 const anexist=store.stack.findIndex(c=>c.key===key)
 if(anexist!==-1){
   store.stack[anexist]!.path=to.path
-  store.stack.slice(0,anexist+1)
+  store.stack=store.stack.slice(0,anexist+1)
   return
 }
 store.stack.push({label:labelMap[key!]!,path:to.path,key:key!})
