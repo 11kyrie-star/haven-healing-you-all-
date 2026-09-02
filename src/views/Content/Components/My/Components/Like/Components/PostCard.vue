@@ -114,15 +114,25 @@ const islkied=ref(props.is_liked)
 const likecount=ref(props.like_count)
 const commentcount=ref(props.comment_count)
 //取消点赞函数
-const cancelstar=async()=>{
-    const res=await cancelstarpost(props.id)
+let timer2:ReturnType<typeof setTimeout> | null=null
+const cancelstar=()=>{
+    if(timer2){return}
+    timer2=setTimeout(async()=>{
+        try{
+          const res=await cancelstarpost(props.id)
     if(res.status===1){
         return ElMessage.warning('网络异常')
     }else{
         islkied.value=res.data.is_liked
         likecount.value--
+        emit('deletelikepost',props.index)
     }
-    emit('deletelikepost',props.index)
+        }finally{
+            clearTimeout(timer2!)
+            timer2=null
+        }
+    },300)
+    
 }
 const data=computed(()=>({
 id:props.id,

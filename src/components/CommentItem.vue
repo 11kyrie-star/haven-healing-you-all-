@@ -65,24 +65,43 @@ const isliked=ref(props.comment.is_liked)
 const starcount=ref(props.comment.star_count)
 const replycount=ref(props.comment.reply_count)
 //点赞函数
-const togglestar=async()=>{
-const res=await commentstar(props.comment.id)
+let timer:ReturnType<typeof setTimeout> | null=null
+const togglestar=()=>{
+    if(timer){return}
+    timer=setTimeout(async()=>{
+        try{
+          const res=await commentstar(props.comment.id)
 if(res.status===1){
     return ElMessage.warning('网络异常')
 }else{
     starcount.value++
     isliked.value=res.data.is_liked
 }
+        }finally{
+            clearTimeout(timer!)
+            timer=null
+        }
+    },300)
 }
 //取消点赞函数
-const cancelstar=async()=>{
-const res=await cancelcomentstar(props.comment.id)
+let timer2:ReturnType<typeof setTimeout> | null =null
+const cancelstar=()=>{
+    if(timer2){return}
+    timer2=setTimeout(async()=>{
+        try{
+          const res=await cancelcomentstar(props.comment.id)
 if(res.status===1){
     return ElMessage.warning('网络异常')
 }else{
     starcount.value--
     isliked.value=res.data.is_liked
 }
+        }finally{
+            clearTimeout(timer2!)
+            timer2=null
+        }
+    },300)
+
 }
 //查看评论的回复
 const handlereplyagain=(commId:number)=>{

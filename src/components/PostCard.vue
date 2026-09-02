@@ -107,24 +107,42 @@ const islkied=ref(props.is_liked)
 const likecount=ref(props.like_count)
 const commentcount=ref(props.comment_count)
 //点赞函数
-const togglelike=async()=>{
-    const res=await starpost(props.id)
+let timer1:ReturnType<typeof setTimeout> | null =null
+const togglelike=()=>{
+    if(timer1){return}
+    timer1=setTimeout(async()=>{
+      try{  
+       const res=await starpost(props.id)
     if(res.status===1){
         return ElMessage.warning('网络异常')
     }else{
         islkied.value=res.data.is_liked
         likecount.value++
+    }}finally{
+       clearTimeout(timer1!)
+       timer1=null
     }
+    },300)
 }
 //取消点赞函数
-const cancelstar=async()=>{
-    const res=await cancelstarpost(props.id)
+let timer2:ReturnType<typeof setTimeout> | null=null
+const cancelstar=()=>{
+    if(timer2){return}
+    timer2=setTimeout(async()=>{
+        try{
+          const res=await cancelstarpost(props.id)
     if(res.status===1){
         return ElMessage.warning('网络异常')
     }else{
         islkied.value=res.data.is_liked
         likecount.value--
     }
+        }finally{
+            clearTimeout(timer2!)
+            timer2=null
+        }
+    },300)
+    
 }
 const data=computed(()=>({
 id:props.id,

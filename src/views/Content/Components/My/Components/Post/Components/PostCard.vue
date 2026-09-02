@@ -117,24 +117,42 @@ const islkied=ref(props.is_liked)
 const likecount=ref(props.like_count)
 const commentcount=ref(props.comment_count)
 //点赞函数
-const togglelike=async()=>{
-    const res=await starpost(props.id)
+let timer1:ReturnType<typeof setTimeout> | null =null
+const togglelike=()=>{
+    if(timer1){return}
+    timer1=setTimeout(async()=>{
+      try{  
+       const res=await starpost(props.id)
     if(res.status===1){
         return ElMessage.warning('网络异常')
     }else{
         islkied.value=res.data.is_liked
         likecount.value++
+    }}finally{
+       clearTimeout(timer1!)
+       timer1=null
     }
+    },300)
 }
 //取消点赞函数
-const cancelstar=async()=>{
-    const res=await cancelstarpost(props.id)
+let timer2:ReturnType<typeof setTimeout> | null=null
+const cancelstar=()=>{
+    if(timer2){return}
+    timer2=setTimeout(async()=>{
+        try{
+          const res=await cancelstarpost(props.id)
     if(res.status===1){
         return ElMessage.warning('网络异常')
     }else{
         islkied.value=res.data.is_liked
         likecount.value--
     }
+        }finally{
+            clearTimeout(timer2!)
+            timer2=null
+        }
+    },300)
+    
 }
 const data=computed(()=>({
 id:props.id,
@@ -326,25 +344,50 @@ onBeforeUnmount(()=>{
 })
 //改变帖子为私密状态状态
 let status=ref(props.is_public)
-const Changestatus=async()=>{
-const res=await changepoststatus(props.id,0)
-if(res.status===0){
-    status.value=0
-}
+let timer5:ReturnType<typeof setTimeout> | null=null
+const Changestatus=()=>{
+    if(timer5){return}
+    timer5=setTimeout(async()=>{
+        try{
+          const res=await changepoststatus(props.id,0)
+         if(res.status===0){
+            status.value=0
+          }
+        }finally{
+            clearTimeout(timer5!)
+            timer5=null
+        }
+    },300)
 }
 //改变帖子为公开状态
-const Changepublic=async()=>{
-    const res=await changepoststatus(props.id,1)
+let timer4:ReturnType<typeof setTimeout> | null=null
+const Changepublic=()=>{
+    if(timer4){return}
+    timer4=setTimeout(async()=>{
+        try{
+      const res=await changepoststatus(props.id,1)
     if(res.status===0){
         status.value=1
+    }}finally{
+        clearTimeout(timer4!)
+        timer4=null
     }
+    },300) 
 }
 //删除帖子
-const deletepost=async()=>{
-const res=await deletepostapi(props.id)
-if(res.status===0){
+let timer3:ReturnType<typeof setTimeout> | null =null
+const deletepost=()=>{
+    if(timer3){return}
+    timer3=setTimeout(async()=>{
+        try{
+       const res=await deletepostapi(props.id)
+   if(res.status===0){
     emit('delete',props.index)
-}
+    }}finally{
+        clearTimeout(timer3!)
+        timer3=null
+    }
+    },300)
 }
 let page=ref(1)
 const size=10
