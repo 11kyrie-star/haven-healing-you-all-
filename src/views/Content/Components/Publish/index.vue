@@ -7,7 +7,7 @@
     </div>
     </div>
     <span class="time">{{ time }}</span>
-    <Name left="25%" top="2.9vh" fontsize="1.5em" v-show="denoshow===0"></Name>
+    <Name left="26%" top="7vh" fontsize="1.5em" v-show="denoshow===0"></Name>
     <div class="name" v-show="denoshow===1">匿名用户</div>
     <Editor ref="publisheditor" margintop="4vh" minheight="30vh" decide="publish" :showeditor="true" :deciname="denoshow" @newpost="addpost"></Editor>
     <el-checkbox v-model="checked" @change="noshow" class="show-name">匿名</el-checkbox>
@@ -86,9 +86,11 @@ feedpost.publish(post)
         top: 10%;
     }
     .noname-img{
+        position: relative;
+        top: 25px;
         background-color: white;
-        width: 5vw;
-        height: 10vh;
+        width: 90px;
+        height: 90px;
         border-radius: 50%;
         padding: 2px;
         img{
@@ -101,8 +103,8 @@ feedpost.publish(post)
     }
     .name{
         position: absolute;
-        left: 25%;
-        top: 2.9vh;
+        left: 26%;
+        top: 7vh;
         cursor: default;
         font-weight: 800;
         font-size: 1.5em;

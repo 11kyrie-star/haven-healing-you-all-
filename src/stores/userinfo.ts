@@ -8,11 +8,11 @@ import router from '@/router'
 
 export const useUserStore=defineStore('user',()=>{
     const userinfo=ref<userinfo>({
-        username:'',
+         username:'',
          email:'',
          avatar:'',
-        token:'',
-        status:0
+         token:'',
+         status:0
     })
     const login=async (data:form)=>{
        const res:loginres<logindata>=await LoginApi(data)
