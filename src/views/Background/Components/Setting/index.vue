@@ -32,7 +32,7 @@ showanimation.value=true
 function closeinfor(){
     setTimeout(()=>{
         showanimation.value=false
-    },2000)
+    },3000)
 }
 function Open(){
     windowstore.open('information')
@@ -64,7 +64,8 @@ function Open2(){
         transition: background-color 1s ease;
     }
     .setting-anima{
-    background-color: rgb(222, 205, 205);
+    background-color: rgba(0, 0, 0, 0.06);
+    border-radius: 50%;
 }
     .line{
         font-size: 25px;
@@ -74,24 +75,35 @@ function Open2(){
 .setting-information{
     p{
         text-align: center;
-        background-color: rgb(222, 205, 205);
+        background-color: transparent;
         cursor: pointer;
-        padding: 5px;
-        font-weight: 800;
+        padding: 6px 6px;
+        font-weight: 600;
+        border-radius: 6px;
+        margin: 2px 4px;
+        transition: background-color 0.2s ease;
+        &:hover{
+            background-color: rgba(0, 0, 0, 0.06);
+        }
     }
     opacity: 0;
     transform: translateY(-6px);
-    transition: opacity 1s ease,transform 1s ease;
+    transition: opacity 0.3s ease,transform 0.3s ease;
     pointer-events: none;
-    width: 5vw;
+    width: 100px;
     height: fit-content;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 1px;
     position: absolute;
     top: 67%;
-    left: 62.5%;
+    left: 62%;
     &.show-information{
     opacity: 1;
     transform: translateY(0px);
