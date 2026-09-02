@@ -3,9 +3,9 @@
     <Search></Search>
     <Logo></Logo>
     <div class="avatar-wrap">
-    <Avatar width="6vw" height="12.5vh" radius="8px"></Avatar>
+    <Avatar radius="8px"></Avatar>
     </div>
-    <Name left="21%" top="75%" fontsize="2em"></Name>
+    <Name left="21%" top="81%" fontsize="2em"></Name>
     <Setting @open="showinfor"></Setting>
 </div>
 </template>
@@ -27,11 +27,11 @@ function showinfor(command:string){
 <style scoped lang="scss">
 .bg{
     width: 100%;
-    height: 35vh;
+    height: 340px;
     background: url('@/assets/bg.jpg') no-repeat center/cover;
-    position: relative;
     filter: blur(3px);
     z-index: 3;
+    position: relative;
     animation: sharpen 2s ease-in-out forwards;
     .avatar-wrap{
         width: fit-content;

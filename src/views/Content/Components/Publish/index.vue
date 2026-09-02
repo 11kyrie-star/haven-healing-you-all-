@@ -1,7 +1,7 @@
 <template>
 <div class="publish-container">
     <div class="avatar-wrap">
-    <Avatar width="5vw" height="10vh" radius="50%" v-show="denoshow===0"></Avatar>
+    <Avatar radius="50%" v-show="denoshow===0"></Avatar>
     <div class="noname-img" v-show="denoshow===1">
         <img src="@/assets/noname.jpeg" alt="">
     </div>

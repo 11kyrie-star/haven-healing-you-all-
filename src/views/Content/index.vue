@@ -52,8 +52,10 @@ const isView=computed(()=>panelmap[panlestore.active]??Publish)
 <style scoped lang="scss">
 .content-container{
     width: 100%;
-    min-height: 65vh;
+    height: auto;
+    min-height: calc(100vh - 340px - 56px);
     position: relative;
+    overflow: visible;
     z-index: 1;
     .content{
         width: 100%;

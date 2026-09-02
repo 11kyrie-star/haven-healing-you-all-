@@ -15,14 +15,16 @@ const windowstore=useWindowStore()
 function Open(){
    windowstore.open('img')
 }
-const props=defineProps<{
-    width?:string,
-    height?:string,
+const props=withDefaults(defineProps<{
     radius?:string
-}>()
+}>(),{
+    radius:'50%'
+})
+// 固定头像尺寸，不随视口 vw/vh 变化
+const avatarSize='90px'
 const styleposition=computed(()=>({
-width:props.width,
-height:props.height,
+width:avatarSize,
+height:avatarSize,
 borderRadius:props.radius
 }))
 </script>
@@ -32,6 +34,8 @@ borderRadius:props.radius
     background-color: white;
     padding: 2px;
     z-index: 80;
+    position: relative;
+    top: 25px;
     .img{
         width: 100%;
         height: 100%;

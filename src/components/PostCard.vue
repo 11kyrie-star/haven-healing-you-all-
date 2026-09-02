@@ -355,10 +355,10 @@ windowstore.open('postimg',img)
 <style scoped lang="scss">
 .card-container{
     width: 30vw;
-    min-height: 40vh;
+    min-height: 35vh;
     margin-top: 3vh;
     content-visibility: auto;
-    contain-intrinsic-size: auto 40vh;
+    contain-intrinsic-size: auto 35vh;
     background:
         radial-gradient(circle at 90% 6%, rgba(233, 189, 124, 0.18) 0%, transparent 40%),
         linear-gradient(135deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 243, 234, 0.58) 100%);
@@ -393,7 +393,7 @@ windowstore.open('postimg',img)
         }
     }
     &:hover{
-        top: -2px;
+        top: -1px;
         border-color: rgba(224, 128, 113, 0.5);
         box-shadow: 0 6px 18px rgba(224, 128, 113, 0.24), 0 14px 34px rgba(120, 60, 40, 0.16);
     }

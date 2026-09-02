@@ -378,7 +378,7 @@ const loadMoreComments=async()=>{
         }
     }
     &:hover{
-        transform: translateY(-3px);
+        transform: translateY(-1px);
         border-color: rgba(224, 128, 113, 0.5);
         box-shadow: 0 6px 18px rgba(224, 128, 113, 0.24), 0 14px 34px rgba(120, 60, 40, 0.16);
     }

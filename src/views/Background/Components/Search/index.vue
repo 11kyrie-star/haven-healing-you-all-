@@ -78,13 +78,12 @@ const noshow=()=>{
 
 <style scoped lang="scss">
 .search-wrap {
-    position: relative;
     width: min(560px, 90vw);
     font-family: 'LXGW WenKai', 'Inter', sans-serif;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: 0%;
+    top: 5%;
     .search-bar {
         display: flex;
         align-items: center;

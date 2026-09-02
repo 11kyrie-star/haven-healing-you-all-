@@ -8,6 +8,8 @@
 .emoji-container{
     position: absolute;
     z-index: 9999;
+    bottom: calc(100% + 8px);
+    left: 0%;
 }
 </style>
 

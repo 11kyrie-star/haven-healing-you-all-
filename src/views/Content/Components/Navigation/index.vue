@@ -89,7 +89,7 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
 <style scoped lang="scss">
 .navigation-container{
     width: 100%;
-    height: 5vh;
+    height: 40px;
     background-color: white;
     user-select: none;
     position: relative;
@@ -220,7 +220,7 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
                 }
                 .note-badge{
                     position: absolute;
-                    top: 0.3vh;
+                    top: 3px;
                     right: -1.2em;
                     min-width: 1.15em;
                     height: 1.15em;
@@ -243,7 +243,7 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
             }
             .slide-bar{
                 position: absolute;
-                bottom: 0.7vh;
+                bottom: 8px;
                 left: 0;
                 width: 0;
                 height: 3px;
