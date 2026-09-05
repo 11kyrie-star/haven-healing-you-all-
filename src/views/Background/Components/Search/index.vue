@@ -11,6 +11,7 @@
                 @focus="open = true"
                 @input="open = true"
                 @blur="noshow"
+                @keyup.enter="handleSearch"
             />
         </div>
 
@@ -73,6 +74,10 @@ router.push(`/layout/content/search/${item}`)
 const noshow=()=>{
     open.value=false
 
+}
+const handleSearch=()=>{
+    if(keyword.value=''){return}
+    pushdetail(keyword.value)
 }
 </script>
 
