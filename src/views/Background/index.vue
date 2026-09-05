@@ -30,7 +30,7 @@ function showinfor(command:string){
     height: 340px;
     background: url('@/assets/bg.jpg') no-repeat center/cover;
     filter: blur(3px);
-    z-index: 3;
+    z-index: 10;
     position: relative;
     animation: sharpen 2s ease-in-out forwards;
     .avatar-wrap{

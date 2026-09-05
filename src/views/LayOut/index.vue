@@ -87,11 +87,10 @@ onUnmounted(() => {
                 rgba(210, 140, 170, 0.15) 80%,
                 rgba(205, 160, 231, 0.3) 100%
             );
-            animation: sunBreath 2s ease-in-out;
+        animation: sunBreath 2s ease-in-out;
     }
     @keyframes sunBreath{
-        0% {opacity: 0.3;}
-        50% {opacity: 0.5;}
+        0% {opacity: 0.5;}
         100% {opacity: 1;}
     }
 }

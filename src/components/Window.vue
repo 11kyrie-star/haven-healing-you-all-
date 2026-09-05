@@ -262,7 +262,7 @@ const closewindow=()=>{
 .window-overlay{
     position: fixed;
     inset: 0;
-    z-index: 3;
+    z-index: 12;
     background: rgba(45, 25, 35, 0.38);
     backdrop-filter: blur(6px);
     display: flex;
@@ -365,7 +365,6 @@ const closewindow=()=>{
             width: fit-content;
             background-color: whitesmoke;
             border: 1px rgb(213, 165, 165) solid;
-            padding: 5%;
             margin-left: 15%;
             border-radius: 5px;
             font-weight: 600;
