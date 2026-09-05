@@ -3,12 +3,14 @@
 <Background></Background>
 <RouterView></RouterView>
 <Window></Window>
+<Top></Top>
 </div>
 </template>
 
 <script setup lang="ts">
 import Background from "@/views/Background/index.vue"
 import Window from "@/components/Window.vue";
+import Top from "./Components/Top.vue";
 import { getTime } from "@/utils/token";
 import { ref ,onMounted,onUnmounted} from "vue";
 import { ElMessage } from "element-plus";
