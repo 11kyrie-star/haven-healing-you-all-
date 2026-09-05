@@ -329,7 +329,8 @@ if(!file?.type.startsWith('image/')){
     ElMessage.warning('请选择图片')
 }
 try{
-    const res=await postpicApi(file as File)
+    const newfile=await compressimage(file as File)
+    const res=await postpicApi(newfile as File)
     const imageurl=res.data.url
     urlList.value.push(imageurl)
     buildgrid()
@@ -337,6 +338,30 @@ try{
 }catch{
     return
 }
+}
+//压缩图片函数
+const compressimage=(file:File)=>{
+    return new Promise((resolve)=>{
+        const img=new Image()
+        img.onload=()=>{
+            const canvas=document.createElement('canvas')
+            const ctx=canvas.getContext('2d')
+            let {width,height}=img
+            if(width>1280 || height>1280){
+               const ratio=1280/Math.max(width,height)
+               width*=ratio
+               height*=ratio
+            }
+            canvas.width=width
+            canvas.height=height
+            ctx?.drawImage(img,0,0,width,height)
+            canvas.toBlob((blob)=>{
+                resolve(new File([blob!],'avatar.webp',{type:'webp/image'}))
+            },'image/webp',0.8)
+            URL.revokeObjectURL(img.src)
+        }
+        img.src=URL.createObjectURL(file)
+    })
 }
 //构造九宫格容器
 const buildgrid=()=>{

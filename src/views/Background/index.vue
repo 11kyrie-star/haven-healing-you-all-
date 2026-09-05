@@ -28,7 +28,7 @@ function showinfor(command:string){
 .bg{
     width: 100%;
     height: 340px;
-    background: url('@/assets/bg.jpg') no-repeat center/cover;
+    background: url('@/assets/bg.webp') no-repeat center/cover;
     filter: blur(3px);
     z-index: 10;
     position: relative;

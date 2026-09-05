@@ -95,7 +95,8 @@ if(file.size>maxsize){
     })
 }
 try{
-    const res=await userstore.updateav(file)
+    const newfile=await compressimage(file)
+    const res=await userstore.updateav(newfile as File)
     if(res){
         ElMessage({
             message:'头像更新成功',
@@ -112,7 +113,30 @@ try{
     return
 }
 }
-
+//压缩图片的函数
+function compressimage(file:File){
+    return new Promise((resolve)=>{
+        const img=new Image()
+        img.onload=()=>{
+            const canvas=document.createElement('canvas')
+            const ctx=canvas.getContext('2d')
+            let {width,height}=img
+            if(width>512 || height>512){
+                const ratio=512/Math.max(width,height)
+                width *=ratio
+                height *=ratio
+            }
+            canvas.width=width
+            canvas.height=height
+            ctx?.drawImage(img,0,0,width,height)
+            canvas.toBlob((blob)=>{
+                resolve(new File([blob!],'avatar.webp',{type:'image/webp'}))
+            },'image/webp',0.8)
+            URL.revokeObjectURL(img.src)
+        }
+        img.src=URL.createObjectURL(file)
+    })
+}
 let infoform=reactive({
     username:userstore.userinfo.username,
     email:userstore.userinfo.email
