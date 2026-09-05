@@ -1,4 +1,26 @@
-//登录页
-$login-title-fontsize:35px;
-$login-another-title-fontfamily:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-$login-form-bgcolor:white;
+// ============================================================
+// 设计令牌总入口（Design Tokens Entry）
+// ============================================================
+// 通过 vite.config.ts 的 additionalData 全局注入：
+//   @use "@/styles/variables" as *;
+// 因此所有 .vue / .scss 文件可直接使用下方任意变量，
+// 无需手动 import。
+//
+// 维护原则：
+//   - 新增令牌按"类别"写入 tokens/ 下对应文件
+//   - 此文件仅做 @forward 汇总，不放具体值
+//   - 仅保留少量"页面级"专用变量（如登录页）
+// ============================================================
+
+// ---- 转发各分类令牌 ----
+@forward './tokens/colors';
+@forward './tokens/typography';
+@forward './tokens/radius';
+@forward './tokens/shadows';
+@forward './tokens/transitions';
+@forward './tokens/glass';
+
+// ---- 登录页专用变量（页面级，无法归入通用令牌） ----
+$login-title-fontsize: 35px;
+$login-another-title-fontfamily: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$login-form-bgcolor: white;

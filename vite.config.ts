@@ -8,6 +8,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
 import ElementPlus from 'unplugin-element-plus/vite' 
+import Font from 'vite-plugin-font'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Icons from 'unplugin-icons/vite'
 import Inspect from 'vite-plugin-inspect'
@@ -18,6 +19,7 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+    Font.vite(),
     AutoImport({
       resolvers: [ElementPlusResolver(),
        IconsResolver({

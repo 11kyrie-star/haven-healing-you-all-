@@ -1,0 +1,53 @@
+// ============================================================
+// 颜色令牌（Color Tokens）—— 方案 A：语义分档
+// ============================================================
+// 设计原则：
+//   - 每个高频值对应一个语义变量名，使用时一眼能看出用途
+//   - 同一基色不同 alpha 用强度档位区分（soft / mid / strong）
+//   - 玻璃拟态用的白色背景在 _glass.scss 单独管理
+//   - 只抽离"高频且语义明确"的值，低频值留在组件内即可
+// ============================================================
+
+// ---- 文字色 ----
+$color-text-primary:       rgba(50, 50, 50, 0.85);    // 主要文字（25 处）
+
+// ---- 中性灰 ----
+$color-gray-mid:           rgba(128, 128, 128, 0.6);  // 占位/辅助文字（18 处）
+
+// ---- 白色调（边框 / 高光 / 阴影内描边） ----
+$color-white-strong:        rgba(255, 255, 255, 0.9);  // 高光描边（34 处）
+$color-white-light:         rgba(255, 255, 255, 0.65);// 内描边（弹窗用）
+$color-white-mid:           rgba(255, 255, 255, 0.6); // 阴影内描边（33 处）
+
+// ---- 暖橘红色（224,128,113 系）—— 主装饰色 ----
+$color-warm-soft:          rgba(224, 128, 113, 0.35); // 柔和装饰（27 处）
+$color-warm-mid:           rgba(224, 128, 113, 0.5);  // 中等装饰（25 处）
+$color-warm-text:          rgba(224, 128, 113, 0.85); // 暖色文字（19 处）
+$color-warm-strong:        rgba(224, 128, 113, 0.9);  // 强暖色（23 处）
+
+// ---- 暖色阴影色（120,60,40 系）—— 用于 box-shadow ----
+$color-warm-shadow-soft:   rgba(120, 60, 40, 0.08);   // 极淡阴影
+$color-warm-shadow-mid:    rgba(120, 60, 40, 0.12);   // 中淡阴影
+$color-warm-shadow-base:   rgba(120, 60, 40, 0.16);   // 基础阴影
+$color-warm-shadow-strong: rgba(120, 60, 40, 0.18);   // 标准阴影
+
+// ---- 强调橙红（219,69,35 系）—— 用于 hover/active ----
+$color-accent-soft:        rgba(219, 69, 35, 0.1);    // hover 背景
+$color-accent-mid:         rgba(219, 69, 35, 0.2);    // active 背景
+$color-accent-strong:      rgba(219, 69, 35, 0.35);  // 强调阴影
+
+// ---- 主题强调粉红（243,79,103 系）—— 用于按钮发光 ----
+$color-pink-soft:          rgba(243, 79, 103, 0.28);  // 输入框聚焦光晕
+$color-pink-strong:        rgba(243, 79, 103, 0.35);  // 按钮发光阴影
+
+// ---- 纯色语义色 ----
+$color-accent-hover:       #c6401f;                  // hover 强调红（30 处）
+$color-warm-pink:          #ff6b81;                  // 暖粉（18 处）
+$color-warm-orange:        #f78c6b;                  // 渐变起点橙（9 处）
+$color-warm-red:           #f34f67;                  // 渐变终点红（11 处）
+$color-bg-soft:            #f4e4df;                  // 柔和背景（14 处）
+$color-ink:                #C5624D;                  // 深褐红（4 处）
+
+// ---- 主题渐变（整体复用，方便整段替换） ----
+$gradient-warm:            linear-gradient(135deg, #f78c6b 0%, #f34f67 100%);
+$gradient-bg-warm:         linear-gradient(45deg, #fad0c4 0%, #f7b7a3 30%, #c9adc6 60%, #89a1c1 100%);
