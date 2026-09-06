@@ -61,7 +61,7 @@ import { useUserStore } from '@/stores/userinfo';
 import { Changepassword } from '@/api/userinfo';
 import { ElMessage } from 'element-plus';
 import { useWindowStore } from '@/stores/window';
-import avatarDefault from '@/assets/avatar.jpg'
+import avatarDefault from '@/assets/avatar.webp'
 const userstore=useUserStore()
 const avatarStr=avatarDefault
 const formpassword=ref()

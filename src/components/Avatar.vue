@@ -9,7 +9,7 @@
         </div>
         <div v-else class="img" @click="Open">
             <img v-if="userstore.userinfo.avatar" :src=userstore.userinfo.avatar class="avatar-img">
-            <img v-else src="@/assets/avatar.jpg" class="avatar-img">
+            <img v-else src="@/assets/avatar.webp" class="avatar-img">
         </div>
     </div>
 </template>
