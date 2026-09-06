@@ -4,7 +4,7 @@
         <div class="name" style="cursor: default;"><span class="me">我</span>:</div>
         <div class="content">
             <div class="text" style="cursor: default;" v-html="props.item.my_comment.content" v-show="props.item.my_comment.content.trim().length"></div>
-            <div class="img"><img :src=props.item.my_comment.images[0] alt=""></div>
+            <div class="img"><img :src=props.item.my_comment.images[0] alt="" @click="opnewindow"></div>
         </div>
         <div class="time" style="cursor: default;">{{ commenttimestr }}</div>
         </div>
@@ -109,6 +109,7 @@
                 overflow: hidden;
                 border-radius: 8px;
                 box-shadow: 0 2px 6px rgba(120, 60, 40, 0.12);
+                cursor: pointer;
                 img{
                     width: 100%;
                     height: 100%;
@@ -195,7 +196,9 @@
 import type { myconmentitem } from '@/types/post';
 import {formatPostTime} from '@/utils/time'
 import { useRouter } from 'vue-router';
+import { useWindowStore } from '@/stores/window';
 import { ref } from 'vue';
+const windowstore=useWindowStore()
 const props=defineProps<{item:myconmentitem}>()
 const commenttime=ref(props.item.my_comment.create_at)
 const commenttimestr=formatPostTime(commenttime.value)
@@ -204,5 +207,9 @@ const posttimestr=formatPostTime(posttime.value)
 const router=useRouter()
 const pushdetail=()=>{
     router.push(`/layout/content/detail/${props.item.id}`)
+}
+const opnewindow=()=>{
+    if(props.item.my_comment.images[0]===undefined){return}
+    windowstore.open('postimg',props.item.my_comment.images[0])
 }
 </script>
