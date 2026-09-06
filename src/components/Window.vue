@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive,ref} from 'vue'
+import {reactive,ref,watch} from 'vue'
 import { useUserStore } from '@/stores/userinfo';
 import { Changepassword } from '@/api/userinfo';
 import { ElMessage } from 'element-plus';
@@ -68,6 +68,7 @@ const formpassword=ref()
 const fileinput=ref<HTMLInputElement>()
 const info=ref()
 const windowstore=useWindowStore()
+//修改密码之取消
 const cancelpwd=()=>{
     windowstore.close()
     form.newpassword=''
@@ -137,6 +138,15 @@ function compressimage(file:File){
         img.src=URL.createObjectURL(file)
     })
 }
+//避免修改资料的表单的值只在组件初始化的时候拷贝一次，防止用户修改一半点击取消了半成品还在那里，导致用户再也找不到自己的账户了
+watch(()=>windowstore.visible,(v)=>{
+    if(v&&windowstore.decwindow==='information'){
+        infoform.username=userstore.userinfo.username
+        infoform.email=userstore.userinfo.email
+        form.oldpassword=''
+        form.newpassword=''
+    }
+})
 let infoform=reactive({
     username:userstore.userinfo.username,
     email:userstore.userinfo.email
@@ -187,10 +197,9 @@ let form=reactive({
     oldpassword:'',
     newpassword:''
 })
+//修改资料之取消
 function cancel(){
     windowstore.close()
-    form.oldpassword=''
-    form.newpassword=''
 }
 function finish(){
     let number=0
