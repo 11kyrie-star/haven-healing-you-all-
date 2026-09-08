@@ -1,5 +1,5 @@
 ﻿<template>
-    <div class="emoji-container" v-if="showemoji" @mousedown.prevent>
+    <div class="emoji-container"  @mousedown.prevent>
         <EmojiPicker :native="true" :hide-search="true" :display-recent="true" @select="insert"></EmojiPicker>
     </div>
 </template>
@@ -18,7 +18,6 @@ import EmojiPicker from 'vue3-emoji-picker'
 import type { EmojiExt } from 'vue3-emoji-picker';
 import '../../node_modules/vue3-emoji-picker/dist/style.css'
 import { ref } from 'vue';
-const props=defineProps<{showemoji:boolean}>()
 const emit=defineEmits<{
     select:[eomji:EmojiExt]
 }>()

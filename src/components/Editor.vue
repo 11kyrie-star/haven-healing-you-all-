@@ -9,7 +9,7 @@
         <div class="tool-container">
             <div class="face">
                 <img src="@/assets/postface.svg" alt="" @mousedown.prevent="show" :class="{showchange:showchange1}" ref="facebtn">
-                <div class="emoji" ref="facetent"><emoji-picker :showemoji="showemoji" @select="insertemoji"></emoji-picker></div>
+                <div class="emoji" ref="facetent"><emoji-picker v-if="Mountedshowemoji" v-show="showemoji" @select="insertemoji"></emoji-picker></div>
             </div>
             <div class="picture">
                 <img src="@/assets/postpic.svg" alt="" @mousedown.prevent="triggerinput" :class="{showchange:showchange2}">
@@ -130,17 +130,15 @@ import  DOMPurify from 'dompurify';
 import { onClickOutside } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
-import { ref,computed,createVNode,render} from 'vue';
+import { ref,computed,createVNode,render,defineAsyncComponent} from 'vue';
 import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
 import type { post} from '@/types/post.ts';
 import { findsensitvie } from '@/utils/sensitvie.ts';
 import { compressimage } from '@/utils/compressimage.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
-import EmojiPicker from './EmojiPicker.vue';
 import type { comment } from '@/types/post.ts';
 let showplaceholder=ref(true)
-const showemoji=ref(false)
 const inpic=ref<HTMLInputElement>()
 const showchange1=ref(false)
 const showchange2=ref(false)
@@ -160,7 +158,15 @@ currentminheight.value='10vh'
 showtool.value=true
 setTimeout(()=>{isflash.value=false},1200)
 }
-
+//预加载表情组件
+const loademoji=()=>import('./EmojiPicker.vue')
+const EmojiPicker=defineAsyncComponent(loademoji)
+const emojichunkpreload=ref(false) //防止focus重复预加载
+const preloademoji=()=>{
+    if(emojichunkpreload.value){return}
+    emojichunkpreload.value=true
+    loademoji()
+}
 //从回复变回评论
 const Change=()=>{
 showpublishbtn.value=true
@@ -501,6 +507,7 @@ showtool.value=true
 if(props.decide==='comment'){
     currentminheight.value= '10vh'
 }
+preloademoji()
 }
 //插入表情
 const insertemoji=(emoji:EmojiExt)=>{
@@ -527,11 +534,16 @@ slection.removeAllRanges()
 slection.addRange(range)
 }
 //按钮状态
+const Mountedshowemoji=ref(false)
+const showemoji=ref(false)
 const show=()=>{
     if(!showchange1.value){
         showchange1.value=true
     }else{
         showchange1.value=false
+    }
+    if(!Mountedshowemoji.value){
+        Mountedshowemoji.value=true
     }
     if(showemoji.value){
         showemoji.value=false
