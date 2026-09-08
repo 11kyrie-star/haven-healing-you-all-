@@ -9,7 +9,7 @@
         <div class="tool-container">
             <div class="face">
                 <img src="@/assets/postface.svg" alt="" @mousedown.prevent="show" :class="{showchange:showchange1}" ref="facebtn">
-                <div class="emoji" ref="facetent"><emoji-picker v-if="Mountedshowemoji" v-show="showemoji" @select="insertemoji"></emoji-picker></div>
+                <div class="emoji" ref="facetent"><emoji-picker v-if="showemoji" @select="insertemoji"></emoji-picker></div>
             </div>
             <div class="picture">
                 <img src="@/assets/postpic.svg" alt="" @mousedown.prevent="triggerinput" :class="{showchange:showchange2}">
@@ -534,16 +534,12 @@ slection.removeAllRanges()
 slection.addRange(range)
 }
 //按钮状态
-const Mountedshowemoji=ref(false)
 const showemoji=ref(false)
 const show=()=>{
     if(!showchange1.value){
         showchange1.value=true
     }else{
         showchange1.value=false
-    }
-    if(!Mountedshowemoji.value){
-        Mountedshowemoji.value=true
     }
     if(showemoji.value){
         showemoji.value=false
