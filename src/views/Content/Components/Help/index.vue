@@ -33,38 +33,10 @@ import PostCard from '@/components/PostCard.vue';
 import { HelpFilled, WarningFilled } from '@element-plus/icons-vue';
 import { getposthelpapi } from '@/api/aboutpost';
 import {ref,onMounted} from 'vue'
-import type { getpost,postitem } from '@/types/post';
 import { useIntersectionObserver } from '@vueuse/core';
-let res=ref<getpost>()
-let page=ref(1)
-const loading=ref(false)
-const hasMore=ref(true)
-const error=ref(false)
-const empty=ref(false)
+import { usePostFeed } from '@/composables/usePostFeed';
 const sentry=ref<HTMLElement | null>()
-const size=10
-let postlist=ref<postitem[]>([])
-const loadmore=async()=>{
-if(loading.value || !hasMore.value){return}
-if(error.value){error.value=false}
-loading.value=true
-try{
-const postres=await getposthelpapi({page:page.value,size:size})
-    if(postres.status===0){
-       res.value=postres
-       postlist.value=res.value.data.list
-       hasMore.value=res.value.data.hasMore
-       page.value++
-       if(postlist.value.length===0){
-        empty.value=true
-       }
-    }
-}catch{
-      error.value=true
-}finally{
-    loading.value=false
-}    
-}
+const {loading,loadmore,error,empty,hasMore,postlist}=usePostFeed(getposthelpapi)
 onMounted(loadmore)
 useIntersectionObserver(sentry,([entry])=>{
 if(entry?.isIntersecting){loadmore()}

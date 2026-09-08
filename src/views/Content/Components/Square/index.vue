@@ -31,49 +31,16 @@
 <script setup lang="ts">
 import PostCard from '@/components/PostCard.vue';
 import { Box, WarningFilled } from '@element-plus/icons-vue';
-
-import { getpostapi } from '@/api/aboutpost';
 import {ref,onMounted,watch} from 'vue'
 import { useIntersectionObserver } from '@vueuse/core';
-import type { getpost,postitem ,post} from '@/types/post';
+import { usePostFeed } from '@/composables/usePostFeed';
 import { usePostFeedStore } from '@/stores/postfeed';
+import { getpostapi } from '@/api/aboutpost';
 const feedpost=usePostFeedStore()
-let res=ref<getpost>()
-let postlist=ref<postitem[]>([])
-let page=ref(1)
-const size=10
-const sentry=ref<HTMLElement | null>()
-const error=ref(false)
-const empty=ref(false)
-//数据加载
-const loading=ref(false)
-const hasMore=ref(true)
-const loadmore=async()=>{
-if(loading.value || !hasMore){return}
-if(error.value){error.value=false}
-loading.value=true
-try{
-const postres=await getpostapi({page:page.value,size:size})
-    if(postres.status===0){
-       res.value=postres
-       postlist.value.push(...res.value.data.list)
-       page.value++
-       hasMore.value=res.value.data.hasMore
-       if(postlist.value.length===0){
-        empty.value=true
-       }
-    }
-}catch{
-    error.value=true
-}finally{
-    loading.value=false
-}
-}
+//调用帖子相关信息的函数
+const {postlist,error,empty,loading,hasMore,loadmore,addpost}=usePostFeed(getpostapi)
 onMounted(loadmore)
-
-const addpost=(post:post)=>{
-    postlist.value.unshift(post)
-}
+const sentry=ref<HTMLElement | null>()
 watch(()=>feedpost.newpost,(P)=>{
     if(P){
         addpost(P)

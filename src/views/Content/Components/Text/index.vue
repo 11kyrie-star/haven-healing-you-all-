@@ -34,37 +34,9 @@ import { Document, WarningFilled } from '@element-plus/icons-vue';
 import { getposttextapi } from '@/api/aboutpost';
 import {ref,onMounted} from 'vue'
 import { useIntersectionObserver } from '@vueuse/core';
-import type { getpost,postitem } from '@/types/post';
-let res=ref<getpost>()
-let page=ref(1)
-const size=10
-const loading=ref(false)
-const hasMore=ref(true)
-const error=ref(false)
-const empty=ref(false)
+import { usePostFeed } from '@/composables/usePostFeed';
 const sentry=ref<HTMLElement | null>()
-let postlist=ref<postitem[]>([])
-const loadmore=async()=>{
-if(loading.value || !hasMore.value){return}
-if(error.value){error.value=false}
-loading.value=true
-try{
-const postres=await getposttextapi({page:page.value,size:size})
-    if(postres.status===0){
-       res.value=postres
-       postlist.value.push(...res.value.data.list)
-       page.value++
-       hasMore.value=res.value.data.hasMore
-       if(postlist.value.length===0){
-        empty.value=true
-       }
-    }
-}catch{
-      error.value=true
-}finally{
-    loading.value=false
-}
-}
+const {loading,loadmore,error,empty,postlist,hasMore}=usePostFeed(getposttextapi)
 onMounted(loadmore)
 useIntersectionObserver(sentry,([entry])=>{
 if(entry?.isIntersecting){loadmore()}
