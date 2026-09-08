@@ -10,6 +10,12 @@
     z-index: 9999;
     bottom: calc(100% + 8px);
     left: 0%;
+  :deep(.emoji-picker) {
+    .emoji-group {           
+      content-visibility: auto;
+      contain-intrinsic-size: auto 200px;
+    }
+  }
 }
 </style>
 

@@ -8,7 +8,7 @@
     <div class="editor-tool" v-show="showtool">
         <div class="tool-container">
             <div class="face">
-                <img src="@/assets/postface.svg" alt="" @mousedown.prevent="show" :class="{showchange:showchange1}" ref="facebtn">
+                <img src="@/assets/postface.svg" alt="" @mouseenter="enterface" @mousedown.prevent="show" :class="{showchange:showchange1}" ref="facebtn">
                 <div class="emoji" ref="facetent"><emoji-picker v-if="showemoji" @select="insertemoji"></emoji-picker></div>
             </div>
             <div class="picture">
@@ -130,7 +130,7 @@ import  DOMPurify from 'dompurify';
 import { onClickOutside } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
-import { ref,computed,createVNode,render,defineAsyncComponent} from 'vue';
+import { ref,computed,createVNode,render,defineAsyncComponent,onMounted} from 'vue';
 import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
 import type { post} from '@/types/post.ts';
 import { findsensitvie } from '@/utils/sensitvie.ts';
@@ -166,6 +166,9 @@ const preloademoji=()=>{
     if(emojichunkpreload.value){return}
     emojichunkpreload.value=true
     loademoji()
+}
+const enterface=()=>{
+    preloademoji()
 }
 //从回复变回评论
 const Change=()=>{
