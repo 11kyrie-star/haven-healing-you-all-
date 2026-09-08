@@ -5,7 +5,7 @@
     </div>
 
     <!-- 空数据状态页：请求成功但没有任何数据时，请将 isEmpty 置为 true -->
-    <div class="state-page" v-if="isEmpty" style="user-select: none;">
+    <div class="state-page" v-if="empty" style="user-select: none;">
         <div class="state-illustration">
             <div class="halo halo-1"></div>
             <div class="halo halo-2"></div>
@@ -20,7 +20,7 @@
     </div>
 
     <!-- 网络异常状态页：请求失败时，请将 hasError 置为 true -->
-    <div class="state-page state-error" v-if="hasError" style="user-select: none;">
+    <div class="state-page state-error" v-if="error" style="user-select: none;">
         <div class="state-illustration">
             <div class="halo halo-1"></div>
             <div class="halo halo-2"></div>
@@ -38,7 +38,7 @@
         <span v-if="loading" class="spinner"></span>
         {{ loading?'加载中...':'上拉加载更多' }}
     </div>
-    <div v-else-if="isEmpty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
+    <div v-else-if="empty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
 </div>
 </template>
 
@@ -47,46 +47,15 @@ import PostCard from '@/views/Content/Components/My/Components/Post/Components/P
 import { getmypost } from '@/api/aboutpost';
 import {ref,onMounted,watch} from 'vue'
 import { useIntersectionObserver } from '@vueuse/core';
-import type { getpost,postitem ,post} from '@/types/post';
 import { usePostFeedStore } from '@/stores/postfeed';
 import { Document, WarningFilled } from '@element-plus/icons-vue'
+import { usePostFeed } from '@/composables/usePostFeed';
 const feedpost=usePostFeedStore()
-let res=ref<getpost>()
-let postlist=ref<postitem[]>([])
-
-// 状态页开关（初始均为 false，默认不展示，请自行编写切换逻辑）：
-const isEmpty=ref(false)      // 请求成功且 postlist 为空时置 true
-const hasError=ref(false)     // 请求失败时置 true
-const hasMore=ref(true)
-const loading=ref(false)
+const {loading,loadmore,addpost,hasMore,error,empty,postlist}=usePostFeed(getmypost)
 const sentry=ref<HTMLElement | null>()
-const page=ref(1)
-const size=10
-const loadmore=async()=>{
-if(loading.value || !hasMore.value){return}
-if(hasError.value){hasError.value=false}
-loading.value=true
-try{
-    const postres=await getmypost({page:page.value,size:size})
-    if(postres.status===0){
-    res.value=postres
-    postlist.value.push(...res.value.data.list)
-    hasMore.value=res.value.data.hasMore
-    page.value++
-    if(postlist.value.length===0){
-        isEmpty.value=true
-    }
-    }
-    }catch{
-        hasError.value=true
-    }finally{
-        loading.value=false
-    }
-}
+
 onMounted(loadmore)
-const addpost=(post:post)=>{
-    postlist.value.unshift(post)
-}
+
 watch(()=>feedpost.newpost,(P)=>{
     if(P){
         addpost(P)

@@ -5,7 +5,7 @@
     </div>
 
     <!-- 空数据状态页：请求成功但没有任何数据时，请将 isEmpty 置为 true -->
-    <div class="state-page" v-if="isEmpty" style="user-select: none;">
+    <div class="state-page" v-if="empty" style="user-select: none;">
         <div class="state-illustration">
             <div class="halo halo-1"></div>
             <div class="halo halo-2"></div>
@@ -21,7 +21,7 @@
     </div>
 
     <!-- 网络异常状态页：请求失败时，请将 hasError 置为 true -->
-    <div class="state-page state-error" v-if="hasError" style="user-select: none;">
+    <div class="state-page state-error" v-if="error" style="user-select: none;">
         <div class="state-illustration">
             <div class="halo halo-1"></div>
             <div class="halo halo-2"></div>
@@ -39,7 +39,7 @@
         <span v-if="loading" class="spinner"></span>
         {{ loading?'加载中...':'上拉加载更多' }}
     </div>
-    <div v-else-if="!isEmpty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
+    <div v-else-if="!empty&&!hasMore" class="load-more" style="cursor: default; user-select: none;">到底啦....</div>
 </div>
 </template>
 
@@ -48,40 +48,12 @@ import { getlikepost } from '@/api/aboutpost';
 import {ref,onMounted} from 'vue'
 import { useRouter } from 'vue-router';
 import { useIntersectionObserver } from '@vueuse/core';
-import type { getpost,postitem ,post} from '@/types/post';
 import { StarFilled, WarningFilled } from '@element-plus/icons-vue'
-let res=ref<getpost>()
-let postlist=ref<postitem[]>([])
+import { usePostFeed } from '@/composables/usePostFeed';
 const router=useRouter()
-// 状态页开关（初始均为 false，默认不展示，请自行编写切换逻辑）：
-const isEmpty=ref(false)      // 请求成功且 postlist 为空时置 true
-const hasError=ref(false)     // 请求失败时置 true
-const hasMore=ref(true)
-const loading=ref(false)
+const {loadmore,loading,hasMore,error,empty,postlist}=usePostFeed(getlikepost)
 const sentry=ref<HTMLElement | null>()
-const page=ref(1)
-const size=10
-const loadmore=async()=>{
-if(loading.value || !hasMore.value){return}
-if(hasError.value){hasError.value=false}
-loading.value=true
-try{
-    const postres=await getlikepost({page:page.value,size:size})
-    if(postres.status===0){
-       res.value=postres
-       postlist.value.push(...res.value.data.list)
-       hasMore.value=res.value.data.list.length===size
-       page.value++
-       if(postlist.value.length===0){
-        isEmpty.value=true
-       }
-    }
-}catch{
-    hasError.value=true
-}finally{
-    loading.value=false
-}
-}
+
 onMounted(loadmore)
 useIntersectionObserver(sentry,([entry])=>{
 if(entry?.isIntersecting){loadmore()}
