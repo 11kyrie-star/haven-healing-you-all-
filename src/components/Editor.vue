@@ -130,10 +130,11 @@ import  DOMPurify from 'dompurify';
 import { onClickOutside } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
-import { ref,defineAsyncComponent,computed,createVNode,render} from 'vue';
-import { postpicApi,sendpostapi ,sendcomment,sendreplyapi,leavewordapi} from '@/api/aboutpost.ts';
-import type { post,leavewordpost } from '@/types/post.ts';
+import { ref,computed,createVNode,render} from 'vue';
+import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
+import type { post} from '@/types/post.ts';
 import { findsensitvie } from '@/utils/sensitvie.ts';
+import { compressimage } from '@/utils/compressimage.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
 import EmojiPicker from './EmojiPicker.vue';
@@ -339,30 +340,7 @@ try{
     return
 }
 }
-//压缩图片函数
-const compressimage=(file:File)=>{
-    return new Promise((resolve)=>{
-        const img=new Image()
-        img.onload=()=>{
-            const canvas=document.createElement('canvas')
-            const ctx=canvas.getContext('2d')
-            let {width,height}=img
-            if(width>1280 || height>1280){
-               const ratio=1280/Math.max(width,height)
-               width*=ratio
-               height*=ratio
-            }
-            canvas.width=width
-            canvas.height=height
-            ctx?.drawImage(img,0,0,width,height)
-            canvas.toBlob((blob)=>{
-                resolve(new File([blob!],'avatar.webp',{type:'webp/image'}))
-            },'image/webp',0.8)
-            URL.revokeObjectURL(img.src)
-        }
-        img.src=URL.createObjectURL(file)
-    })
-}
+
 //构造九宫格容器
 const buildgrid=()=>{
    const edit=editorinput.value
