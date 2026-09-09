@@ -77,7 +77,7 @@
 import {View,Star,ChatSquare,ArrowDown,StarFilled,Lock} from '@element-plus/icons-vue'
 import { useIntersectionObserver } from '@vueuse/core';
 import { formatPostTime } from '@/utils/time.ts';
-import {getpostcomment,getpostreply,starpost,cancelstarpost,addpostview,changepoststatus,deletepostapi} from '@/api/aboutpost.ts';
+import {getpostcomment,getpostreply,addpostview,changepoststatus,deletepostapi} from '@/api/aboutpost.ts';
 import type { post } from '@/types/post.ts';
 import type { comment } from '@/types/post.ts';
 import { useWindowStore } from '@/stores/window';
@@ -85,7 +85,7 @@ import { computed } from 'vue';
 import Editor from '@/components/Editor.vue';
 import CommentItem from '@/components/CommentItem.vue';
 import { ref,onBeforeUnmount } from 'vue';
-import { ElMessage } from 'element-plus';
+import { usePostLike } from '@/composables/usePostLike';
 const props=defineProps<{
     id:number,
     user_id:number,
@@ -113,47 +113,10 @@ const emit=defineEmits<{
     addpostagain:[post:post],
     delete:[id:number]
 }>()
-const islkied=ref(props.is_liked)
-const likecount=ref(props.like_count)
+
 const commentcount=ref(props.comment_count)
-//点赞函数
-let timer1:ReturnType<typeof setTimeout> | null =null
-const togglelike=()=>{
-    if(timer1){return}
-    timer1=setTimeout(async()=>{
-      try{  
-       const res=await starpost(props.id)
-    if(res.status===1){
-        return ElMessage.warning('网络异常')
-    }else{
-        islkied.value=res.data.is_liked
-        likecount.value++
-    }}finally{
-       clearTimeout(timer1!)
-       timer1=null
-    }
-    },300)
-}
-//取消点赞函数
-let timer2:ReturnType<typeof setTimeout> | null=null
-const cancelstar=()=>{
-    if(timer2){return}
-    timer2=setTimeout(async()=>{
-        try{
-          const res=await cancelstarpost(props.id)
-    if(res.status===1){
-        return ElMessage.warning('网络异常')
-    }else{
-        islkied.value=res.data.is_liked
-        likecount.value--
-    }
-        }finally{
-            clearTimeout(timer2!)
-            timer2=null
-        }
-    },300)
-    
-}
+//点赞模块
+const {cancelstar,togglelike,islkied,likecount}=usePostLike(props.id,props.is_liked,props.like_count)
 const data=computed(()=>({
 id:props.id,
 user_id:props.user_id,
