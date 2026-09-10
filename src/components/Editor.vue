@@ -130,14 +130,16 @@ import  DOMPurify from 'dompurify';
 import { onClickOutside } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import {Close} from '@element-plus/icons-vue'
-import { ref,computed,createVNode,render,defineAsyncComponent,onMounted} from 'vue';
+import { ref,computed,createVNode,render,defineAsyncComponent} from 'vue';
 import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
 import type { post} from '@/types/post.ts';
+import { useWindowScroll } from '@vueuse/core';
 import { findsensitvie } from '@/utils/sensitvie.ts';
 import { compressimage } from '@/utils/compressimage.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
 import type { comment } from '@/types/post.ts';
+import { useWindowStore } from '@/stores/window.ts';
 let showplaceholder=ref(true)
 const inpic=ref<HTMLInputElement>()
 const showchange1=ref(false)
@@ -460,7 +462,7 @@ const getgridstyle=(num:number):{columns?:number,rows?:number,aspectRatio?:strin
     gap: '4px'
   }
    }
-
+const windowstore=useWindowStore()
 //创建格子
 const createimgcell=(url:string,index:number)=>{
 const cell=document.createElement('div')
@@ -495,6 +497,10 @@ cell.style.overflow='hidden'
 cell.style.position='relative'
 cell.appendChild(closebtn)
 const img=document.createElement('img')
+img.style.cursor='pointer'
+img.addEventListener('click',()=>{
+windowstore.open('postimg',url)
+})
 img.src=url
 img.style.width='100%'
 img.style.height='100%'

@@ -1,7 +1,7 @@
 import {ref} from 'vue'
 import type { comment, commentnode } from '@/types/post'
 import { getpostcomment, getpostreply } from '@/api/aboutpost'
-
+//让每个节点都有自己的状态
 function createCommentNode(item: comment): commentnode {
     return {
         ...item,
