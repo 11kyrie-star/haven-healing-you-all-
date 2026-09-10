@@ -57,7 +57,7 @@
         </div>
         <div class="show-comment" v-if="showcomment">
         <div class="comment-item" v-for="item in roots" :key="item.id">    
-         <CommentItem :comment="item" :activereplyid="activereplyid" :has-morereplys="hasMorereplys" :replys-error="replysError" :replys-loading="replysLoading" @toggle-reply="getreply" @want-reply="findeditor" @cancel="change"></CommentItem>
+         <CommentItem :comment="item" :activereplyid="activereplyid" @toggle-reply="openReplies" @load-more-reply="loadMoreReplies" @want-reply="findeditor" @cancel="change"></CommentItem>
         </div>     
         <!-- 加载更多评论 -->
         <div class="load-more-comments" v-if="hasMoreComments" @click="loadMoreComments" :class="{loading: commentsLoading, error: commentsError}" style="user-select: none;">
@@ -77,15 +77,15 @@
 import {View,Star,ChatSquare,ArrowDown,StarFilled,Lock} from '@element-plus/icons-vue'
 import { useIntersectionObserver } from '@vueuse/core';
 import { formatPostTime } from '@/utils/time.ts';
-import {getpostcomment,getpostreply,addpostview,changepoststatus,deletepostapi} from '@/api/aboutpost.ts';
+import {addpostview,changepoststatus,deletepostapi} from '@/api/aboutpost.ts';
 import type { post } from '@/types/post.ts';
-import type { comment } from '@/types/post.ts';
 import { useWindowStore } from '@/stores/window';
 import { computed } from 'vue';
 import Editor from '@/components/Editor.vue';
 import CommentItem from '@/components/CommentItem.vue';
 import { ref,onBeforeUnmount } from 'vue';
 import { usePostLike } from '@/composables/usePostLike';
+import { useCommentLoad } from '@/composables/useCommentLoad';
 const props=defineProps<{
     id:number,
     user_id:number,
@@ -106,30 +106,17 @@ const windowstore=useWindowStore()
 const openwindow=(postimg:string)=>{
     windowstore.open('postimg',postimg)
 }
-//用于记录回复评论的id
-const activereplyid=ref<number | null>(null)
+
 const viewcount=ref(props.view_count)
 const emit=defineEmits<{
     addpostagain:[post:post],
     delete:[id:number]
 }>()
 
-const commentcount=ref(props.comment_count)
+
 //点赞模块
 const {cancelstar,togglelike,islkied,likecount}=usePostLike(props.id,props.is_liked,props.like_count)
-const data=computed(()=>({
-id:props.id,
-user_id:props.user_id,
-avatar:props.avatar,
-username:props.username,
-create_at:props.create_at,
-content:props.content,
-images:props.images,
-view_count:props.view_count,
-like_count:props.like_count,
-comment_count:props.comment_count,
-is_liked:props.is_liked
-}))
+
 const gridlayout=computed(()=>{
     const n=props.images.length
     if(n===1)return {cols:1,rows:1,aspect:'16/9'}
@@ -141,127 +128,8 @@ const gridlayout=computed(()=>{
 const timestr=computed(()=>{
     return formatPostTime(props.create_at)
 })
-const addcomment=(comment:comment)=>{
-    if(comment.parent_id===null){
-       commentList.value.unshift(comment)
-       roots.value=biuldtree(commentList.value)
-       commentcount.value++
-    }else{
-        const parent=findNode(roots.value,comment.parent_id!)
-        if (parent) {
-            parent.reply_count++ 
-            commentcount.value++                   
-            parent.children.unshift({
-                ...comment,
-                children: [],
-                showreply: false
-            })
-            parent.showreply=true   
-        }                    
-    }
-    activereplyid.value=null
-}
-const commentList=ref<comment[]>([])
-const roots=ref<commentnode[]>([])
-const showcomment=ref(false)
-const isCommentactive=ref(false) //控制按钮的状态
-//点击评论按钮后的处理函数
-const commenthandle=()=>{
-if(commentcount.value===0){
-    return
-}
-if(isCommentactive.value===false){
-    isCommentactive.value=true
-}else{
-    isCommentactive.value=false
-}
-if(showcomment.value===false){
-showcomment.value=true
-loadMoreComments()
-}else{
-    showcomment.value=false
-}
-}
-interface commentnode{
-    id:number,
-    post_id:number,
-    user_id:number,
-    parent_id:null | number,
-    avatar:string,
-    username:string,
-    content:string,
-    create_at:string,
-    star_count:number,
-    reply_count:number,
-    images?:string[]
-    children:commentnode[],
-    showreply:boolean,
-    is_liked:number
-}
-//把后端返回了数据构建成树
-function biuldtree(list:comment[]):commentnode[]{
-    const map=new Map<number,commentnode>()
-    const roots=ref<commentnode[]>([])
-    for(const item of list){
-        map.set(item.id,{...item,children:[],showreply:false})
-    }
-    for(const item of list){
-        const node=map.get(item.id)
-        if(item.parent_id===null){
-            roots.value.push(node!)
-        }else{
-            const parent=map.get(item.parent_id)
-            parent?.children.push(node!)
-        }
-    }
-    return roots.value
-}
-//点到回复评论的函数
-let replypage=ref(1)
-let replysize=10
-const replysLoading=ref(false)
-const replysError=ref(false)
-const hasMorereplys=ref(true)
-const getreply=async (commId:number)=>{
-const node=findNode(roots.value,commId)
-if(!node) return
-if(replysLoading.value || !hasMorereplys.value) return
-if(replysError.value){replysError.value=false}
-replysLoading.value=true
-if(node.children.length===0){
-try{
-const res=(await getpostreply(commId,replypage.value,replysize))
-if(res.status===0){
-    const replies=res.data.list
-    node.children.push(...replies.map((item:comment)=>({
-...item,
-children:[],
-showreply:false
-})))
-    replypage.value++
-    hasMorereplys.value=res.data.hasMore
-}
-}catch{
-    replysError.value=true
-}finally{
-    replysLoading.value=false
-}
-}
-node.showreply=true
-}
-//找到对应的节点
-const findNode=(tree:commentnode[],id:number):commentnode | null=>{
-   for(const node of tree){
-    if(node.id===id){
-        return node
-    }
-    if(node.children.length){
-        const found=findNode(node.children,id)
-        if(found) return found
-    }
-   }
-   return null
-}
+
+
 const editref=ref<InstanceType<typeof Editor>>()
 //点击回复以后定位评论框
 const findeditor=(id:number,name:string)=>{
@@ -352,29 +220,9 @@ const deletepost=()=>{
     }
     },300)
 }
-let page=ref(1)
-const size=10
-const commentsLoading=ref(false)
-const commentsError=ref(false)
-const hasMoreComments=ref(true)
-const loadMoreComments=async()=>{
-    if(commentsLoading.value || !hasMoreComments.value){return}
-    if(commentsError.value){commentsError.value=false}
-    commentsLoading.value=true
-    try{
-        const res=await getpostcomment(props.id,page.value,size)
-        if(res.status===0){
-        commentList.value=res.data.list
-        roots.value=biuldtree(commentList.value)
-        page.value++
-        hasMoreComments.value=res.data.hasMore
-        }
-    }catch{
-        commentsError.value=true
-    }finally{
-        commentsLoading.value=false
-    }
-}
+//展示、加载、添加评论模块
+const {roots,loadMoreComments,hasMoreComments,commentList,commentsError,commentsLoading,commenthandle,isCommentactive,showcomment,addcomment,activereplyid,findNode,commentcount,openReplies,loadMoreReplies}=useCommentLoad(props.id,props.comment_count)
+
 </script>
 
 <style scoped lang="scss">

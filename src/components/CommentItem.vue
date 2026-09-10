@@ -27,11 +27,11 @@
         </div>
     </div>
     <div v-if="comment.showreply && comment.children.length">
-           <CommentItem v-for="children in comment.children" :comment="children" :key="children.id" :activereplyid="activereplyid" :depth="(depth??0)+1" :replys-error="props.replysError" :replys-loading="props.replysLoading" :has-morereplys="props.hasMorereplys" @toggle-reply="(id:number)=>emit('toggleReply',id)" @want-reply="(id:number,reply:string)=>emit('wantReply',id,reply)"></CommentItem>
+      <CommentItem v-for="children in comment.children" :comment="children" :key="children.id" :activereplyid="activereplyid" :depth="(depth??0)+1" @toggle-reply="(id:number)=>emit('toggleReply',id)" @want-reply="(id:number,reply:string)=>emit('wantReply',id,reply)" @load-more-reply="(id:number)=>emit('loadMoreReply',id)"></CommentItem>
     <!-- 加载更多回复 -->
-    <div class="load-more-comments" v-if="props.hasMorereplys" @click="loadMorereplys" :class="{loading: props.replysLoading, error: props.replysError}" style="user-select: none;">
-        <span v-if="props.replysLoading" class="spinner"></span>
-        <span style="cursor: default;">{{ replysError ? '加载失败，点击重试' : (replysLoading ? '加载中...' : '加载更多回复') }}</span>
+    <div class="load-more-comments" v-if="comment.replyHasMore" @click="loadMorereplys" :class="{loading: comment.replyLoading, error: comment.replyError}" style="user-select: none;">
+      <span v-if="comment.replyLoading" class="spinner"></span>
+      <span style="cursor: default;">{{ comment.replyError ? '加载失败，点击重试' : (comment.replyLoading ? '加载中...' : '加载更多回复') }}</span>
         <el-icon :size="14" class="load-more-arrow" style="cursor: pointer;"><ArrowDown /></el-icon>
     </div>
     </div>
@@ -43,27 +43,11 @@ import { commentstar ,cancelcomentstar} from '@/api/aboutpost';
 import {ref,computed} from 'vue'
 import { formatPostTime } from '@/utils/time';
 import { ElMessage } from 'element-plus';
-const props= defineProps<{comment:commentnode,depth?:number,activereplyid:number | null,replysLoading:boolean,replysError:boolean,hasMorereplys:boolean}>()
-const emit=defineEmits<{toggleReply:[commId:number],wantReply:[commId:number,reply:string],cancel:[]}>()
-interface commentnode{
-    id:number,
-    post_id:number,
-    user_id:number,
-    parent_id:null | number,
-    avatar:string,
-    username:string,
-    content:string,
-    create_at:string,
-    star_count:number,
-    reply_count:number,
-    images?:string[]
-    children:commentnode[],
-    showreply:boolean,
-    is_liked:number
-}
+import type { commentnode } from '@/types/post';
+const props= defineProps<{comment:commentnode,depth?:number,activereplyid:number | null}>()
+const emit=defineEmits<{toggleReply:[commId:number],wantReply:[commId:number,reply:string],cancel:[],loadMoreReply:[commId:number]}>()
 const isliked=ref(props.comment.is_liked)
 const starcount=ref(props.comment.star_count)
-const replycount=ref(props.comment.reply_count)
 //点赞函数
 let timer:ReturnType<typeof setTimeout> | null=null
 const togglestar=()=>{
@@ -108,13 +92,15 @@ const handlereplyagain=(commId:number)=>{
     if(props.comment.reply_count===0){
         return
     }
-    if(isactive.value===false){
-    emit('toggleReply',commId)
-    isactive.value=true
-}else{
-    isactive.value=false
-    props.comment.showreply=false
-}
+    // 已加载过就直接展开/收起，未加载过才让父组件去请求第一页
+    if(props.comment.showreply && props.comment.children.length>0){
+        props.comment.showreply=false
+        return
+    }
+    props.comment.showreply=true
+    if(props.comment.children.length===0){
+        emit('toggleReply',commId)
+    }
 }
 const replyactive=computed(()=>(props.activereplyid===props.comment.id))
 //点击回复按钮
@@ -125,13 +111,13 @@ const handlereplebtn=()=>{
       emit('cancel')
     }
 }
-const isactive=ref(false)
+const isactive=computed(()=>props.comment.showreply && props.comment.children.length>0)
 
 
 let timestr=ref()
 timestr.value=formatPostTime(props.comment.create_at)
 const loadMorereplys=()=>{
-    emit('toggleReply',props.comment.id)
+    emit('loadMoreReply',props.comment.id)
 }
 </script>
 

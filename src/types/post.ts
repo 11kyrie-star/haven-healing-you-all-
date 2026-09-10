@@ -114,6 +114,15 @@ export interface comment{
     is_liked:number
 }
 
+export interface commentnode extends comment{
+    children:commentnode[],
+    showreply:boolean,
+    replyPage:number,
+    replyHasMore:boolean,
+    replyLoading:boolean,
+    replyError:boolean
+}
+
 export interface commentres{
     status:number,
     msg:string,
