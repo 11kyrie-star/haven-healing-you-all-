@@ -28,3 +28,9 @@ export interface getunreadnoteres{
         list:NotificationItem[]
     }
 }
+
+export interface clearmsgres{
+    status:number,
+    msg:string,
+    data:{deleted:number}
+}
