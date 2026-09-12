@@ -78,6 +78,7 @@ const cancelpwd=()=>{
 const clickinput=()=>{
     fileinput.value?.click()
 }
+//修改资料之上传头像处理函数
 const changefile=async (even:Event)=>{
 const target=even.target as HTMLInputElement
 const file=target.files?.[0]
@@ -147,8 +148,8 @@ const inforule=reactive({
         {type:'email',message:'邮箱格式不正确',trigger:'blur'}
     ]
 })
+//修改密码的表单校验规则
 const rules=reactive({
-
 oldpassword:[{
     validator:(rule:object,value:string,callback:(error?:string | Error)=>void)=>{
          if(!value) return callback() 

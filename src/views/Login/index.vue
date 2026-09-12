@@ -79,6 +79,7 @@ const forgetform=reactive({
     newpassword:''
 })
 const Forform=ref()
+//登录规则
 const Lorules=reactive({
     username:[
         {
@@ -108,6 +109,7 @@ const Lorules=reactive({
         }
     ]
 })
+//忘记密码的规则
 const Forrules=reactive({
     email:[
         {type:'email',message:'邮箱格式不正确',trigger:'blur'}
@@ -125,6 +127,7 @@ const Forrules=reactive({
         }
     ]
 })
+//注册的规则
 const Rerules=reactive({
     username:[
         {
@@ -158,6 +161,7 @@ const Rerules=reactive({
         {type:'email',message:'邮箱格式不正确',trigger:'blur'}
     ]
 })
+//登录函数
 const onsubmit=()=>{
     if(!showLogin.value){
         showLogin.value=true
