@@ -6,11 +6,13 @@
     <Avatar radius="8px"></Avatar>
     </div>
     <Name left="21%" top="81%" fontsize="2em"></Name>
+    <Counts></Counts>
     <Setting @open="showinfor"></Setting>
 </div>
 </template>
 
 <script setup lang="ts">
+import Counts from '@/views/Background/Components/Counts/index.vue'
 import Logo from '@/views/Background/Components/Logo/index.vue'
 import Avatar from '@/components/Avatar.vue';
 import Setting from '@/views/Background/Components/Setting/index.vue'
