@@ -1,6 +1,8 @@
 ﻿<template>
 <div class="bg">
     <Search></Search>
+    <!-- AI 倾诉入口：位于 Search 右侧，点击逻辑后续接入 -->
+    <AiLogo></AiLogo>
     <Logo></Logo>
     <div class="avatar-wrap">
     <Avatar radius="8px"></Avatar>
@@ -18,6 +20,7 @@ import Avatar from '@/components/Avatar.vue';
 import Setting from '@/views/Background/Components/Setting/index.vue'
 import Name from '@/views/Background/Components/Name/index.vue'
 import Search from '@/views/Background/Components/Search/index.vue'
+import AiLogo from '@/views/Background/Components/AiLogo/index.vue'
 const emit= defineEmits<{
     open:[command:string]
 }>()

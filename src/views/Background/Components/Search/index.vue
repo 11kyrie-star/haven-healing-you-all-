@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { Search, Close } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
 import Pannel from './Components/Pannel.vue'
 import type { searchhotlist } from '@/types/search.ts';
 import { getsociatepai } from '@/api/search.ts';
