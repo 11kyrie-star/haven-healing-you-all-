@@ -133,7 +133,6 @@ import {Close} from '@element-plus/icons-vue'
 import { ref,computed,createVNode,render,defineAsyncComponent} from 'vue';
 import { postpicApi,sendpostapi ,sendcomment,sendreplyapi} from '@/api/aboutpost.ts';
 import type { post} from '@/types/post.ts';
-import { useWindowScroll } from '@vueuse/core';
 import { findsensitvie } from '@/utils/sensitvie.ts';
 import { compressimage } from '@/utils/compressimage.ts';
 import type { EmojiExt } from 'vue3-emoji-picker';

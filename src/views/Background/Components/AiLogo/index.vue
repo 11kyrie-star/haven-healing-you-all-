@@ -1,5 +1,6 @@
 <template>
-  <div class="ai-entry">
+  <div class="ai-entry" ref="aientry">
+    <div class="ai-logo">
     <button
       class="ai-trigger"
       type="button"
@@ -39,18 +40,39 @@
       <span class="ai-tip-title">我是你的 Haven AI</span>
       <span class="ai-tip-desc">在想什么呢？说给我听</span>
     </div>
+    </div>
+    <div class="ai-chat" v-show="showai">
+      <AiChat v-if="showopen"></AiChat>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// 只抛出点击事件，具体打开哪个对话界面交给父组件处理
-const emit = defineEmits<{
-  click: []
-}>()
-
+import { defineAsyncComponent, ref } from 'vue';
+import { onClickOutside } from '@vueuse/core';
+//是否展示AI聊天界面
+const showai=ref(false)
+const showopen=ref(false)
 const handleClick = () => {
-  emit('click')
+  if(!showopen.value){
+    showopen.value=true
+  }
+  if(!showai.value){
+    showai.value=true
+  }else{
+    showai.value=false
+  }
 }
+//异步AI聊天组件
+const loadai=()=>import('./Components/AiChat/index.vue')
+const AiChat=defineAsyncComponent(loadai)
+//点击以外的地方关闭聊天UI
+const aientry=ref<HTMLElement | null>(null)
+onClickOutside(aientry,()=>{
+  if(showai.value){
+    showai.value=false
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -64,9 +86,11 @@ const handleClick = () => {
   left: calc(50% + var(--search-half) + 60px);
   z-index: 30;
   height: 48px;
-  display: flex;
-  font-family: $font-family-base;
-  user-select: none;
+  .ai-logo{
+     display: flex;
+     font-family: $font-family-base;
+     user-select: none;
+  }
 }
 
 /* ---------- 悬浮渐变光环 ---------- */
@@ -339,7 +363,7 @@ const handleClick = () => {
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
-  z-index: 3;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -407,18 +431,18 @@ const handleClick = () => {
 }
 
 /* ---------- 悬浮 / 键盘聚焦状态 ---------- */
-.ai-entry:hover .ai-halo,
-.ai-entry:focus-within .ai-halo {
+.ai-logo:hover .ai-halo,
+.ai-logo:focus-within .ai-halo {
   opacity: 0.75;
 }
 
-.ai-entry:hover .ai-pulse,
-.ai-entry:focus-within .ai-pulse {
+.ai-logo:hover .ai-pulse,
+.ai-logo:focus-within .ai-pulse {
   animation: none;
   opacity: 0;
 }
 
-.ai-entry:hover .ai-trigger,
+.ai-logo:hover .ai-trigger,
 .ai-trigger:focus-visible {
   border-color: rgba(243, 79, 103, 0.5);
   background: rgba(255, 255, 255, 0.94);
@@ -429,12 +453,12 @@ const handleClick = () => {
   transform: translateY(-2px);
 }
 
-.ai-entry:hover .ai-pet,
+.ai-logo:hover .ai-pet,
 .ai-trigger:focus-visible .ai-pet {
   animation: ai-pet-bounce 0.95s var(--ai-spring) infinite;
 }
 
-.ai-entry:hover .ai-pet-body,
+.ai-logo:hover .ai-pet-body,
 .ai-trigger:focus-visible .ai-pet-body {
   box-shadow:
     0 5px 14px rgba(243, 79, 103, 0.42),
@@ -442,43 +466,43 @@ const handleClick = () => {
     inset 0 -7px 10px -7px rgba(150, 50, 40, 0.4);
 }
 
-.ai-entry:hover .ai-pet-eye,
+.ai-logo:hover .ai-pet-eye,
 .ai-trigger:focus-visible .ai-pet-eye {
   height: 7.5px;
 }
 
-.ai-entry:hover .ai-pet-mouth,
+.ai-logo:hover .ai-pet-mouth,
 .ai-trigger:focus-visible .ai-pet-mouth {
   height: 5px;
   opacity: 0.9;
 }
 
-.ai-entry:hover .ai-pet-blush,
+.ai-logo:hover .ai-pet-blush,
 .ai-trigger:focus-visible .ai-pet-blush {
   opacity: 1;
 }
 
-.ai-entry:hover .ai-pet-antenna {
+.ai-logo:hover .ai-pet-antenna {
   animation-duration: 1.1s;
 }
 
-.ai-entry:hover .ai-sheen {
+.ai-logo:hover .ai-sheen {
   animation: ai-sheen 0.9s ease 0.05s;
 }
 
-.ai-entry:hover .ai-spark {
+.ai-logo:hover .ai-spark {
   animation: ai-twinkle 1.7s ease-in-out infinite;
 }
 
-.ai-entry:hover .ai-spark--two {
+.ai-logo:hover .ai-spark--two {
   animation-delay: 0.28s;
 }
 
-.ai-entry:hover .ai-spark--three {
+.ai-logo:hover .ai-spark--three {
   animation-delay: 0.6s;
 }
 
-.ai-entry:hover .ai-tip,
+.ai-logo:hover .ai-tip,
 .ai-trigger:focus-visible ~ .ai-tip {
   opacity: 1;
   transform: translateY(0) scale(1);

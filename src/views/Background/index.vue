@@ -1,7 +1,6 @@
 ﻿<template>
 <div class="bg">
     <Search></Search>
-    <!-- AI 倾诉入口：位于 Search 右侧，点击逻辑后续接入 -->
     <AiLogo></AiLogo>
     <Logo></Logo>
     <div class="avatar-wrap">
@@ -21,6 +20,7 @@ import Setting from '@/views/Background/Components/Setting/index.vue'
 import Name from '@/views/Background/Components/Name/index.vue'
 import Search from '@/views/Background/Components/Search/index.vue'
 import AiLogo from '@/views/Background/Components/AiLogo/index.vue'
+import { defineAsyncComponent, ref } from 'vue';
 const emit= defineEmits<{
     open:[command:string]
 }>()
