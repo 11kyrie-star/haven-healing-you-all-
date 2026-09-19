@@ -280,10 +280,10 @@ const closewindow=()=>{
     justify-content: center;
     align-items: center;
     .window-card{
-        max-width: fit-content;
-        max-height: fit-content;
+        width: fit-content;
+        height: fit-content;
+        padding: 2px;
         box-shadow: 0 10px 36px rgba(60, 20, 30, 0.35);
-        padding: 8px;
         position: relative;
         border-radius: 18px;
         overflow: hidden;
@@ -371,7 +371,6 @@ const closewindow=()=>{
     }
     .window-img{
         height: fit-content;
-        margin-bottom: 10px;
         .img-button{
             width: fit-content;
             background-color: whitesmoke;
@@ -383,8 +382,9 @@ const closewindow=()=>{
             cursor: pointer;
         }
         img{
-            width: 60vw;
-            height: 50vw;
+            display: block;
+            max-width: 60vw;
+            max-height: 72vh;
             object-fit: cover;
         }
     }

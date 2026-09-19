@@ -14,7 +14,7 @@ return new Promise((resolve)=>{
             canvas.height=height
             ctx?.drawImage(img,0,0,width,height)
             canvas.toBlob((blob)=>{
-                resolve(new File([blob!],'avatar.webp',{type:'webp/image'}))
+                resolve(new File([blob!],'avatar.webp',{type:'image/webp'}))
             },'image/webp',0.8)
             URL.revokeObjectURL(img.src)
         }
