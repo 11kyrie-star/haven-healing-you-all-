@@ -19,7 +19,7 @@
       <span class="ai-header-mark" aria-hidden="true">AI</span>
     </header>
 
-    <div class="ai-list" aria-live="polite" @scroll="closeMenu">
+    <div class="ai-list" aria-live="polite" @scroll="closeMenu" ref="listRef">
       <div class="ai-date"><span>今天</span></div>
 
       <article
@@ -127,7 +127,7 @@
 
 <script setup lang="ts">
 import { Promotion, VideoPause, Delete } from '@element-plus/icons-vue'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { streamrequest } from '@/utils/streamrequest'
 const text = ref('')
 type MessageStatus='done' | 'pending' | 'stopped' | 'error'
@@ -210,6 +210,7 @@ const pushmessage = async () => {
     push.value = false
     isLoading.value = false
     showPushbtn.value=true
+    scrolltoBottom()
   }
 }
 //取消生成
@@ -285,6 +286,15 @@ const handleDelete = () => {
   messages.value = messages.value.filter((item) => item.id !== target.id)
   closeMenu()
 }
+
+//时刻展现最新消息
+const listRef=ref<HTMLElement | null>()
+const scrolltoBottom=async()=>{
+  await nextTick()
+  const el=listRef.value
+  if(el){return}
+  el!.scrollTop=el!.scrollHeight
+}
 </script>
 
 <style scoped lang="scss">
@@ -315,7 +325,6 @@ const handleDelete = () => {
   backdrop-filter: blur(22px) saturate(1.16);
   color: var(--ai-ink);
   font-family: $font-family-base;
-  user-select: none;
   transform-origin: 100% 0;
   animation: ai-chat-in 0.34s var(--ai-spring) both;
 
@@ -619,7 +628,6 @@ const handleDelete = () => {
   box-shadow:
     0 7px 18px rgba(76, 155, 188, 0.13),
     inset 0 1px 0 rgba(255, 255, 255, 0.84);
-
   &::before {
     content: '';
     position: absolute;
