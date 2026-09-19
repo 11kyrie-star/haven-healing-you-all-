@@ -19,7 +19,7 @@
       <span class="ai-header-mark" aria-hidden="true">AI</span>
     </header>
 
-    <div class="ai-list" aria-live="polite">
+    <div class="ai-list" aria-live="polite" @scroll="closeMenu">
       <div class="ai-date"><span>今天</span></div>
 
       <article
@@ -27,6 +27,7 @@
         :key="message.id"
         class="ai-message"
         :class="{ 'ai-message--me': message.from !== 'ai' }"
+        @contextmenu.prevent="openMenu($event, message)"
       >
         <span v-if="message.from === 'ai'" class="ai-message-avatar" aria-hidden="true">
           <span></span>
@@ -99,11 +100,34 @@
       <p class="ai-input-hint">这里没有评判，只有认真倾听</p>
     </footer>
   </section>
+
+  <!-- 消息右键菜单：Teleport 到 body，避免被容器的 transform / overflow 影响定位 -->
+  <Teleport to="body">
+    <div
+      v-if="menuVisible"
+      class="ai-context-menu"
+      :style="{ left: menuX + 'px', top: menuY + 'px' }"
+      role="menu"
+      aria-label="消息操作"
+      @mousedown.stop
+      @contextmenu.prevent
+    >
+      <button
+        class="ai-context-menu-item"
+        type="button"
+        role="menuitem"
+        @click="handleDelete"
+      >
+        <el-icon :size="13"><Delete /></el-icon>
+        <span>删除</span>
+      </button>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { Promotion, VideoPause } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { Promotion, VideoPause, Delete } from '@element-plus/icons-vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { streamrequest } from '@/utils/streamrequest'
 const text = ref('')
 type MessageStatus='done' | 'pending' | 'stopped' | 'error'
@@ -199,6 +223,67 @@ const stop = () => {
   showPushbtn.value = true
   isLoading.value = false
   messages.value[messages.value.length-1]!.status='stopped'
+}
+
+/* ---------- 消息右键菜单 ---------- */
+// 菜单大致宽高，用于贴边判断
+const MENU_WIDTH = 132
+const MENU_HEIGHT = 44
+// 菜单是否显示
+const menuVisible = ref(false)
+// 菜单渲染位置（相对视口）
+const menuX = ref(0)
+const menuY = ref(0)
+// 当前被右键的消息
+const menuTarget = ref<message | null>(null)
+
+// 打开菜单：记住目标 + 算出不超出视口的位置
+const openMenu = (e: MouseEvent, item: message) => {
+  menuTarget.value = item
+  const maxX = Math.max(0, window.innerWidth - MENU_WIDTH)
+  const maxY = Math.max(0, window.innerHeight - MENU_HEIGHT)
+  menuX.value = Math.min(e.clientX, maxX)
+  menuY.value = Math.min(e.clientY, maxY)
+  menuVisible.value = true
+}
+
+// 关闭菜单
+const closeMenu = () => {
+  menuVisible.value = false
+  menuTarget.value = null
+}
+
+// 点击页面任意位置关闭（菜单内部的 mousedown 已被 .stop 拦截）
+const handleGlobalMouseDown = () => {
+  closeMenu()
+}
+
+// 按 Esc 关闭
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') closeMenu()
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', handleGlobalMouseDown)
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', handleGlobalMouseDown)
+  document.removeEventListener('keydown', handleKeyDown)
+})
+
+// 删除被右键的消息
+const handleDelete = () => {
+  const target = menuTarget.value
+  if (!target) return
+  // 正在流式输出，且删的就是正在生成的那条 → 先停止生成
+  const isStreaming = isLoading.value && messages.value[messages.value.length - 1]?.id === target.id
+  if (isStreaming) {
+    stop()
+  }
+  messages.value = messages.value.filter((item) => item.id !== target.id)
+  closeMenu()
 }
 </script>
 
@@ -776,6 +861,74 @@ const stop = () => {
   text-align: center;
 }
 
+/* ---------- 消息右键菜单 ---------- */
+.ai-context-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 132px;
+  padding: 5px;
+  border: 1px solid rgba(224, 167, 167, 0.35);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 14px 32px rgba(120, 60, 40, 0.18),
+    0 4px 12px rgba(120, 60, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px) saturate(1.1);
+  font-family: $font-family-base;
+  user-select: none;
+  transform-origin: 0 0;
+  animation: ai-menu-in 0.18s ease-out both;
+}
+
+.ai-context-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(184, 105, 92, 0.88);
+  font-family: inherit;
+  font-size: 0.76rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    color: #fff;
+    background: linear-gradient(135deg, #f78c6b 0%, #f34f67 100%);
+    box-shadow: 0 4px 12px rgba(243, 79, 103, 0.26);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(243, 79, 103, 0.26);
+  }
+}
+
+@keyframes ai-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(-3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 @keyframes ai-typing-wave {
   0%,
   60%,
@@ -822,7 +975,8 @@ const stop = () => {
 
 @media (prefers-reduced-motion: reduce) {
   .ai-container,
-  .ai-send {
+  .ai-send,
+  .ai-context-menu {
     animation: none;
     transition: none;
   }

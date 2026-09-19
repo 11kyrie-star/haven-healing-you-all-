@@ -66,13 +66,13 @@ const handleClick = () => {
 //异步AI聊天组件
 const loadai=()=>import('./Components/AiChat/index.vue')
 const AiChat=defineAsyncComponent(loadai)
-//点击以外的地方关闭聊天UI
+//点击以外的地方关闭聊天UI（右键菜单被 Teleport 到 body，要排除在外，否则点删除会连带关掉面板）
 const aientry=ref<HTMLElement | null>(null)
 onClickOutside(aientry,()=>{
   if(showai.value){
     showai.value=false
   }
-})
+},{ ignore: ['.ai-context-menu'] })
 </script>
 
 <style scoped lang="scss">
