@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus';
 import router from '@/router';
 
 const request = axios.create({
-  baseURL: 'http://127.0.0.1:3007/haven',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
 });
 

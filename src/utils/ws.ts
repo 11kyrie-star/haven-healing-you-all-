@@ -11,7 +11,7 @@ class WsClient{
         const token=localStorage.getItem('token')
         if(!token || this.ws?.readyState===WebSocket.OPEN){return}
         this.closedByUser=false
-        this.ws=new WebSocket(`ws://127.0.0.1:3007/ws?token=${encodeURIComponent(token)}`)
+        this.ws=new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}/ws?token=${encodeURIComponent(token)}`)
         this.ws.onopen=()=>{
             this.retryCount=0
             this.heartbeatTimer=setInterval(()=>{

@@ -15,7 +15,7 @@ export async function streamrequest(history:message[],addmessage:(message:string
         if(message.from==='ai'){return message.status==='done'}
         return false
     })
-    const response=await fetch('http://127.0.0.1:3007/haven/ai/chat',{
+    const response=await fetch(`${import.meta.env.VITE_API_BASE_URL}/ai/chat`,{
         method:'POST',
         headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
         body:JSON.stringify({messages:requestMessages}),
