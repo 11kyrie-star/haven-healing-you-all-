@@ -1,10 +1,14 @@
 <template>
     <div class="card-container" ref="cardRef">
-        <div class="leave-word">
+        <div class="card-actions">
+            <div class="privacy-badge" v-show="!status" role="status" aria-label="当前帖子仅自己可见">
+                <el-icon :size="12"><Lock></Lock></el-icon>
+                <span>私密</span>
+            </div>
             <el-dropdown trigger="click">
-               <span style="user-select: none;">
-                <el-icon :size="20"><ArrowDown></ArrowDown></el-icon>
-               </span>
+               <button class="more-trigger" type="button" aria-label="帖子操作">
+                <el-icon :size="18"><ArrowDown></ArrowDown></el-icon>
+               </button>
                <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item @click="deletepost">删除</el-dropdown-item>
@@ -69,7 +73,6 @@
         <div class="push-comment">
          <Editor ref="editref" margintop="3vh" :showeditor=false minheight="6vh" decide="comment" :post_id="id" @newcomment="addcomment"></Editor>   
         </div>
-        <div class="status" v-show="!status"><el-icon><Lock></Lock></el-icon><span>私密</span></div>
     </div>
 </template>
 
@@ -254,32 +257,65 @@ const {roots,loadMoreComments,hasMoreComments,commentsError,commentsLoading,comm
         border-radius: 0 0 6px 6px;
         background: linear-gradient(90deg, rgba(233, 189, 124, 0.6), rgba(224, 128, 113, 0.7), rgba(250, 130, 145, 0.55));
     }
-    .status{
+    .card-actions{
         position: absolute;
-        left: 78%;
-        top: 2.2%;
-        color: #7c8bb5;
+        top: 14px;
+        right: 16px;
+        z-index: 2;
         display: flex;
-        justify-content: center;
         align-items: center;
-        gap: 3px;
+        gap: 8px;
+    }
+    .privacy-badge{
+        height: 28px;
+        padding: 0 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: $color-warm-text;
+        font-size: 0.75em;
+        font-weight: 600;
+        line-height: 1;
+        white-space: nowrap;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 243, 234, 0.7));
+        border: 1px solid $color-warm-soft;
+        border-radius: $radius-pill;
+        box-shadow: 0 2px 8px rgba(224, 128, 113, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        backdrop-filter: $glass-blur-mini;
+        user-select: none;
         :deep(.el-icon){
-            color: #7c8bb5;
-        }
-        span{
-            opacity: 0.75;
-            font-size: 0.8em;
+            color: $color-warm-strong;
         }
     }
-    .leave-word{
-        position: absolute;
+    .more-trigger{
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        color: $color-ink;
+        background: rgba(255, 255, 255, 0.62);
+        border: 1px solid $color-warm-soft;
+        border-radius: $radius-circle;
+        box-shadow: 0 2px 8px rgba(224, 128, 113, 0.14);
+        backdrop-filter: $glass-blur-mini;
         cursor: pointer;
-        left: 90%;
-        top: 15px;
-        color: rgba(50, 50, 50, 0.55);
-        transition: color 0.2s ease;
+        transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         &:hover{
-            color: #c6401f;
+            color: $color-warm-pink;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 236, 230, 0.8));
+            border-color: $color-warm-mid;
+            box-shadow: 0 4px 12px rgba(224, 128, 113, 0.24);
+            transform: translateY(-1px);
+        }
+        &:active{
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(224, 128, 113, 0.18);
+        }
+        &:focus-visible{
+            outline: 2px solid $color-pink-soft;
+            outline-offset: 2px;
         }
     }
     &:hover{
