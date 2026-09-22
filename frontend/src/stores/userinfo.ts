@@ -16,23 +16,24 @@ export const useUserStore=defineStore('user',()=>{
     })
     const login=async (data:form)=>{
        const res:loginres<logindata>=await LoginApi(data)
-       userinfo.value.email=res.data.email
-       userinfo.value.avatar=res.data.avatar
-       userinfo.value.username=res.data.username
-       userinfo.value.status=res.status
-       userinfo.value.token=res.token
-      localStorage.setItem('token', res.token)
        if(res.status===1){
         ElMessage({
             message:res.msg,
             type:'warning'
         })
+        return
        }else{
         ElMessage({
             message:res.msg,
             type:'success'
         })
        }
+       userinfo.value.email=res.data.email
+       userinfo.value.avatar=res.data.avatar
+       userinfo.value.username=res.data.username
+       userinfo.value.status=res.status
+       userinfo.value.token=res.token
+      localStorage.setItem('token', res.token)
     }
     const updateusername=async (data:string)=>{
         const res:changeres=await Changeusername(data)

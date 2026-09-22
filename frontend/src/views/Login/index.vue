@@ -129,8 +129,6 @@ const onsubmit=()=>{
            await userstore.login(form)
            if(userstore.userinfo.status===0){
             router.replace('/layout/content')
-           }else{
-            ElMessage.warning('账号或者密码错误')
            }
         }catch{
             return
