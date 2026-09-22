@@ -37,7 +37,7 @@ import { useThrottleFn } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 import { TrendCharts, WarningFilled } from '@element-plus/icons-vue';
 const router=useRouter()
-let hotlist=ref<hotlist[]>([])
+const hotlist=ref<hotlist[]>([])
 const hasError=ref(false)
 const loading=ref(false)
 const isEmpty=ref(false)

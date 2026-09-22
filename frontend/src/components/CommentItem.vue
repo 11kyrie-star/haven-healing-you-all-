@@ -92,15 +92,8 @@ const handlereplyagain=(commId:number)=>{
     if(props.comment.reply_count===0){
         return
     }
-    // 已加载过就直接展开/收起，未加载过才让父组件去请求第一页
-    if(props.comment.showreply && props.comment.children.length>0){
-        props.comment.showreply=false
-        return
-    }
-    props.comment.showreply=true
-    if(props.comment.children.length===0){
-        emit('toggleReply',commId)
-    }
+    // 展开/收起与首次加载统一交给父组件维护，避免直接修改 props
+    emit('toggleReply',commId)
 }
 const replyactive=computed(()=>(props.activereplyid===props.comment.id))
 //点击回复按钮
@@ -114,7 +107,7 @@ const handlereplebtn=()=>{
 const isactive=computed(()=>props.comment.showreply && props.comment.children.length>0)
 
 
-let timestr=ref()
+const timestr=ref()
 timestr.value=formatPostTime(props.comment.create_at)
 const loadMorereplys=()=>{
     emit('loadMoreReply',props.comment.id)

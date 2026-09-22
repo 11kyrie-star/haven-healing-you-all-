@@ -14,7 +14,7 @@ function createCommentNode(item: comment): commentnode {
     }
 }
 export function useCommentLoad(id:number,commcount:number){
-    let page=ref(1)
+    const page=ref(1)
     const activereplyid=ref<number | null>(null)
     const commentcount=ref(commcount)
     const isCommentactive=ref(false)
@@ -98,10 +98,15 @@ const requestReplies=async (node:commentnode,openAfterLoad:boolean)=>{
 const openReplies=async (commId:number)=>{
     const node=findNode(roots.value,commId)
     if(!node || node.replyLoading) return
+    if(node.showreply && node.children.length>0){
+        node.showreply=false
+        return
+    }
     if(node.children.length>0){
         node.showreply=true
         return
     }
+    node.showreply=true
     await requestReplies(node,true)
 }
 const loadMoreReplies=async (commId:number)=>{

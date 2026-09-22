@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 <div class="layout-wrapper">
 <Background></Background>
 <RouterView></RouterView>
@@ -12,7 +12,7 @@ import Background from "@/views/Background/index.vue"
 import Window from "@/components/Window.vue";
 import Top from "./Components/Top.vue";
 import { getTime } from "@/utils/token";
-import { ref ,onMounted,onUnmounted} from "vue";
+import { onMounted,onUnmounted} from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 let time = 0

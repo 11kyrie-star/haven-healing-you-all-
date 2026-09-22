@@ -34,7 +34,7 @@ onMounted(async()=>{
         if(msg.type!=='notification' || !msg.data){
            return
         }
-        notestore.add(msg.data)
+        notestore.add(msg.data as NotificationItem)
     })
     try{
     const res=await getunreadnote()

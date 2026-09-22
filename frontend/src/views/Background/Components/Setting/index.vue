@@ -40,7 +40,6 @@ function Open(){
 function Open2(){
     windowstore.open('password')
 }
-const greetingsword=ref('Good Morning')
 
 </script>
 

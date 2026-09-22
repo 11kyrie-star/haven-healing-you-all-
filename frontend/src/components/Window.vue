@@ -125,7 +125,7 @@ watch(()=>windowstore.visible,(v)=>{
         form.newpassword=''
     }
 })
-let infoform=reactive({
+const infoform=reactive({
     username:userstore.userinfo.username,
     email:userstore.userinfo.email
 })
@@ -171,7 +171,7 @@ newpassword:[{
     }
 }]
 })
-let form=reactive({
+const form=reactive({
     oldpassword:'',
     newpassword:''
 })

@@ -1,6 +1,6 @@
 <template>
     <div class="nav-container" v-show="data.length>1">
-        <template v-for="(item,index) in data">
+        <template v-for="(item,index) in data" :key="item.key">
             <div class="back" :class="{current:index===data.length-1}" @click="go(item.path)">{{ item.label }}</div>
             <div v-show="index<data.length-1" style="cursor: default;">></div>
         </template>
@@ -34,10 +34,9 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import {ref,computed} from 'vue'
 const router=useRouter()
 const go=(path:string)=>{
     router.push(path)
 }
-const props=defineProps<{data:{label:string,path:string,key:string}[]}>()
+defineProps<{data:{label:string,path:string,key:string}[]}>()
 </script>

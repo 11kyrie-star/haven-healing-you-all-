@@ -155,7 +155,7 @@ const showPushbtn = ref(true)
 //控制流式输出
 let abortController: AbortController | null
 //推送消息
-let push = ref(false) //防止用户在输出的时候再次发送
+const push = ref(false) //防止用户在输出的时候再次发送
 const pushmessage = async () => {
   if (push.value) {
     return
@@ -169,7 +169,7 @@ const pushmessage = async () => {
   if (!newtext) {
     return
   }
-  let usermessage = ref<message>({
+  const usermessage = ref<message>({
     id: Date.now() + Math.random(),
     from: 'user',
     content: newtext,
@@ -179,7 +179,7 @@ const pushmessage = async () => {
   push.value = true
   text.value = ''
   showPushbtn.value = false
-  let aimessage = ref<message>({
+  const aimessage = ref<message>({
     id: Date.now() + Math.random(),
     from: 'ai',
     content: '思考中...',

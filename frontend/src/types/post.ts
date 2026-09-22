@@ -1,5 +1,3 @@
-import type { InjectionKey, ShallowRef } from "vue"
-
 export interface postpic<T>{
     status:number,
     msg:string,

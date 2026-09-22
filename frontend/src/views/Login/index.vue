@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref,reactive,onMounted} from 'vue'
+import {ref,reactive} from 'vue'
 import { RegisterApi,ForgetApi } from '@/api/login-register'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -64,7 +64,6 @@ const showLogin=ref(true)
 const showEmail=ref(false)
 const showRegister=ref(false)
 const showForget=ref(false)
-const judge=ref(true)
 const primary=ref<'primary'| ''>('primary')
 const primary2=ref<''| 'primary'>('')
 const userstore=useUserStore()

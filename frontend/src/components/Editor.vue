@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 <div class="editor-container" :style="{'margin-top':datafa.margintop}" :class="{flash:isflash}">
     <div class="editor-body">
        <div class="editor-input" contenteditable='true' @focus="focus" @blur="blur" @input="input" @keydown="onkeydown" ref="editorinput" :style="{'min-height':currentminheight}"></div>
@@ -139,13 +139,13 @@ import type { EmojiExt } from 'vue3-emoji-picker';
 import Tag from '@/components/Tag.vue';
 import type { comment } from '@/types/post.ts';
 import { useWindowStore } from '@/stores/window.ts';
-let showplaceholder=ref(true)
+const showplaceholder=ref(true)
 const inpic=ref<HTMLInputElement>()
 const showchange1=ref(false)
 const showchange2=ref(false)
-let showtool=ref(false)
-let showtag=ref(false)
-let showchange3=ref(false)
+const showtool=ref(false)
+const showtag=ref(false)
+const showchange3=ref(false)
 const showpublishbtn=ref(true)
 //用于PostCard组件改变我们的编辑框状态,回复功能用
 const replyId=ref<number | null>()
@@ -332,7 +332,7 @@ if(showplaceholder.value){
 if(!input || !input.files || input.files.length===0){return}
 const file=input.files[0]
 const maxsize=10*1024*1024
-if(file?.size!>maxsize){
+if(file && file.size>maxsize){
     ElMessage.warning('图片大小不能超过10MB')
     return
 }

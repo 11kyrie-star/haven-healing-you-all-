@@ -3,11 +3,11 @@ import type { getpost,postitem ,post} from '@/types/post';
 type FeedFetcher=(params:{page:number,size:number})=>Promise<getpost>
 export function usePostFeed(fetcher:FeedFetcher){
 //接口返回的帖子的信息
-let res=ref<getpost>()
+const res=ref<getpost>()
 //帖子的数据
-let postlist=ref<postitem[]>([])
+const postlist=ref<postitem[]>([])
 //用于向后端的拿数据
-let page=ref(1)
+const page=ref(1)
 const size=10
 //用于判断页面的状态
 const error=ref(false)

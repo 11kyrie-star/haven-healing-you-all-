@@ -5,7 +5,7 @@
         <div @click="toggleMenu"><span  style="user-select: none;" :class="{active:actvieTap==='我的'}">{{ mylabel }}</span><el-icon :size="15" class="arrow" :class="{'arrow-open':menuVisible}"><ArrowDown></ArrowDown></el-icon></div>
         <Transition name="menu-drop">
             <div v-show="menuVisible" class="menu" style="user-select: none;">
-                <div class="item" v-for="item in ['留言','帖子','喜欢','评论']" @click="ChangeMy(item)">{{ item }}</div>
+                <div class="item" v-for="item in ['留言','帖子','喜欢','评论']" :key="item" @click="ChangeMy(item)">{{ item }}</div>
             </div>
         </Transition>
     </div>
@@ -26,8 +26,6 @@ import {ArrowDown} from '@element-plus/icons-vue'
 import { usePanelStore } from '@/stores/panle';
 import { useNotificationStore } from '@/stores/note_pub';
 const sideTap=ref('发帖区')
-// 未读消息数量（目前写死，请替换为真实未读数）：
-const unreadCount=ref(5)
 const slideBarRef=ref()
 const router=useRouter()
 const route=useRoute()

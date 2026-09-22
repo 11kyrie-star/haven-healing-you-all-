@@ -1,4 +1,5 @@
-type Handler=(msg:any)=>void
+interface WsMessage{type?:string,data?:unknown}
+type Handler=(msg:WsMessage)=>void
 
 class WsClient{
     private ws:WebSocket | null =null //是否已经连接

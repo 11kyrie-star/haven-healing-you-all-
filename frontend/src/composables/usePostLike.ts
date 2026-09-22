@@ -1,4 +1,3 @@
-import type { starpostty } from "@/types/post";
 import { ElMessage } from "element-plus";
 import { starpost,cancelstarpost } from "@/api/aboutpost";
 import { ref } from "vue";

@@ -76,7 +76,7 @@ const noshow=()=>{
 
 }
 const handleSearch=()=>{
-    if(keyword.value=''){return}
+    if(keyword.value===''){return}
     pushdetail(keyword.value)
 }
 </script>

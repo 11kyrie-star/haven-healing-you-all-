@@ -187,7 +187,6 @@ import { useRoute } from 'vue-router';
 import { detailpostapi } from '@/api/aboutpost';
 import type { detaildata } from '@/types/post';
 import {ref,onMounted,watch} from 'vue'
-import router from '@/router';
 const route=useRoute()
 const post=ref<detaildata['data']>()
 const reload=async(rowid:string | undefined | string[])=>{

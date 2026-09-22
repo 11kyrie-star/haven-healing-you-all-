@@ -20,9 +20,9 @@ import Editor from '@/components/Editor.vue';
 import Name from '@/views/Background/Components/Name/index.vue'
 import { type post } from '@/types/post';
 import { usePostFeedStore } from '@/stores/postfeed';
-import { ref,onMounted,onUnmounted,inject,watch } from 'vue';
+import { ref,onMounted,onUnmounted } from 'vue';
 const feedpost=usePostFeedStore()
-let time=ref()
+const time=ref()
 //用于判断是否匿名
 const denoshow=ref(0)
 let timenum:null | number=null

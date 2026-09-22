@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 <div class="bg">
     <Search></Search>
     <AiLogo></AiLogo>
@@ -20,7 +20,6 @@ import Setting from '@/views/Background/Components/Setting/index.vue'
 import Name from '@/views/Background/Components/Name/index.vue'
 import Search from '@/views/Background/Components/Search/index.vue'
 import AiLogo from '@/views/Background/Components/AiLogo/index.vue'
-import { defineAsyncComponent, ref } from 'vue';
 const emit= defineEmits<{
     open:[command:string]
 }>()
