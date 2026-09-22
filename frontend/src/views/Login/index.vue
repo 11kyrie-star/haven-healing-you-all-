@@ -44,6 +44,7 @@
                 <el-input v-model="forgetform.newpassword" style="width: 80%;" class="input"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-button @click="cancelForget">取消</el-button>
                 <el-button type="primary" @click="finsh" style="margin-left: 30%;">完成</el-button>
             </el-form-item>
         </el-form>
@@ -224,11 +225,21 @@ const enroll=()=>{
 })
     }
 }
+
+//忘记表单
+//点击忘记密码按钮
 const forget=()=>{
     showLogin.value=false
     showRegister.value=false
     showForget.value=true
 }
+//在忘记密码表单里面点击取消
+const cancelForget=()=>{
+    showLogin.value=true
+    showRegister.value=false
+    showForget.value=false
+}
+//忘记表单的完成按钮
 const finsh=()=>{
 Forform.value.validate(async(valid:boolean)=>{
     if(valid){
