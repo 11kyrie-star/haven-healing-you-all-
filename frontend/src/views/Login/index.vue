@@ -109,24 +109,39 @@ const Lorules=reactive({
         }
     ]
 })
-//忘记密码的规则
-const Forrules=reactive({
-    email:[
-        {type:'email',message:'邮箱格式不正确',trigger:'blur'}
-    ],
-    newpassword:[
-        {
-            validator:(rule:object,value:string,callback:(error?:string | Error)=>void)=>{
-               if(!value) return callback() 
-               if(value.length<6){
-                callback(new Error('密码至少六位'))
-               }else{
-                callback()
-               }
-            }
+//登录函数
+const onsubmit=()=>{
+    if(!showLogin.value){
+        showLogin.value=true
+        showRegister.value=false
+    }
+    if(showEmail.value){
+        showEmail.value=false
+    }
+    if(!primary.value){
+        primary.value='primary'
+        primary2.value=''
+    }
+    if(form.username && form.password){
+    LoginformRef.value.validate(async(valid:boolean)=>{
+        if(valid){
+           try{
+           await userstore.login(form)
+           if(userstore.userinfo.status===0){
+            router.replace('/layout/content')
+           }else{
+            ElMessage.warning('账号或者密码错误')
+           }
+        }catch{
+            return
+           }
+        }else{
+            ElMessage.error('格式错误')
         }
-    ]
-})
+    })
+}
+}
+
 //注册的规则
 const Rerules=reactive({
     username:[
@@ -161,36 +176,6 @@ const Rerules=reactive({
         {type:'email',message:'邮箱格式不正确',trigger:'blur'}
     ]
 })
-//登录函数
-const onsubmit=()=>{
-    if(!showLogin.value){
-        showLogin.value=true
-        showRegister.value=false
-    }
-    if(showEmail.value){
-        showEmail.value=false
-    }
-    if(!primary.value){
-        primary.value='primary'
-        primary2.value=''
-    }
-    if(form.username && form.password){
-    LoginformRef.value.validate(async(valid:boolean)=>{
-        if(valid){
-           try{
-           await userstore.login(form)
-           if(userstore.userinfo.status===0){
-            router.replace('/layout/content')
-           }
-        }catch{
-            return
-           }
-        }else{
-            ElMessage.error('格式错误')
-        }
-    })
-}
-}
 //注册函数
 const enroll=()=>{
     if(showLogin.value && !showRegister.value && !showEmail.value){
@@ -227,6 +212,24 @@ const enroll=()=>{
 }
 
 //忘记表单
+//忘记密码的规则
+const Forrules=reactive({
+    email:[
+        {type:'email',message:'邮箱格式不正确',trigger:'blur'}
+    ],
+    newpassword:[
+        {
+            validator:(rule:object,value:string,callback:(error?:string | Error)=>void)=>{
+               if(!value) return callback() 
+               if(value.length<6){
+                callback(new Error('密码至少六位'))
+               }else{
+                callback()
+               }
+            }
+        }
+    ]
+})
 //点击忘记密码按钮
 const forget=()=>{
     showLogin.value=false
