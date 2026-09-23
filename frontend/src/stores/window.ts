@@ -4,10 +4,14 @@ export const useWindowStore=defineStore('window',()=>{
     const visible=ref(false)
     const decwindow=ref('')
     const postimg=ref('')
-    function open(type:string,img?:string){
+    const postid=ref<number>(0)
+    function open(type:string,img?:string,id?:number){
         decwindow.value=type
         if(img!==undefined){
             postimg.value=img
+        }
+        if(id!==undefined){
+            postid.value=id
         }
         visible.value=true
     }
@@ -16,5 +20,5 @@ export const useWindowStore=defineStore('window',()=>{
         decwindow.value=''
         postimg.value=''
     }
-    return {visible,open,close,decwindow,postimg}
+    return {visible,open,close,decwindow,postimg,postid}
 })

@@ -338,3 +338,8 @@ export interface taleavewordres{
         list:taleaveworddata[]
     }
 }
+
+export interface reportres{
+    status:number,
+    msg:string
+}

@@ -51,6 +51,47 @@
                 </div>
                 <div class="hi">Hi~</div>  
             </div>
+            <div class="window-report" v-else-if="windowstore.decwindow==='report'">
+                <div class="report-header">
+                    <div class="report-title">举报帖子</div>
+                    <div class="report-subtitle">请描述问题，并选择对应的违规原因</div>
+                </div>
+                <el-form class="report-form" label-position="top">
+                    <el-form-item class="report-description">
+                        <template #label>
+                            <span class="report-label">举报说明</span>
+                        </template>
+                        <el-input
+                            type="textarea"
+                            :rows="4"
+                            maxlength="300"
+                            show-word-limit
+                            resize="none"
+                            placeholder="请描述你为什么要举报这篇帖子"
+                            v-model="reportForm.descriptipn"
+                        />
+                    </el-form-item>
+                    <el-form-item class="report-reasons">
+                        <template #label>
+                            <span class="report-label">违规原因</span>
+                            <span class="report-optional">可选，最多选择 2 项</span>
+                        </template>
+                        
+                          <el-checkbox-group v-model="reportForm.reasons" :max="2" class="report-options">
+                            <el-checkbox name="report-reason" value="spam">垃圾广告或营销推广</el-checkbox>
+                            <el-checkbox name="report-reason" value="porn">色情低俗内容</el-checkbox>
+                            <el-checkbox name="report-reason" value="abuse">辱骂或人身攻击</el-checkbox>
+                            <el-checkbox name="report-reason" value="misinformation">虚假不实信息</el-checkbox>
+                            <el-checkbox name="report-reason" value="illegal">违法违规内容</el-checkbox>
+                            <el-checkbox name="report-reason" value="infringement">侵权、抄袭或骚扰</el-checkbox>
+                           </el-checkbox-group>  
+                    </el-form-item>
+                </el-form>
+                <div class="report-actions">
+                    <el-button @click="cancelReport">取消</el-button>
+                    <el-button type="primary" @click="submitReport">提交举报</el-button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -62,6 +103,7 @@ import { Changepassword } from '@/api/userinfo';
 import { ElMessage } from 'element-plus';
 import { useWindowStore } from '@/stores/window';
 import { compressimage } from '@/utils/compressimage';
+import { reportPostApi } from '@/api/aboutpost';
 import avatarDefault from '@/assets/avatar.webp'
 const userstore=useUserStore()
 const avatarStr=avatarDefault
@@ -118,11 +160,19 @@ try{
 }
 //避免修改资料的表单的值只在组件初始化的时候拷贝一次，防止用户修改一半点击取消了半成品还在那里，导致用户再也找不到自己的账户了
 watch(()=>windowstore.visible,(v)=>{
-    if(v&&windowstore.decwindow==='information'){
+    if(!v){return}
+    switch(windowstore.decwindow){
+        case 'information':
         infoform.username=userstore.userinfo.username
         infoform.email=userstore.userinfo.email
+        break
+        case 'password':
         form.oldpassword=''
         form.newpassword=''
+        break
+        case 'report':
+        reportForm.descriptipn=''
+        reportForm.reasons=[]    
     }
 })
 const infoform=reactive({
@@ -267,6 +317,40 @@ if(form.oldpassword && form.newpassword){
 }
 const closewindow=()=>{
     windowstore.close()
+}
+//取消举报
+const cancelReport=()=>{
+    windowstore.close()
+}
+//举报表单
+const reportForm=reactive({
+    descriptipn:'',
+    reasons:[] as string[]
+})
+//举报选项映射表
+const map:Record<string,string>={
+    spam:'垃圾广告或营销推广',
+    porn:'色情低俗内容',
+    abuse:'辱骂或人身攻击',
+    misinformation:'虚假不实信息',
+    illegal:'违法违规内容',
+    infringement:'侵权、抄袭或骚扰'
+}
+//提交举报
+const submitReport=async()=>{
+    let newarr:string[]=[]
+    if(reportForm.reasons.length){
+         newarr=reportForm.reasons.map(item=>map[item]) as string[]
+    }
+    const res=await reportPostApi(windowstore.postid,reportForm.descriptipn,newarr)
+    if(res.status===0){
+        ElMessage.success(res.msg)
+        reportForm.descriptipn=''
+        reportForm.reasons=[]
+        windowstore.close()
+    }else{
+        ElMessage.warning(res.msg)
+    }
 }
 </script>
 <style scoped lang="scss">
@@ -479,6 +563,153 @@ const closewindow=()=>{
             gap: 16px;
         }
     }
+    .window-report{
+        width: min(420px, calc(100vw - 40px));
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 66px 28px 26px;
+        background: rgba(255, 255, 255, 0.42);
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        border-radius: 14px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 6px 18px rgba(120, 60, 40, 0.12);
+        backdrop-filter: blur(8px);
+        animation: window-card-in 0.35s ease;
+        .report-header{
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: center;
+            .report-title{
+                color: rgba(60, 30, 30, 0.82);
+                font-size: 1.35rem;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+            .report-subtitle{
+                color: rgba(128, 128, 128, 0.72);
+                font-size: 0.8rem;
+            }
+        }
+        .report-form{
+            width: 100%;
+            :deep(.el-form-item){
+                margin-bottom: 20px;
+            }
+            :deep(.el-form-item:last-child){
+                margin-bottom: 0;
+            }
+            :deep(.el-form-item__label){
+                width: 100%;
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                padding: 0;
+                line-height: 1.5;
+            }
+            :deep(.el-form-item__content){
+                display: block;
+                line-height: normal;
+            }
+        }
+        .report-label{
+            color: rgba(50, 50, 50, 0.85);
+            font-weight: 700;
+        }
+        .report-optional{
+            color: rgba(128, 128, 128, 0.62);
+            font-size: 0.76rem;
+            font-weight: 400;
+        }
+        :deep(.el-textarea__inner){
+            box-sizing: border-box;
+            min-height: 112px !important;
+            padding: 12px 14px 28px;
+            color: rgba(50, 50, 50, 0.85);
+            font-family: inherit;
+            line-height: 1.6;
+            background-color: rgba(255, 255, 255, 0.65);
+            border-radius: 10px;
+            box-shadow: 0 0 0 1px rgba(224, 167, 167, 0.35) inset;
+            transition: box-shadow 0.25s ease, background-color 0.25s ease;
+        }
+        :deep(.el-textarea__inner:hover){
+            box-shadow: 0 0 0 1px rgba(224, 167, 167, 0.6) inset;
+        }
+        :deep(.el-textarea__inner:focus){
+            background-color: rgba(255, 255, 255, 0.78);
+            box-shadow: 0 0 0 1.5px #ef7d8e inset, 0 0 8px rgba(255, 107, 129, 0.28);
+        }
+        :deep(.el-input__count){
+            right: 12px;
+            bottom: 8px;
+            color: rgba(128, 128, 128, 0.58);
+            background: transparent;
+        }
+        .report-options{
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        :deep(.el-checkbox){
+            width: 100%;
+            height: auto;
+            min-height: 42px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 9px 12px;
+            color: rgba(50, 50, 50, 0.78);
+            white-space: normal;
+            background: rgba(255, 255, 255, 0.52);
+            border: 1px solid rgba(224, 167, 167, 0.3);
+            border-radius: 10px;
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        :deep(.el-checkbox:hover){
+            color: #c6401f;
+            background: rgba(255, 255, 255, 0.78);
+            border-color: rgba(224, 128, 113, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(120, 60, 40, 0.1);
+        }
+        :deep(.el-checkbox__input){
+            flex-shrink: 0;
+        }
+        :deep(.el-checkbox__inner){
+            width: 16px;
+            height: 16px;
+            background-color: rgba(255, 255, 255, 0.78);
+            border-color: rgba(224, 128, 113, 0.5);
+            border-radius: 5px;
+        }
+        :deep(.el-checkbox__label){
+            padding-left: 8px;
+            color: inherit;
+            font-size: 0.84rem;
+            line-height: 1.35;
+            white-space: normal;
+        }
+        :deep(.el-checkbox.is-checked){
+            color: #c6401f;
+            background: linear-gradient(135deg, rgba(255, 243, 234, 0.92), rgba(255, 231, 229, 0.82));
+            border-color: rgba(243, 79, 103, 0.5);
+            box-shadow: 0 3px 12px rgba(243, 79, 103, 0.16);
+        }
+        :deep(.el-checkbox.is-checked .el-checkbox__inner){
+            background: linear-gradient(135deg, #f78c6b, #f34f67);
+            border-color: #f34f67;
+        }
+        :deep(.el-checkbox.is-checked .el-checkbox__inner::after){
+            border-color: #ffffff;
+        }
+        .report-actions{
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+    }
     .hi{
         font-family: 'Great Vibes', cursive;
         font-size: 2.6rem;
@@ -486,6 +717,17 @@ const closewindow=()=>{
         color: rgba(243, 79, 103, 0.5);
         text-shadow: 0 2px 10px rgba(255, 255, 255, 0.6);
         margin-top: 2px;
+    }
+}
+@media (max-width: 520px){
+    .window-overlay .window-report{
+        padding: 60px 20px 22px;
+        .report-options{
+            grid-template-columns: 1fr;
+        }
+        .report-actions{
+            justify-content: center;
+        }
     }
 }
 @keyframes window-card-in{
