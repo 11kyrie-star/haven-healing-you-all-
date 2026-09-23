@@ -8,6 +8,7 @@
                <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item @click="leave">给作者留言</el-dropdown-item>
+                    <el-dropdown-item @click="reportPost">举报</el-dropdown-item>
                 </el-dropdown-menu>
                </template>
             </el-dropdown>
@@ -174,6 +175,10 @@ windowstore.open('postimg',img)
 //展示、加载、添加评论模块
 const {roots,loadMoreComments,hasMoreComments,commentsError,commentsLoading,commenthandle,isCommentactive,showcomment,addcomment,activereplyid,commentcount,openReplies,loadMoreReplies}=useCommentLoad(props.id,props.comment_count)
 
+//举报帖子
+const reportPost=()=>{
+    windowstore.open('report',undefined ,props.id)
+}
 </script>
 
 <style scoped lang="scss">
