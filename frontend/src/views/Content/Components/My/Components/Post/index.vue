@@ -1,7 +1,7 @@
 <template>
 <div class="post-container">
     <div class="card-item" v-for="(item,index) in postlist" :key="item.id">
-    <PostCard  @delete="deletepost" :id="item.id" :user_id="item.user_id" :avatar="item.avatar" :username="item.username" :create_at="item.created_at" :content="item.content" :comment_count="item.comment_count" :view_count="item.view_count" :images="item.images" :like_count="item.like_count" :is_liked="item.is_liked" :is_public="item.is_public" :index="index"></PostCard>
+    <PostCard  @delete="deletepost" :id="item.id" :user_id="item.user_id" :avatar="item.avatar" :username="item.username" :create_at="item.created_at" :content="item.content" :comment_count="item.comment_count" :view_count="item.view_count" :images="item.images" :like_count="item.like_count" :is_liked="item.is_liked" :is_public="item.is_public" :index="index" :report_status="item.report_status"></PostCard>
     </div>
 
     <!-- 空数据状态页：请求成功但没有任何数据时，请将 isEmpty 置为 true -->

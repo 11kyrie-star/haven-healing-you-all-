@@ -92,7 +92,9 @@ export interface postitem{
     created_at:string,
     username:string,
     avatar:string,
-    is_liked:number
+    is_liked:number,
+    report_status?:number,
+    report_status_text?:string
 }
 
 export type getpost=getpostRes<getpostdata>
