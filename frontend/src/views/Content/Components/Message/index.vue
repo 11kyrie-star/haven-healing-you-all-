@@ -93,7 +93,7 @@ try{
 }
 onMounted(async ()=>{
     await loadmore()
-    store.MarkAllread()
+    await store.MarkAllread()
 })
 useIntersectionObserver(sentry,([entry])=>{
 if(entry?.isIntersecting){loadmore()}

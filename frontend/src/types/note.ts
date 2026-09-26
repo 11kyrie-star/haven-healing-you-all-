@@ -38,3 +38,9 @@ export interface clearmsgres{
     msg:string,
     data:{deleted:number}
 }
+
+export interface readnoteres{
+    status:number,
+    msg:string,
+    data:{updated:number}
+}

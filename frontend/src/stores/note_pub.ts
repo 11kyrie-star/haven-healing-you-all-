@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { NotificationItem } from "@/types/note";
-import { clear } from "@/api/note";
+import { clear ,readNote} from "@/api/note";
 import {ref} from 'vue'
 import { ElMessage } from "element-plus";
 export const useNotificationStore=defineStore('notification',()=>{
@@ -11,8 +11,11 @@ export const useNotificationStore=defineStore('notification',()=>{
         unread.value++
         list.value.unshift(item)
     }
-    function MarkAllread(){
-        unread.value=0
+    async function MarkAllread(){
+        const res=await readNote()
+        if(res.status===0){
+            unread.value=0
+        }
     }
     function init(items:NotificationItem[]){
         list.value=items
