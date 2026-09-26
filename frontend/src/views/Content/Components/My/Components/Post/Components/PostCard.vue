@@ -1,9 +1,18 @@
 <template>
     <div class="card-container" ref="cardRef">
         <div class="card-actions">
-            <div class="privacy-badge" v-show="!status" role="status" aria-label="当前帖子仅自己可见">
-                <el-icon :size="12"><Lock></Lock></el-icon>
-                <span>私密</span>
+            <div class="post-state-badges">
+                <div class="post-state-badge privacy-badge" v-show="!status && props.report_status!==3" role="status" aria-label="当前帖子仅自己可见">
+                    <span class="state-symbol" aria-hidden="true">
+                        <el-icon :size="11"><Lock></Lock></el-icon>
+                    </span>
+                    <span>私密</span>
+                </div>
+                <!-- 下架状态：接入 report_status 后，替换这里的 v-if 条件 -->
+                <div class="post-state-badge offline-badge" v-if="props.report_status===3" role="status" aria-label="当前帖子已下架">
+                    <span class="state-symbol offline-symbol" aria-hidden="true">×</span>
+                    <span>已下架</span>
+                </div>
             </div>
             <el-dropdown trigger="click">
                <button class="more-trigger" type="button" aria-label="帖子操作">
@@ -102,7 +111,8 @@ const props=defineProps<{
     comment_count:number,
     is_liked:number,
     is_public:1 |0,
-    index:number
+    index:number,
+    report_status:number | undefined
 }>()
 //打开弹窗显示照片
 const windowstore=useWindowStore()
@@ -266,26 +276,70 @@ const {roots,loadMoreComments,hasMoreComments,commentsError,commentsLoading,comm
         align-items: center;
         gap: 8px;
     }
-    .privacy-badge{
-        height: 28px;
-        padding: 0 10px;
+    .post-state-badges{
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+    }
+
+    .post-state-badge{
+        position: relative;
+        height: 26px;
+        padding: 0 9px 0 5px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
-        color: $color-warm-text;
-        font-size: 0.75em;
-        font-weight: 600;
+        gap: 5px;
+        box-sizing: border-box;
+        border-radius: 8px;
+        font-size: 0.72em;
+        font-weight: 700;
         line-height: 1;
         white-space: nowrap;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 243, 234, 0.7));
-        border: 1px solid $color-warm-soft;
-        border-radius: $radius-pill;
-        box-shadow: 0 2px 8px rgba(224, 128, 113, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.75);
-        backdrop-filter: $glass-blur-mini;
         user-select: none;
-        :deep(.el-icon){
-            color: $color-warm-strong;
+        backdrop-filter: $glass-blur-mini;
+    }
+
+    .state-symbol{
+        width: 16px;
+        height: 16px;
+        display: grid;
+        flex: 0 0 16px;
+        place-items: center;
+        border-radius: 5px;
+        font-size: 0.86em;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .privacy-badge{
+        color: #8b5e55;
+        background: linear-gradient(135deg, rgba(255, 252, 249, 0.92), rgba(247, 226, 218, 0.78));
+        border: 1px solid rgba(184, 118, 104, 0.26);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.82),
+            0 3px 10px rgba(120, 60, 40, 0.1);
+
+        .state-symbol{
+            color: #fff;
+            background: linear-gradient(135deg, #cd8b78, #ad665b);
+            box-shadow: 0 2px 5px rgba(173, 102, 91, 0.22);
+        }
+    }
+
+    .offline-badge{
+        color: #6f625f;
+        background: linear-gradient(135deg, rgba(249, 248, 247, 0.94), rgba(225, 220, 218, 0.82));
+        border: 1px solid rgba(105, 92, 88, 0.24);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.84),
+            0 3px 10px rgba(70, 58, 55, 0.1);
+
+        .offline-symbol{
+            color: #fff;
+            background: linear-gradient(135deg, #8d7d78, #6b5c58);
+            box-shadow: 0 2px 5px rgba(78, 65, 61, 0.24);
         }
     }
     .more-trigger{
