@@ -16,7 +16,7 @@
     left: 31%;
     gap: 15px;
     top: 6vh;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     font-size: 1.1em;
     user-select: none;
     z-index: 4;

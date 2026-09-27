@@ -89,7 +89,7 @@ const bubbleStyle = (bubble: Bubble) => ({
 
     .chalk-title {
         display: block;
-        font-family: 'LXGW WenKai', 'Inter', sans-serif;
+        font-family: var(--font-main);
         font-size: 1.15em;
         letter-spacing: 6px;
         color: rgba(255, 255, 255, 0.92);
@@ -133,7 +133,7 @@ const bubbleStyle = (bubble: Bubble) => ({
     justify-content: center;
     padding: 10px;
     text-align: center;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     font-size: 11.5px;
     line-height: 1.35;
     letter-spacing: 0.5px;

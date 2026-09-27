@@ -372,7 +372,7 @@ const submitReport=async()=>{
         border-radius: 18px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.55);
-        font-family: 'LXGW WenKai', 'Inter', sans-serif;
+        font-family: var(--font-main);
         background: linear-gradient(
             45deg,
             #fad0c4 0%, 

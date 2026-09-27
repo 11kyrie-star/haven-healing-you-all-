@@ -210,7 +210,7 @@ onBeforeUnmount(()=>{
     transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
     padding: 3%;
     position: relative;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     color: rgba(50, 50, 50, 0.85);
     &::before{
         content: '';

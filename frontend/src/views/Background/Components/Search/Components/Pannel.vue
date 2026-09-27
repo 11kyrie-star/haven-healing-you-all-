@@ -125,7 +125,7 @@ router.push(`/layout/content/search/${item}`)
     box-shadow:
         0 14px 36px rgba(120, 60, 40, 0.18),
         0 4px 12px rgba(120, 60, 40, 0.08);
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     color: rgba(50, 50, 50, 0.85);
     &::before {
         content: '';

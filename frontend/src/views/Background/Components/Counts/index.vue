@@ -49,7 +49,7 @@ if(res.status===0){
   align-items: center;
   gap: 22px;
   width: fit-content;
-  font-family: 'LXGW WenKai', 'Inter', sans-serif;
+  font-family: var(--font-main);
   user-select: none;
   animation: counts-in 0.7s 0.25s ease both;
 }
@@ -87,7 +87,7 @@ if(res.status===0){
 }
 
 .count-value {
-  font-family: 'Inter', 'LXGW WenKai', sans-serif;
+  font-family: 'Inter', var(--font-main);
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.1;

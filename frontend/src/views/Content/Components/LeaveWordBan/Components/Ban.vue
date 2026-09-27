@@ -56,7 +56,7 @@ const submit=async()=>{
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(120, 60, 40, 0.06);
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     color: rgba(50, 50, 50, 0.85);
     display: flex;
     flex-direction: column;
@@ -96,7 +96,7 @@ const submit=async()=>{
                 border-radius: 10px;
                 box-shadow: 0 0 0 1px rgba(224, 167, 167, 0.35) inset;
                 color: rgba(50, 50, 50, 0.85);
-                font-family: 'LXGW WenKai', 'Inter', sans-serif;
+                font-family: var(--font-main);
                 font-size: 0.95em;
                 line-height: 1.6;
                 padding: 10px 12px;

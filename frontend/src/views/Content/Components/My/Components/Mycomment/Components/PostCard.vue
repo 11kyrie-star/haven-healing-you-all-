@@ -34,7 +34,7 @@
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     color: rgba(50, 50, 50, 0.85);
     transition: box-shadow 0.3s ease, transform 0.3s ease;
     &:hover{

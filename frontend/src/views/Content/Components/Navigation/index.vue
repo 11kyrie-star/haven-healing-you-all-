@@ -131,7 +131,7 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
         margin-left: 48%;
         transform: translateX(-50%);
         font-size: 1.3em;
-        font-family: 'LXGW WenKai', 'Inter', sans-serif;
+        font-family: var(--font-main);
         text-shadow: 0 0 1px rgba(224, 167, 167, 0.1);  
         color: rgba(50, 50, 50, 0.85);
         position: relative;
@@ -166,7 +166,7 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
            .item{
               font-size: 1em;
               text-align: center;
-              font-family: 'LXGW WenKai', 'Inter', sans-serif;
+              font-family: var(--font-main);
               text-shadow: 0 0 1px rgba(224, 167, 167, 0.1);  
               color: rgba(50, 50, 50, 0.85);
               cursor: pointer;
@@ -204,7 +204,7 @@ bar.style.transform=`translateX(${el.offsetLeft}px)`
                 position: relative;
                 cursor: pointer;
                 font-size: 1.3em;
-                font-family: 'LXGW WenKai', 'Inter', sans-serif;
+                font-family: var(--font-main);
                 text-shadow: 0 0 1px rgba(224, 167, 167, 0.1);
                 color: rgba(50, 50, 50, 0.85);
                 padding: 0 2px;

@@ -40,7 +40,7 @@
     justify-content: center;
     cursor: pointer;
     user-select: none;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     font-size: 0.95em;
     font-weight: 400;
     letter-spacing: 2px;

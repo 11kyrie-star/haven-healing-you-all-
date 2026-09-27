@@ -90,7 +90,7 @@
             align-items: baseline;
             gap: 10px;
             .title-main{
-                font-family: 'LXGW WenKai', sans-serif;
+                font-family: var(--font-main);
                 font-size: 1.7em;
                 font-weight: 700;
                 letter-spacing: 0.35em;
@@ -154,7 +154,7 @@
             }
         }
         .footer-text{
-            font-family: 'LXGW WenKai', sans-serif;
+            font-family: var(--font-main);
             font-size: 0.85em;
             letter-spacing: 0.18em;
             color: rgba(198, 64, 31, 0.6);

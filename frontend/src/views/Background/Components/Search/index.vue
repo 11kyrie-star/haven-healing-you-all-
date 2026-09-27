@@ -84,7 +84,7 @@ const handleSearch=()=>{
 <style scoped lang="scss">
 .search-wrap {
     width: min(560px, 90vw);
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -169,7 +169,7 @@ const handleSearch=()=>{
         box-shadow:
             0 14px 36px rgba(120, 60, 40, 0.18),
             0 4px 12px rgba(120, 60, 40, 0.08);
-        font-family: 'LXGW WenKai', 'Inter', sans-serif;
+        font-family: var(--font-main);
         color: rgba(50, 50, 50, 0.85);
         &::before {
             content: '';

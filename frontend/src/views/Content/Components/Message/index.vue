@@ -134,7 +134,7 @@ const clearmsg=()=>{
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 20px rgba(0, 0, 0, 0.08), 0 20px 40px rgba(0, 0, 0, 0.1);
     margin-right: 3%;
     align-self: flex-start;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     color: rgba(50, 50, 50, 0.85);
     overflow: hidden;
     isolation: isolate;

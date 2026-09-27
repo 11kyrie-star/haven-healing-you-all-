@@ -123,7 +123,7 @@ const loadMorereplys=()=>{
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(120, 60, 40, 0.05);
     position: relative;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     color: rgba(50, 50, 50, 0.85);
     content-visibility: auto;
     contain-intrinsic-size: auto 20vh;

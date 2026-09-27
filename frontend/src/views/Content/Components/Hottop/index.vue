@@ -203,7 +203,7 @@ const limitHotText=(str:string,max:number=8)=>{
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-family: 'LXGW WenKai', sans-serif;
+            font-family: var(--font-main);
             font-weight: 700;
             cursor: default;
         }

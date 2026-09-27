@@ -46,7 +46,7 @@ const backToTop=()=>{
     box-shadow: 0 6px 18px rgba(120, 60, 40, 0.16), 0 2px 6px rgba(120, 60, 40, 0.08);
     color: rgba(50, 50, 50, 0.85);
     cursor: pointer;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     user-select: none;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
     .back-top-arrow{

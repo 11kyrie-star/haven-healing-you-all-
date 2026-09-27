@@ -30,7 +30,7 @@
   }
   .pc-only-text{
     margin-top: 12px;
-    font-family: 'LXGW WenKai',sans-serif;
+    font-family: var(--font-main);
     color: rgb(50, 50,50, 0.7);
     line-height: 1.8;
     text-align: center;

@@ -211,7 +211,7 @@ const goDetail = () => {
     box-shadow: 0 2px 10px rgba(120, 60, 40, 0.1), 0 8px 24px rgba(224, 128, 113, 0.14);
     backdrop-filter: blur(8px);
     transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
-    font-family: 'LXGW WenKai', 'Inter', sans-serif;
+    font-family: var(--font-main);
     color: rgba(50, 50, 50, 0.85);
 
     &:hover {

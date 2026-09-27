@@ -7,6 +7,14 @@ import { loadsensitive } from './utils/sensitvie.ts'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import '@/styles/reset.scss'
 import '@/styles/font.scss'
+import {css as wenkaiCss} from '@/assets/fonts/LXGWWenKai-Regular.ttf'
+
+const wenkaiFallback =
+    '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif'
+document.documentElement.style.setProperty(
+    '--font-main',
+    `"${wenkaiCss.family}",${wenkaiFallback}`
+)
 
 async function prepareapp(){
 if(import.meta.env.DEV){

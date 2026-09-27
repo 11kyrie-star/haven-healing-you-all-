@@ -5,6 +5,6 @@
 // ============================================================
 
 // ---- 字体栈 ----
-$font-family-base:         'LXGW WenKai', 'Inter', sans-serif;  // 全站默认
-$font-family-simple:       'LXGW WenKai', sans-serif;             // 简化版（少 fallback）
-$font-family-zh-only:      'LXGW WenKai';                          // 仅中文字体
+$font-family-base:         var(--font-main);  // 全站默认
+$font-family-simple:       var(--font-main);             // 简化版（少 fallback）
+$font-family-zh-only:      var(--font-main);                          // 仅中文字体
