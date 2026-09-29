@@ -1,0 +1,16 @@
+node_modules/
+
+# 用户上传的文件不入库，只保留空目录占位
+uploads/avatars/*
+!uploads/avatars/.gitkeep
+uploads/posts/*
+!uploads/posts/.gitkeep
+
+# 环境变量（含密钥，禁止提交）
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# 日志文件
+*.log
