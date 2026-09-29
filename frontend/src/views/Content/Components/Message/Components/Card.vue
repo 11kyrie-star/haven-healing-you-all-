@@ -175,7 +175,6 @@ const timeStr = formatPostTime(props.item.create_at)
 const reportReasons = (props.item.reasons ?? [])
     .map((reason) => reportReasonMap[reason] ?? reason)
     .filter(Boolean)
-const reportPostImages = props.item.post.images ?? []
 const reportPostTitle =
     reportRole === 'reporter' ? '你举报的帖子' : reportRole === 'author' ? '你的帖子' : '相关帖子'
 const handleResult = props.item.handle_result?.trim() || '平台已完成处理，请以最终处理结果为准。'
