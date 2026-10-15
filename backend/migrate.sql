@@ -148,3 +148,56 @@ CREATE TABLE IF NOT EXISTS post_reports (
     INDEX idx_post (post_id),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- 8. B 端后台 RBAC（表结构；角色/权限/种子账号由 migrate_admin.js 启动时自动写入）
+--    等级继承：等级越高，权限包含越低等级的全部权限
+--    一级(role_level=1)：巡查帖子、处理举报、驳回，下架需申请
+--    二级(role_level=2)：含一级 + 审批下架申请、下架帖子
+--    三级(role_level=3)：含一、二级 + 查看用户信息、封禁账号、可视化大屏
+-- ============================================
+
+-- 角色表
+CREATE TABLE IF NOT EXISTS admin_roles (
+    id          INT             PRIMARY KEY AUTO_INCREMENT,
+    role_level  TINYINT         NOT NULL UNIQUE,
+    role_name   VARCHAR(45)     NOT NULL,
+    description VARCHAR(200),
+    create_at   DATETIME        DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 权限点表
+CREATE TABLE IF NOT EXISTS admin_permissions (
+    id          INT             PRIMARY KEY AUTO_INCREMENT,
+    perm_code   VARCHAR(64)     NOT NULL UNIQUE,
+    perm_name   VARCHAR(64)     NOT NULL,
+    type        VARCHAR(20)     NOT NULL DEFAULT 'api',
+    description VARCHAR(200),
+    create_at   DATETIME        DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 管理员账号表
+CREATE TABLE IF NOT EXISTS admins (
+    id            INT             PRIMARY KEY AUTO_INCREMENT,
+    username      VARCHAR(45)     NOT NULL UNIQUE,
+    password      VARCHAR(255)    NOT NULL,
+    nickname      VARCHAR(45),
+    avatar        VARCHAR(500),
+    email         VARCHAR(100),
+    role_id       INT             NOT NULL,
+    status        TINYINT(1)      NOT NULL DEFAULT 1,
+    last_login_at DATETIME        DEFAULT NULL,
+    last_login_ip VARCHAR(45)     DEFAULT NULL,
+    create_at     DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    update_at     DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_role (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 角色-权限映射表
+CREATE TABLE IF NOT EXISTS admin_role_permissions (
+    id       INT  PRIMARY KEY AUTO_INCREMENT,
+    role_id  INT  NOT NULL,
+    perm_id  INT  NOT NULL,
+    UNIQUE KEY uk_role_perm (role_id, perm_id),
+    INDEX idx_role (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
