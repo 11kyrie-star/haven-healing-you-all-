@@ -1,5 +1,6 @@
 // 自动迁移脚本：启动时检查并补全缺失的字段
 const db = require("./db/index")
+const adminMigrate = require("./migrate_admin")
 
 const migrations = [
     // [表名, 字段, 定义, 在哪个字段后面]
@@ -259,8 +260,11 @@ module.exports = function (done) {
                                     if (err8) return done(err8)
                                     ensurePostReportsColumns((err9) => {
                                         if (err9) return done(err9)
-                                        console.log("[migrate] 数据库检查完成")
-                                        done(null)
+                                        adminMigrate((err10) => {
+                                            if (err10) return done(err10)
+                                            console.log("[migrate] 数据库检查完成")
+                                            done(null)
+                                        })
                                     })
                                 })
                             })

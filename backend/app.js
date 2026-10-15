@@ -6,6 +6,7 @@ const cors = require("cors")
 const joi = require("joi")
 const userRouter = require("./router/user")
 const postRouter = require("./router/post")
+const adminRouter = require("./router/admin")
 const notify = require("./notify")
 
 const app = express()
@@ -54,6 +55,7 @@ app.use(function (req, res, next) {
 // Routes
 app.use("/haven", userRouter)
 app.use("/haven", postRouter)
+app.use("/haven", adminRouter)
 
 // Global error handler
 app.use(function (err, req, res, next) {
