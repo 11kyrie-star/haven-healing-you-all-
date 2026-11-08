@@ -15,10 +15,13 @@ const app = express()
 // 否则拼接出的图片地址会是 http，前端在 https 页面下会被浏览器拦截（混合内容）
 app.set("trust proxy", 1)
 
-// CORS：默认只允许本地开发地址；线上用环境变量 CORS_ORIGINS 指定（逗号分隔多个来源）
+// CORS：默认只允许本地开发地址（C 端 5173、B 端 8848）；线上用环境变量 CORS_ORIGINS 指定（逗号分隔多个来源）
 app.use(
     cors({
-        origin: (process.env.CORS_ORIGINS || "http://localhost:5173,http://127.0.0.1:5173")
+        origin: (
+            process.env.CORS_ORIGINS ||
+            "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8848,http://127.0.0.1:8848"
+        )
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean),
