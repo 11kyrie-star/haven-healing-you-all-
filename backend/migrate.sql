@@ -10,7 +10,13 @@ CREATE TABLE IF NOT EXISTS userinfo (
     username    VARCHAR(45)     UNIQUE,
     password    VARCHAR(255),
     email       VARCHAR(100),
-    avatar      VARCHAR(500)
+    avatar      VARCHAR(500),
+    status      TINYINT(1)      NOT NULL DEFAULT 1,
+    ban_reason  VARCHAR(50)     DEFAULT NULL,
+    ban_by      INT             DEFAULT NULL,
+    ban_at      DATETIME        DEFAULT NULL,
+    ban_until   DATETIME        DEFAULT NULL,
+    create_at   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2. 帖子表
@@ -143,10 +149,13 @@ CREATE TABLE IF NOT EXISTS post_reports (
     handle_at     DATETIME(3)   DEFAULT NULL,
     handle_result VARCHAR(200)  DEFAULT NULL,
     handle_by     VARCHAR(50)   DEFAULT NULL,
+    offline_application_id INT  DEFAULT NULL,
+    record_deleted TINYINT(1)   NOT NULL DEFAULT 0,
     create_at     DATETIME(3)   DEFAULT CURRENT_TIMESTAMP(3),
     UNIQUE KEY uk_post_user (post_id, user_id),
     INDEX idx_post (post_id),
-    INDEX idx_status (status)
+    INDEX idx_status (status),
+    INDEX idx_offline_application (offline_application_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
@@ -155,6 +164,7 @@ CREATE TABLE IF NOT EXISTS post_reports (
 --    一级(role_level=1)：巡查帖子、处理举报、驳回，下架需申请
 --    二级(role_level=2)：含一级 + 审批下架申请、下架帖子
 --    三级(role_level=3)：含一、二级 + 查看用户信息、封禁账号、可视化大屏
+--    四级(role_level=4)：超级管理员，含一、二、三级 + 管理员账号管理、角色权限管理
 -- ============================================
 
 -- 角色表
@@ -200,4 +210,87 @@ CREATE TABLE IF NOT EXISTS admin_role_permissions (
     perm_id  INT  NOT NULL,
     UNIQUE KEY uk_role_perm (role_id, perm_id),
     INDEX idx_role (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- 9. B 端动态路由（菜单表 + 角色-菜单映射）
+--    菜单数据由 migrate_admin.js 启动时自动写入（按 minLevel 做等级继承）
+--    admin_menus 是扁平结构(parent_id)，后端按角色查出后组装成树形 JSON 返回
+--    menu_type: 1=目录(仅分组，不渲染页面) 2=菜单(真实页面，注册成前端路由)
+--    按钮级权限不在这张表，统一走 admin_permissions
+-- ============================================
+
+-- 菜单/路由表
+CREATE TABLE IF NOT EXISTS admin_menus (
+    id          INT             PRIMARY KEY AUTO_INCREMENT,
+    parent_id   INT             NOT NULL DEFAULT 0,
+    menu_type   TINYINT         NOT NULL DEFAULT 2,
+    menu_name   VARCHAR(50)     NOT NULL,
+    route_name  VARCHAR(100)    DEFAULT NULL,
+    path        VARCHAR(200)    DEFAULT NULL,
+    component   VARCHAR(200)    DEFAULT NULL,
+    redirect    VARCHAR(200)    DEFAULT NULL,
+    icon        VARCHAR(100)    DEFAULT NULL,
+    perm_code   VARCHAR(64)     DEFAULT NULL,
+    frame_src   VARCHAR(500)    DEFAULT NULL,
+    sort        INT             NOT NULL DEFAULT 0,
+    visible     TINYINT(1)      NOT NULL DEFAULT 1,
+    keep_alive  TINYINT(1)      NOT NULL DEFAULT 0,
+    always_show TINYINT(1)      NOT NULL DEFAULT 0,
+    status      TINYINT(1)      NOT NULL DEFAULT 1,
+    remark      VARCHAR(200)    DEFAULT NULL,
+    create_at   DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    update_at   DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_path (path),
+    INDEX idx_parent (parent_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 角色-菜单映射表
+CREATE TABLE IF NOT EXISTS admin_role_menus (
+    id       INT  PRIMARY KEY AUTO_INCREMENT,
+    role_id  INT  NOT NULL,
+    menu_id  INT  NOT NULL,
+    UNIQUE KEY uk_role_menu (role_id, menu_id),
+    INDEX idx_role (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- admin_refresh_tokens：B 端刷新令牌表
+--    只存 sha256 摘要，原始 token 只在签发时返回给前端
+--    每次刷新删除旧记录写入新记录，旧 token 立即失效
+CREATE TABLE IF NOT EXISTS admin_refresh_tokens (
+    id         INT          PRIMARY KEY AUTO_INCREMENT,
+    admin_id   INT          NOT NULL,
+    token_hash CHAR(64)     NOT NULL UNIQUE,
+    expires_at DATETIME     NOT NULL,
+    create_at  DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_admin (admin_id),
+    INDEX idx_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 9. 帖子下架申请表（一级管理员提交，二级及以上审批）
+--    status: 0 待处理 / 1 处理完成（帖子已下架） / 2 已驳回（帖子保留）
+--            3 已撤销（申请人自己撤回） / 4 申诉中（申请人对驳回结果申诉）
+--    pending_post_id 是生成列：status=0 时等于 post_id，否则为 NULL
+--    配合唯一索引 uk_pending_post，保证同一帖子最多一条待处理申请
+CREATE TABLE IF NOT EXISTS post_offline_applications (
+    id              INT          PRIMARY KEY AUTO_INCREMENT,
+    post_id         INT          NOT NULL,
+    applicant_id    INT          NOT NULL,
+    apply_reason    VARCHAR(50)  NOT NULL,
+    status          TINYINT      NOT NULL DEFAULT 0,
+    handle_by       INT          DEFAULT NULL,
+    handle_reason   VARCHAR(50)  DEFAULT NULL,
+    handle_at       DATETIME     DEFAULT NULL,
+    appeal_reason        VARCHAR(50) DEFAULT NULL,
+    appeal_at            DATETIME    DEFAULT NULL,
+    appeal_handle_by     INT         DEFAULT NULL,
+    appeal_handle_reason VARCHAR(50) DEFAULT NULL,
+    appeal_handle_at     DATETIME    DEFAULT NULL,
+    create_at       DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    pending_post_id INT GENERATED ALWAYS AS (IF(status = 0, post_id, NULL)) STORED,
+    UNIQUE KEY uk_pending_post (pending_post_id),
+    INDEX idx_post (post_id),
+    INDEX idx_applicant (applicant_id),
+    INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

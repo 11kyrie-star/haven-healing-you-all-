@@ -1,4 +1,4 @@
-﻿const db = require("../db/index")
+﻿﻿const db = require("../db/index")
 const fs = require("fs")
 const path = require("path")
 const jwt = require("jsonwebtoken")
@@ -20,6 +20,20 @@ module.exports.login = (req, res) => {
         const compareResult = bcrypt.compareSync(req.body.password, user.password)
         if (!compareResult) {
             return req.cc("密码错误")
+        }
+        // 被管理员封禁的账号不能登录（status: 1 正常 / 0 封禁）
+        // 临时封禁到期后自动恢复，永久封禁（ban_until 为空）继续拦截
+        if (Number(user.status) !== 1) {
+            const banUntil = user.ban_until ? new Date(user.ban_until).getTime() : null
+            if (banUntil !== null && banUntil <= Date.now()) {
+                db.query(
+                    "UPDATE userinfo SET status = 1, ban_reason = NULL, ban_by = NULL, ban_at = NULL, ban_until = NULL WHERE id = ?",
+                    [user.id],
+                    (e) => { if (e) console.error("自动解封失败:", e) }
+                )
+            } else {
+                return req.cc("该账号已被封禁，请联系管理员")
+            }
         }
         const tokenPayload = {
             id: user.id,

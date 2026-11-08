@@ -365,7 +365,7 @@ module.exports.myPostList = function (req, res) {
             tags: typeof row.tags === "string" ? JSON.parse(row.tags) : (row.tags || []),
             category: row.category || "日常",
             report_status: row.report_status || 0,
-            report_status_text: ["正常", "待受理", "受理中", "已下架"][row.report_status] || "正常",
+            report_status_text: ["正常", "待受理", "已受理", "已下架"][row.report_status] || "正常",
         }))
             res.send({ status: 0, msg: "查询成功", data: { list, page, size, hasMore: offset + size < total } })
         })
@@ -1228,7 +1228,9 @@ module.exports.reportPost = function (req, res) {
     db.query("SELECT id, user_id, status, report_status FROM posts WHERE id = ?", [postId], (err, posts) => {
         if (err) { console.error("举报时查询帖子失败:", err); return req.cc("服务器异常", 1, 500) }
         if (posts.length === 0 || posts[0].status !== 1) return req.cc("帖子不存在")
-        if (posts[0].report_status === 2) return req.cc("该帖子已下架")
+        // 已下架的帖子不能再被举报（原来这里错写成 === 2，导致：已受理的帖子被误报为"已下架"，
+        // 而真正已下架的帖子反倒可以继续举报）
+        if (posts[0].report_status === 3) return req.cc("该帖子已下架")
         if (posts[0].user_id === req.user.id) return req.cc("不能举报自己的帖子")
 
         db.query("SELECT username, avatar FROM userinfo WHERE id = ?", [req.user.id], (err2, users) => {
@@ -1238,7 +1240,9 @@ module.exports.reportPost = function (req, res) {
             const sql = "INSERT INTO post_reports (post_id, user_id, username, avatar, reasons, description) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE reasons = VALUES(reasons), description = VALUES(description), status = 0, create_at = NOW(3)"
             db.query(sql, [postId, req.user.id, me.username || "用户", me.avatar || null, reasonsJson, description || null], (err3) => {
                 if (err3) { console.error("提交举报失败:", err3); return req.cc("服务器异常", 1, 500) }
-                db.query("UPDATE posts SET report_status = 1 WHERE id = ? AND report_status = 0", [postId])
+                // 只要不是"已下架"就置为待受理：已受理(2)的帖子再次被举报，要能重新变回待受理，
+                // 否则新的举报会被这个字段吞掉，管理员在列表里看不出有待处理
+                db.query("UPDATE posts SET report_status = 1 WHERE id = ? AND report_status <> 3", [postId])
                 res.send({ status: 0, msg: "举报已提交，我们会尽快处理" })
             })
         })
@@ -1299,8 +1303,10 @@ module.exports.updatePostAuditStatus = function (req, res) {
     const postId = parseInt(req.params.id)
     if (!postId) return req.cc("参数错误")
     const action = (req.body && req.body.action) || ""
-    const map = { normal: 0, pending: 1, processing: 2, offline: 3 }
-    if (!(action in map)) return req.cc("action 只能是 normal / pending / processing / offline")
+    // report_status 语义（全项目统一）：
+    //   0 正常 / 1 待受理 / 2 已受理 / 3 已下架（= 不显示，C 端查询统一用 <> 3 排除）
+    const map = { normal: 0, pending: 1, accepted: 2, offline: 3 }
+    if (!(action in map)) return req.cc("action 只能是 normal / pending / accepted / offline")
     const value = map[action]
 
     db.query("UPDATE posts SET report_status = ? WHERE id = ?", [value, postId], (err, result) => {
@@ -1322,91 +1328,6 @@ module.exports.updatePostAuditStatus = function (req, res) {
             })
         }
         res.send({ status: 0, msg: "操作成功", data: { report_status: value } })
-    })
-}
-
-// ============ Admin: 举报列表（管理端） ============
-module.exports.adminReportList = function (req, res) {
-    const expectKey = require("../config").adminKey
-    const adminKey = req.headers["x-admin-key"]
-    if (!expectKey || adminKey !== expectKey) return req.cc("无权操作", 1, 403)
-
-    const page = parseInt(req.query.page) || 1
-    const size = parseInt(req.query.size) || 10
-    const offset = (page - 1) * size
-    const rawStatus = req.query.status
-    const hasStatus = rawStatus !== undefined && rawStatus !== "" && !isNaN(parseInt(rawStatus))
-    const where = hasStatus ? "WHERE r.status = ?" : ""
-    const params = hasStatus ? [parseInt(rawStatus)] : []
-
-    db.query("SELECT COUNT(*) AS total FROM post_reports r " + where, params, (errC, counts) => {
-        if (errC) { console.error("查询举报总数失败:", errC); return req.cc("服务器异常", 1, 500) }
-        const total = counts[0] ? counts[0].total : 0
-
-        const sql = "SELECT r.id, r.post_id, r.user_id, r.username, r.avatar, r.reasons, r.description, r.status, r.handle_at, r.handle_result, r.handle_by, r.create_at, p.content AS post_content, p.images AS post_images, p.report_status AS post_report_status FROM post_reports r LEFT JOIN posts p ON r.post_id = p.id " + where + " ORDER BY r.create_at DESC, r.id DESC LIMIT ? OFFSET ?"
-        db.query(sql, params.concat([size, offset]), (err, results) => {
-            if (err) { console.error("查询举报列表失败:", err); return req.cc("服务器异常", 1, 500) }
-            const base = req.protocol + "://" + req.get("host")
-            const list = results.map(r => ({
-                id: r.id,
-                post_id: r.post_id,
-                user_id: r.user_id,
-                username: r.username,
-                avatar: r.avatar ? (r.avatar.startsWith("http") ? r.avatar : base + r.avatar) : null,
-                reasons: typeof r.reasons === "string" ? JSON.parse(r.reasons) : (r.reasons || []),
-                description: r.description || "",
-                status: r.status,
-                handle_at: r.handle_at,
-                handle_result: r.handle_result || "",
-                handle_by: r.handle_by || "",
-                create_at: r.create_at,
-                post: {
-                    id: r.post_id,
-                    content: r.post_content || "",
-                    images: typeof r.post_images === "string" ? JSON.parse(r.post_images) : (r.post_images || []),
-                    report_status: r.post_report_status,
-                },
-            }))
-            res.send({ status: 0, msg: "查询成功", data: { list, page, size, total, hasMore: offset + size < total } })
-        })
-    })
-}
-
-// ============ Admin: 帖子列表（管理端，可按审核状态筛选） ============
-module.exports.adminPostList = function (req, res) {
-    const expectKey = require("../config").adminKey
-    const adminKey = req.headers["x-admin-key"]
-    if (!expectKey || adminKey !== expectKey) return req.cc("无权操作", 1, 403)
-
-    const page = parseInt(req.query.page) || 1
-    const size = parseInt(req.query.size) || 10
-    const offset = (page - 1) * size
-    const rawStatus = req.query.report_status
-    const hasStatus = rawStatus !== undefined && rawStatus !== "" && !isNaN(parseInt(rawStatus))
-
-    const conditions = ["p.status = 1"]
-    const params = []
-    if (hasStatus) { conditions.push("p.report_status = ?"); params.push(parseInt(rawStatus)) }
-    const where = "WHERE " + conditions.join(" AND ")
-
-    db.query("SELECT COUNT(*) AS total FROM posts p " + where, params, (errC, counts) => {
-        if (errC) { console.error("查询帖子总数失败:", errC); return req.cc("服务器异常", 1, 500) }
-        const total = counts[0] ? counts[0].total : 0
-
-        const sql = "SELECT p.id, p.user_id, p.content, p.images, p.tags, p.category, p.view_count, p.like_count, p.comment_count, p.hot_value, p.is_public, p.is_anonymous, p.report_status, p.created_at, u.username, u.avatar FROM posts p LEFT JOIN userinfo u ON p.user_id = u.id " + where + " ORDER BY p.report_status DESC, p.created_at DESC, p.id DESC LIMIT ? OFFSET ?"
-        db.query(sql, params.concat([size, offset]), (err, results) => {
-            if (err) { console.error("查询管理端帖子列表失败:", err); return req.cc("服务器异常", 1, 500) }
-            const base = req.protocol + "://" + req.get("host")
-            const list = results.map(row => ({
-                ...row,
-                avatar: row.is_anonymous ? (base + "/default_avatar.jpeg") : (row.avatar ? (row.avatar.startsWith("http") ? row.avatar : base + row.avatar) : null),
-                username: row.is_anonymous ? "匿名用户" : row.username,
-                images: typeof row.images === "string" ? JSON.parse(row.images) : (row.images || []),
-                tags: typeof row.tags === "string" ? JSON.parse(row.tags) : (row.tags || []),
-                category: row.category || "日常",
-            }))
-            res.send({ status: 0, msg: "查询成功", data: { list, page, size, total, hasMore: offset + size < total } })
-        })
     })
 }
 

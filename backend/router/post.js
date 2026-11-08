@@ -37,9 +37,6 @@ router.post("/post/:id/message", auth, expressjoi(rule.create_message), function
 router.post("/post/:id/report", auth, functions.reportPost)
 router.put("/post/:id/audit", functions.updatePostAuditStatus)
 
-// 管理端（B 端后台，需要 x-admin-key）
-router.get("/admin/reports", functions.adminReportList)
-router.get("/admin/posts", functions.adminPostList)
 router.get("/message/mine", auth, functions.myMessageList)
 router.get("/message/to-me", auth, functions.messageToMeList)
 router.get("/notification/list", auth, functions.notificationList)

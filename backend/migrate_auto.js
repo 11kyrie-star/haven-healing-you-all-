@@ -10,6 +10,10 @@ const migrations = [
     ["comments", "images", "JSON", "content"],
     ["comments", "reply_count", "INT DEFAULT 0", "star_count"],
     ["posts", "report_status", "TINYINT(1) NOT NULL DEFAULT 0", "status"],
+    // 下架审计信息：下架理由（最多 50 字）、下架管理员 id、下架时间
+    ["posts", "offline_reason", "VARCHAR(50) DEFAULT NULL", "report_status"],
+    ["posts", "offline_by", "INT DEFAULT NULL", "offline_reason"],
+    ["posts", "offline_at", "DATETIME DEFAULT NULL", "offline_by"],
 ]
 
 function columnExists(table, column, cb) {
