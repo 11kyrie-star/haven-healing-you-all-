@@ -60,12 +60,59 @@
         </p>
         <div class="intro-sign">Haven · Heal all your wounds</div>
       </aside>
+
+      <el-dialog
+        v-model="banDialogVisible"
+        width="440px"
+        align-center
+        append-to-body
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+      >
+        <template #header>
+          <div class="appeal-header">账号已被封禁</div>
+        </template>
+        <div class="appeal-info">
+          <div class="appeal-row">
+            <span class="appeal-label">封禁原因</span>
+            <span class="appeal-value">{{ banInfo?.ban_reason || '未填写' }}</span>
+          </div>
+          <div class="appeal-row">
+            <span class="appeal-label">封禁时长</span>
+            <span class="appeal-value">{{ banDurationText }}</span>
+          </div>
+        </div>
+        <div class="appeal-form">
+          <div class="appeal-label">申诉理由</div>
+          <el-input
+            v-model="appealReason"
+            type="textarea"
+            :rows="4"
+            maxlength="50"
+            show-word-limit
+            resize="none"
+            :disabled="appealPending"
+            :placeholder="appealPending ? '申诉正在处理中，请等待管理员审核' : '请填写申诉理由，50 字以内'"
+          />
+          <div v-if="appealPending" class="appeal-pending-tip">
+            你已提交过申诉，管理员处理完成前无法重复提交。
+          </div>
+        </div>
+        <template #footer>
+          <el-button :disabled="appealLoading" @click="cancelAppeal">取消</el-button>
+          <el-button type="primary" :disabled="appealPending || !appealReason.trim()" :loading="appealLoading" @click="submitAppeal">
+            {{ appealPending ? '申诉处理中' : '提交申诉' }}
+          </el-button>
+        </template>
+      </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import {ref,reactive} from 'vue'
-import { RegisterApi,ForgetApi } from '@/api/login-register'
+import {ref,reactive,computed} from 'vue'
+import { RegisterApi,ForgetApi,SubmitAppealApi } from '@/api/login-register'
+import type { BanInfo } from '@/types/user'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userinfo'
@@ -79,6 +126,56 @@ const showForget=ref(false)
 const primary=ref<'primary'| ''>('primary')
 const primary2=ref<''| 'primary'>('')
 const userstore=useUserStore()
+
+// 封禁弹窗
+const banDialogVisible=ref(false)
+const banInfo=ref<BanInfo|null>(null)
+const appealReason=ref('')
+const appealLoading=ref(false)
+// 是否已有待处理申诉：有则禁用整个申诉入口，防止重复提交
+const appealPending=ref(false)
+const banDurationText=computed(()=>{
+    const info=banInfo.value
+    if(!info) return ''
+    if(!info.ban_until) return '永久封禁'
+    const end=new Date(info.ban_until)
+    const ms=end.getTime()-Date.now()
+    const until=end.toLocaleString('zh-CN',{hour12:false})
+    if(ms<=0) return `已到期（${until}）`
+    const days=Math.floor(ms/86400000)
+    const hours=Math.floor((ms%86400000)/3600000)
+    const remain=days>0?`${days} 天${hours>0?` ${hours} 小时`:''}`:`${Math.max(hours,1)} 小时`
+    return `至 ${until}（剩余约 ${remain}）`
+})
+const cancelAppeal=()=>{
+    banDialogVisible.value=false
+    appealReason.value=''
+    appealPending.value=false
+}
+const submitAppeal=async()=>{
+    const reason=appealReason.value.trim()
+    if(!reason || !banInfo.value || appealPending.value) return
+    appealLoading.value=true
+    try{
+        const res=await SubmitAppealApi({ban_ticket:banInfo.value.ban_ticket,appeal_reason:reason})
+        if(res.status===0){
+            ElMessage.success(res.msg)
+            appealReason.value=''
+            banDialogVisible.value=false
+        }else{
+            // 服务端判定已有待处理申诉时，直接把界面切到「处理中」
+            if(res.data?.appeal_pending){
+                appealPending.value=true
+                appealReason.value=''
+            }
+            ElMessage.warning(res.msg)
+        }
+    }catch{
+        // 参数校验和服务器异常已由请求拦截器提示
+    }finally{
+        appealLoading.value=false
+    }
+}
 
 const form=reactive({
     username:'',
@@ -137,10 +234,15 @@ const onsubmit=()=>{
     LoginformRef.value.validate(async(valid:boolean)=>{
         if(valid){
            try{
-           await userstore.login(form)
-           if(userstore.userinfo.status===0){
+           const res=await userstore.login(form)
+           if(res.status===0){
             router.replace('/layout/content')
             ElMessage.success("登录成功")
+           }else if(res.data){
+            // 账号被封禁：展示原因、时长并允许提交申诉
+            banInfo.value=res.data
+            appealPending.value=res.data.has_pending_appeal
+            banDialogVisible.value=true
            }
         }catch{
             return
@@ -366,6 +468,48 @@ Forform.value.validate(async(valid:boolean)=>{
         .intro{
             display: none;
         }
+    }
+}
+.appeal-header{
+    font-size: 16px;
+    font-weight: 600;
+    color: $color-ink;
+}
+.appeal-info{
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    background: rgba(243, 79, 103, 0.06);
+    border: 1px solid rgba(243, 79, 103, 0.18);
+    .appeal-row{
+        display: flex;
+        align-items: flex-start;
+        font-size: 13px;
+        line-height: 1.7;
+        & + .appeal-row{
+            margin-top: 6px;
+        }
+    }
+    .appeal-label{
+        flex: 0 0 64px;
+        color: $color-text-primary;
+    }
+    .appeal-value{
+        flex: 1;
+        color: $color-ink;
+        word-break: break-all;
+    }
+}
+.appeal-form{
+    .appeal-label{
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: $color-text-primary;
+    }
+    .appeal-pending-tip{
+        margin-top: 8px;
+        font-size: 12px;
+        color: $color-warm-text;
     }
 }
 </style>

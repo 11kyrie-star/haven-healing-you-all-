@@ -232,6 +232,8 @@ const CREATE_TABLES = [
 
     // 封禁申诉表：用户对被封禁的结果不满意时提交，三级管理员处理
     // status: 0 待处理 / 1 同意（撤销封禁） / 2 驳回（维持封禁）
+    // 不做「同一次封禁只能申诉一次」的唯一约束：驳回后允许补充理由重新申诉，
+    // 只拦截「已有待处理申诉」的情况（见 handle_router/user.js 的 appeal）
     `CREATE TABLE IF NOT EXISTS user_ban_appeals (
         id            INT          PRIMARY KEY AUTO_INCREMENT,
         user_id       INT          NOT NULL,
@@ -244,8 +246,7 @@ const CREATE_TABLES = [
         create_at     DATETIME     DEFAULT CURRENT_TIMESTAMP,
         INDEX idx_user (user_id),
         INDEX idx_status (status),
-        INDEX idx_create (create_at),
-        UNIQUE KEY uk_user_ban (user_id, ban_record_id)
+        INDEX idx_create (create_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 ]
 
@@ -337,19 +338,17 @@ function ensureBanRecordColumns(cb) {
     next(null)
 }
 
-// 封禁申诉表补「同一用户同一次封禁只能申诉一次」的唯一索引（老表升级用）
-function ensureBanAppealIndex(cb) {
+// 老库升级：删除早期的 uk_user_ban 唯一索引
+// 新策略是「待处理时不能重复申诉」，驳回后允许再次申诉，唯一索引会把后者也拦掉
+function dropBanAppealIndex(cb) {
     db.query("SHOW INDEX FROM user_ban_appeals WHERE Key_name = 'uk_user_ban'", (err, rows) => {
         if (err) return cb(err)
-        if (rows.length) return cb(null)
-        db.query(
-            "ALTER TABLE user_ban_appeals ADD UNIQUE KEY uk_user_ban (user_id, ban_record_id)",
-            (err2) => {
-                if (err2) return cb(err2)
-                console.log("[migrate] user_ban_appeals.uk_user_ban 已添加")
-                cb(null)
-            }
-        )
+        if (rows.length === 0) return cb(null)
+        db.query("ALTER TABLE user_ban_appeals DROP INDEX uk_user_ban", (err2) => {
+            if (err2) return cb(err2)
+            console.log("[migrate] user_ban_appeals.uk_user_ban 已删除")
+            cb(null)
+        })
     })
 }
 
@@ -615,7 +614,7 @@ module.exports = function (done) {
                 if (errB) return done(errB)
                 ensureBanRecordColumns((errBR) => {
                     if (errBR) return done(errBR)
-                    ensureBanAppealIndex((errBA) => {
+                    dropBanAppealIndex((errBA) => {
                         if (errBA) return done(errBA)
                         ensureOfflineApplicationColumns((errC) => {
                             if (errC) return done(errC)

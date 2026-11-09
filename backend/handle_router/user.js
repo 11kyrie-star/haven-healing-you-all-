@@ -23,7 +23,7 @@ module.exports.login = (req, res) => {
         }
         // 被管理员封禁的账号不能登录（status: 1 正常 / 0 封禁）
         // 临时封禁到期后自动恢复，永久封禁（ban_until 为空）继续拦截
-        if (Number(user.status) !== 1) {
+        if (Number(user.status) === 0) {
             const banUntil = user.ban_until ? new Date(user.ban_until).getTime() : null
             if (banUntil !== null && banUntil <= Date.now()) {
                 db.query(
@@ -32,7 +32,28 @@ module.exports.login = (req, res) => {
                     (e) => { if (e) console.error("自动解封失败:", e) }
                 )
             } else {
-                return req.cc("该账号已被封禁，请联系管理员")
+                // 把封禁详情一并返回，前端可展示原因和解封时间（永久封禁 ban_until 为 null）
+                // ban_ticket 是 10 分钟内有效的申诉凭证，避免申诉接口要求用户再次输入密码
+                const banTicket = jwt.sign({ id: user.id, scope: "ban_appeal" }, secretkey, { expiresIn: "10m" })
+                // 查一次是否有待处理申诉，前端据此直接禁用申诉入口，避免重复提交
+                return db.query(
+                    "SELECT id FROM user_ban_appeals WHERE user_id = ? AND status = 0 LIMIT 1",
+                    [user.id],
+                    (appealErr, appealRows) => {
+                        if (appealErr) console.error("查询待处理申诉失败:", appealErr)
+                        res.send({
+                            status: 1,
+                            msg: "该账号已被封禁，请联系管理员",
+                            data: {
+                                status: 0,
+                                ban_reason: user.ban_reason || null,
+                                ban_until: user.ban_until || null,
+                                ban_ticket: banTicket,
+                                has_pending_appeal: !appealErr && appealRows.length > 0,
+                            },
+                        })
+                    }
+                )
             }
         }
         const tokenPayload = {
@@ -50,6 +71,74 @@ module.exports.login = (req, res) => {
                 email: user.email,
                 avatar: user.avatar ? (user.avatar.startsWith("http") ? user.avatar : req.protocol + "://" + req.get("host") + user.avatar) : null,
             },
+        })
+    })
+}
+
+// Submit ban appeal
+// 无需登录：凭登录失败时下发的 ban_ticket（scope=ban_appeal，10 分钟有效）确认身份
+module.exports.appeal = (req, res) => {
+    const { ban_ticket, appeal_reason } = req.body
+    let decoded
+    try {
+        decoded = jwt.verify(ban_ticket, secretkey)
+    } catch (err) {
+        return req.cc("申诉凭证已失效，请重新登录后再提交")
+    }
+    if (decoded.scope !== "ban_appeal" || !decoded.id) {
+        return req.cc("申诉凭证无效，请重新登录后再提交")
+    }
+    const userId = decoded.id
+
+    db.query("SELECT id, status FROM userinfo WHERE id = ?", [userId], (err, rows) => {
+        if (err) {
+            console.error("申诉查询用户失败:", err)
+            return req.cc("服务器异常", 1, 500)
+        }
+        if (rows.length !== 1) {
+            return req.cc("用户不存在")
+        }
+        if (Number(rows[0].status) !== 0) {
+            return req.cc("该账号当前未被封禁，无需申诉")
+        }
+
+        db.query("SELECT id FROM user_ban_appeals WHERE user_id = ? AND status = 0", [userId], (err2, pending) => {
+            if (err2) {
+                console.error("查询待处理申诉失败:", err2)
+                return req.cc("服务器异常", 1, 500)
+            }
+            if (pending.length > 0) {
+                // appeal_pending 供前端直接把弹窗切到「处理中」状态
+                return res.send({
+                    status: 1,
+                    msg: "你已提交过申诉，请等待管理员处理",
+                    data: { appeal_pending: true },
+                })
+            }
+
+            // 关联最近一次封禁记录，便于后台按封禁批次追溯
+            db.query("SELECT id FROM user_ban_records WHERE user_id = ? ORDER BY id DESC LIMIT 1", [userId], (err3, records) => {
+                if (err3) {
+                    console.error("查询封禁记录失败:", err3)
+                    return req.cc("服务器异常", 1, 500)
+                }
+                const banRecordId = records.length > 0 ? records[0].id : null
+                db.query(
+                    "INSERT INTO user_ban_appeals (user_id, ban_record_id, appeal_reason) VALUES (?,?,?)",
+                    [userId, banRecordId, appeal_reason],
+                    (err4, result) => {
+                        if (err4) {
+                            console.error("写入申诉失败:", err4)
+                            return req.cc("服务器异常", 1, 500)
+                        }
+                        res.send({
+                            status: 0,
+                            msg: "申诉已提交，请等待管理员处理",
+                            data: { appeal_id: result.insertId },
+                        })
+                    }
+                )
+            })
         })
     })
 }

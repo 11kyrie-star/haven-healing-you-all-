@@ -9,6 +9,7 @@ const router = express.Router()
 router.post("/login", expressjoi(rule.login), functions.login)
 router.post("/register", expressjoi(rule.register), functions.register)
 router.post("/forget", expressjoi(rule.forget), functions.forget)
+router.post("/appeal", expressjoi(rule.appeal), functions.appeal)
 
 // Authenticated routes
 router.post("/avatar", auth, functions.avatar)

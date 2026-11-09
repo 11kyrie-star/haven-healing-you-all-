@@ -26,6 +26,14 @@ module.exports.forget = {
     },
 }
 
+// 封禁申诉：ban_ticket 来自登录失败响应，appeal_reason 最多 50 字
+module.exports.appeal = {
+    body: {
+        ban_ticket: joi.string().required(),
+        appeal_reason: joi.string().trim().max(50).required(),
+    },
+}
+
 module.exports.changepwd = {
     body: {
         oldpassword: password,

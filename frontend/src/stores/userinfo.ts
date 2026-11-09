@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import { LoginApi } from '@/api/login-register'
 import { Changeusername,Changeemail ,Changeprofile,Changeavatar} from '@/api/userinfo'
-import type {  loginres,form ,logindata,changeres,changeprofile,userinfo,updateavatar,avatardata} from '@/types/user'
+import type {  LoginResponse,form ,changeres,changeprofile,userinfo,updateavatar,avatardata} from '@/types/user'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 
@@ -14,18 +14,22 @@ export const useUserStore=defineStore('user',()=>{
          token:'',
          status:0
     })
-    const login=async (data:form)=>{
-       const res:loginres<logindata>=await LoginApi(data)
+    const login=async (data:form):Promise<LoginResponse>=>{
+       const res=await LoginApi(data)
        if(res.status===1){
-        ElMessage.warning(res.msg || "账号或者密码错误")
-        return
+        // 被封禁时由登录页弹窗展示原因和时长，这里不再额外提示
+        if(!res.data){
+          ElMessage.warning(res.msg || "账号或者密码错误")
+        }
+        return res
        }
        userinfo.value.email=res.data.email
-       userinfo.value.avatar=res.data.avatar
+       userinfo.value.avatar=res.data.avatar ?? ''
        userinfo.value.username=res.data.username
        userinfo.value.status=res.status
        userinfo.value.token=res.token
       localStorage.setItem('token', res.token)
+      return res
     }
     const updateusername=async (data:string)=>{
         const res:changeres=await Changeusername(data)

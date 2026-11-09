@@ -38,7 +38,7 @@ request.interceptors.response.use(
   },
   (err) => {
     if (err.response?.status === 401) {
-      ElMessage.error('登录已失效，请重新登录');
+      ElMessage.error(err.response?.data?.msg || '登录已失效，请重新登录');
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       router.push('/');
