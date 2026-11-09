@@ -421,13 +421,28 @@ module.exports.updatePost = function (req, res) {
     if (req.body.is_anonymous !== undefined) { fields.push("is_anonymous = ?"); values.push(req.body.is_anonymous) }
     if (fields.length === 0) return req.cc("没有需要更新的内容")
 
-    values.push(postId, req.user.id)
-    const sql = `UPDATE posts SET ${fields.join(", ")} WHERE id = ? AND user_id = ?`
-    db.query(sql, values, (err, result) => {
-        if (err) { console.error("更新帖子失败:", err); return req.cc("服务器异常", 1, 500) }
-        if (result.affectedRows === 0) return req.cc("帖子不存在或无权操作")
-        res.send({ status: 0, msg: "更新成功" })
-    })
+    const doUpdate = () => {
+        values.push(postId, req.user.id)
+        const sql = `UPDATE posts SET ${fields.join(", ")} WHERE id = ? AND user_id = ?`
+        db.query(sql, values, (err, result) => {
+            if (err) { console.error("更新帖子失败:", err); return req.cc("服务器异常", 1, 500) }
+            if (result.affectedRows === 0) return req.cc("帖子不存在或无权操作")
+            res.send({ status: 0, msg: "更新成功" })
+        })
+    }
+
+    // 改可见状态时，已删除或已下架的帖子同样不允许操作
+    if (req.body.is_public !== undefined) {
+        db.query("SELECT status, report_status FROM posts WHERE id = ? AND user_id = ?", [postId, req.user.id], (err, rows) => {
+            if (err) { console.error("查询帖子失败:", err); return req.cc("服务器异常", 1, 500) }
+            if (rows.length === 0) return req.cc("帖子不存在或无权操作")
+            if (rows[0].status !== 1) return req.cc("帖子已被删除，无法修改可见状态")
+            if (rows[0].report_status === 3) return req.cc("帖子已下架，无法修改可见状态")
+            doUpdate()
+        })
+        return
+    }
+    doUpdate()
 }
 // ============ Set Post Visibility ============
 module.exports.setPostVisibility = function (req, res) {
@@ -436,9 +451,13 @@ module.exports.setPostVisibility = function (req, res) {
     const isPublic = Number(req.body.is_public)
     if (isPublic !== 0 && isPublic !== 1) return req.cc("is_public 参数错误")
 
-    db.query("SELECT id FROM posts WHERE id = ? AND status = 1 AND user_id = ?", [postId, req.user.id], (err, results) => {
+    db.query("SELECT id, status, report_status FROM posts WHERE id = ? AND user_id = ?", [postId, req.user.id], (err, results) => {
         if (err) { console.error("查询帖子失败:", err); return req.cc("服务器异常", 1, 500) }
         if (results.length === 0) return req.cc("帖子不存在或无权操作")
+        const post = results[0]
+        if (post.status !== 1) return req.cc("帖子已被删除，无法修改可见状态")
+        // 下架帖 report_status 为 3，status 仍为 1，必须单独拦截
+        if (post.report_status === 3) return req.cc("帖子已下架，无法修改可见状态")
         db.query("UPDATE posts SET is_public = ? WHERE id = ?", [isPublic, postId], (err2) => {
             if (err2) { console.error("更新帖子可见状态失败:", err2); return req.cc("服务器异常", 1, 500) }
             res.send({ status: 0, msg: "设置成功", data: { is_public: isPublic } })
