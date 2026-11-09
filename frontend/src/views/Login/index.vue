@@ -49,6 +49,17 @@
             </el-form-item>
         </el-form>
       </div>
+      <aside class="intro" style="cursor: default;">
+        <div class="intro-label">关于 Haven</div>
+        <div class="intro-title">让每一个在意别人眼光的人，都能大胆开口。</div>
+        <p class="intro-text">
+          这里没有好友功能，也没有人能看到你的真实身份。你可以放心地抱怨、倾诉，把那些不好说出口的情绪留在这里。
+        </p>
+        <p class="intro-text">
+          也许你会遇见和你一样正在经历糟糕日子的人——你会发现，自己并不孤单。撑不住的时候，也可以在这里求助。
+        </p>
+        <div class="intro-sign">Haven · Heal all your wounds</div>
+      </aside>
     </div>
 </template>
 
@@ -129,6 +140,7 @@ const onsubmit=()=>{
            await userstore.login(form)
            if(userstore.userinfo.status===0){
             router.replace('/layout/content')
+            ElMessage.success("登录成功")
            }
         }catch{
             return
@@ -307,6 +319,52 @@ Forform.value.validate(async(valid:boolean)=>{
             --el-input-focus-border-color:grey;
             --el-input-border-color:#bdc3c7 ;
             --el-input-bg-color:#bdc3c7;
+        }
+    }
+    .intro{
+        position: absolute;
+        left: 4%;
+        bottom: 5%;
+        width: min(32vw, 380px);
+        padding: 24px 26px 18px;
+        background: $glass-bg;
+        backdrop-filter: $glass-blur;
+        border: $glass-border-soft;
+        border-radius: $radius-card;
+        box-shadow: 0 8px 32px $color-warm-shadow-soft;
+        font-family: var(--font-main);
+        .intro-label{
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: $color-warm-text;
+            margin-bottom: 10px;
+        }
+        .intro-title{
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: 600;
+            color: $color-ink;
+            margin-bottom: 12px;
+        }
+        .intro-text{
+            font-size: 13px;
+            line-height: 1.9;
+            color: $color-text-primary;
+            text-align: justify;
+            margin-bottom: 10px;
+        }
+        .intro-sign{
+            margin-top: 4px;
+            padding-top: 12px;
+            border-top: 1px solid $color-white-light;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: $color-warm-text;
+        }
+    }
+    @media (max-width: 900px){
+        .intro{
+            display: none;
         }
     }
 }

@@ -21,8 +21,8 @@
                <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item @click="deletepost">删除</el-dropdown-item>
-                    <el-dropdown-item @click="Changestatus" v-if="status">私密</el-dropdown-item>
-                    <el-dropdown-item @click="Changepublic" v-if="!status">公开</el-dropdown-item>
+                    <el-dropdown-item @click="Changestatus" v-if="status && props.report_status!==3">私密</el-dropdown-item>
+                    <el-dropdown-item @click="Changepublic" v-if="!status && props.report_status!==3">公开</el-dropdown-item>
                 </el-dropdown-menu>
                </template>
             </el-dropdown>
@@ -196,7 +196,7 @@ const Changestatus=()=>{
           const res=await changepoststatus(props.id,0)
          if(res.status===0){
             status.value=0
-          }
+          }else{return}
         }finally{
             clearTimeout(timer5!)
             timer5=null
@@ -212,6 +212,8 @@ const Changepublic=()=>{
       const res=await changepoststatus(props.id,1)
     if(res.status===0){
         status.value=1
+    }else{
+        return
     }}finally{
         clearTimeout(timer4!)
         timer4=null

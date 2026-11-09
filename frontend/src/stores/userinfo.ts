@@ -17,16 +17,8 @@ export const useUserStore=defineStore('user',()=>{
     const login=async (data:form)=>{
        const res:loginres<logindata>=await LoginApi(data)
        if(res.status===1){
-        ElMessage({
-            message:res.msg,
-            type:'warning'
-        })
+        ElMessage.warning(res.msg || "账号或者密码错误")
         return
-       }else{
-        ElMessage({
-            message:res.msg,
-            type:'success'
-        })
        }
        userinfo.value.email=res.data.email
        userinfo.value.avatar=res.data.avatar

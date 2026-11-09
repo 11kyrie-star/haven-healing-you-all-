@@ -15,7 +15,7 @@
                 </button>
             </div>
             <Card v-for="item in store.list" :key="item.id" :item="item" />
-            <div class="empty" v-if="(empty && !loading) || store.list.length===0" style="user-select: none;">
+            <div class="empty" v-if="(empty && !loading) && store.list.length===0 && !store.connect" style="user-select: none;">
                 <div class="empty-illustration">
                     <div class="halo halo-1"></div>
                     <div class="halo halo-2"></div>
@@ -98,8 +98,8 @@ onMounted(async ()=>{
 useIntersectionObserver(sentry,([entry])=>{
 if(entry?.isIntersecting){loadmore()}
 },{rootMargin:'0px 0px 40% 0px'})
-const reload=()=>{
-    window.location.reload()
+const reload=async()=>{
+    await loadmore()
 }
 //清空通知
 let timer1:ReturnType<typeof setTimeout> | null=null
