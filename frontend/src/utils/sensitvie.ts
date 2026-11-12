@@ -1,8 +1,12 @@
 import { getsensitivedata } from "@/api/sensitiveapi"
 let word:string[]=[]
 export async function loadsensitive(){
-   const data=await getsensitivedata()
-   word=data.data.words
+   try{
+      const data=await getsensitivedata()
+      word=data?.data?.words ?? []
+   }catch{
+      word=[]
+   }
 }
 
 export function findsensitvie(html:string):boolean{

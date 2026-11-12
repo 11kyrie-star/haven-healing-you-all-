@@ -7,7 +7,8 @@ msg:string
 export interface logindata{
     username:string,
     email:string,
-    avatar:string | null
+    avatar:string | null,
+    login_time:string
 }
 
 // 账号被封禁时登录返回的详情
@@ -87,7 +88,8 @@ export interface userinfo{
     email:string,
     avatar:string,
     token:string,
-    status:number
+    status:number,
+    login_time:string
 }
 
 export interface updateavatar<T>{

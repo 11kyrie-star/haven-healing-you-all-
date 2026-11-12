@@ -304,9 +304,12 @@ const enroll=()=>{
         if(valid){
           try{  
           const res=await RegisterApi(form)
-          form.password=''
-          form.username=''
-          form.email=''
+          // 仅在注册成功时清空表单，用户名/邮箱已存在等失败情况保留用户输入
+          if(res.status===0){
+            form.password=''
+            form.username=''
+            form.email=''
+          }
           ElMessage({
             message:res.msg,
             type:res.status===0?'success':'warning'

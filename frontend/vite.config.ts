@@ -19,7 +19,10 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    Font.vite(),
+    // 轻量分包：只打包源码中实际用到的字，避免 315 份全量分片
+    Font.vite({
+      scanFiles: ['src/**/*.{vue,ts,tsx,js,jsx}'],
+    }),
     AutoImport({
       resolvers: [ElementPlusResolver(),
        IconsResolver({

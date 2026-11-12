@@ -12,7 +12,8 @@ export const useUserStore=defineStore('user',()=>{
          email:'',
          avatar:'',
          token:'',
-         status:0
+         status:0,
+         login_time:''
     })
     const login=async (data:form):Promise<LoginResponse>=>{
        const res=await LoginApi(data)
@@ -28,6 +29,7 @@ export const useUserStore=defineStore('user',()=>{
        userinfo.value.username=res.data.username
        userinfo.value.status=res.status
        userinfo.value.token=res.token
+       userinfo.value.login_time=res.data.login_time
       localStorage.setItem('token', res.token)
       return res
     }

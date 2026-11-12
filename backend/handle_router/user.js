@@ -70,6 +70,8 @@ module.exports.login = (req, res) => {
                 username: user.username,
                 email: user.email,
                 avatar: user.avatar ? (user.avatar.startsWith("http") ? user.avatar : req.protocol + "://" + req.get("host") + user.avatar) : null,
+                // 登录时间（ISO 8601，UTC），前端换算成本地时间后生成问候语
+                login_time: new Date().toISOString(),
             },
         })
     })

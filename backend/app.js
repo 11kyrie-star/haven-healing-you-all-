@@ -28,6 +28,19 @@ app.use(
     })
 )
 
+// Unified response helper
+// 必须放在 body 解析之前：body 解析报错时 Express 会跳过普通中间件直达错误处理，
+// 放到后面会导致错误处理里拿不到 req.cc
+app.use(function (req, res, next) {
+    req.cc = (err, bodyStatus = 1, httpStatus = 200) => {
+        res.status(httpStatus).send({
+            status: bodyStatus,
+            msg: err instanceof Error ? err.message : err,
+        })
+    }
+    next()
+})
+
 // Body parsing
 app.use(express.urlencoded({ extended: false, limit: "50mb" }))
 app.use(express.json({ limit: "50mb" }))
@@ -36,6 +49,10 @@ app.use(express.json({ limit: "50mb" }))
 app.use(function (err, req, res, next) {
     if (err.type === "entity.too.large" || err.status === 413) {
         return res.status(413).send({ status: 1, msg: "请求体过大，请压缩后重试" })
+    }
+    // JSON 格式错误（例如请求体直接传了裸字符串）统一返回 400，避免落到全局兜底变成 500
+    if (err.type === "entity.parse.failed") {
+        return req.cc("请求体格式错误，请提交 JSON 对象", 1, 400)
     }
     next(err)
 })

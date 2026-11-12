@@ -1,7 +1,7 @@
 <template>
   <div class="setting-container">
    <div class="setting-contain">
-    <div class="greetings">Good MOrning,Welcome to Haven</div> 
+    <div class="greetings">{{ greeting }}, Welcome to Haven</div> 
     <div class="line">|</div>   
     <el-icon class="setting" :class="{'setting-anima':showanimation}" :size="32" @mouseenter="showinformation" @mouseleave="closeinfor">
       <Setting style="color:black;"/>
@@ -17,14 +17,24 @@
 
 <script setup lang="ts">
 import {Setting} from '@element-plus/icons-vue'
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
 import { useUserStore } from '@/stores/userinfo'
 import { useWindowStore } from '@/stores/window'
 const windowstore=useWindowStore()
 const showanimation=ref(false)
-const router=useUserStore()
+const userstore=useUserStore()
+// 按后端返回的登录时间（换算成本地时间）生成英文问候语
+const greeting=computed(()=>{
+    const loginTime=userstore.userinfo.login_time
+    const date=loginTime ? new Date(loginTime) : new Date()
+    const hour=Number.isNaN(date.getTime()) ? new Date().getHours() : date.getHours()
+    if(hour>=5&&hour<12) return 'Good Morning'
+    if(hour>=12&&hour<18) return 'Good Afternoon'
+    if(hour>=18&&hour<23) return 'Good Evening'
+    return 'Good Night'
+})
 const logout=()=>{
-    router.logout()
+    userstore.logout()
 }
 function showinformation(){
 showanimation.value=true
