@@ -42,8 +42,10 @@ app.use(function (req, res, next) {
 })
 
 // Body parsing
-app.use(express.urlencoded({ extended: false, limit: "50mb" }))
-app.use(express.json({ limit: "50mb" }))
+// 限制请求体大小，防止单次大请求把服务器内存打满
+// 表单只传文本字段，1mb 足够；JSON 里最大的是头像 base64（前端已压到 1280px webp），5mb 足够
+app.use(express.urlencoded({ extended: false, limit: "1mb" }))
+app.use(express.json({ limit: "5mb" }))
 
 // Catch body-parser errors early
 app.use(function (err, req, res, next) {

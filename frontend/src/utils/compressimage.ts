@@ -1,5 +1,5 @@
 export function compressimage(file:File){
-return new Promise((resolve)=>{
+	return new Promise((resolve,reject)=>{
         const img=new Image()
         img.onload=()=>{
             const canvas=document.createElement('canvas')
@@ -14,9 +14,17 @@ return new Promise((resolve)=>{
             canvas.height=height
             ctx?.drawImage(img,0,0,width,height)
             canvas.toBlob((blob)=>{
-                resolve(new File([blob!],'avatar.webp',{type:'image/webp'}))
+                URL.revokeObjectURL(img.src)
+                if(!blob){
+                    reject(new Error('图片压缩失败'))
+                    return
+                }
+                resolve(new File([blob],'avatar.webp',{type:'image/webp'}))
             },'image/webp',0.8)
+        }
+        img.onerror=()=>{
             URL.revokeObjectURL(img.src)
+            reject(new Error('图片读取失败'))
         }
         img.src=URL.createObjectURL(file)
     })

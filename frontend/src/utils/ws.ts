@@ -12,7 +12,9 @@ class WsClient{
         const token=localStorage.getItem('token')
         if(!token || this.ws?.readyState===WebSocket.OPEN){return}
         this.closedByUser=false
-        this.ws=new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}/ws?token=${encodeURIComponent(token)}`)
+        // 生产环境 VITE_WS_BASE_URL 留空时回退到当前域名，由 Nginx 同源代理 /ws
+        const wsBase=import.meta.env.VITE_WS_BASE_URL || `${location.protocol==='https:'?'wss:':'ws:'}//${location.host}`
+        this.ws=new WebSocket(`${wsBase}/ws?token=${encodeURIComponent(token)}`)
         this.ws.onopen=()=>{
             this.retryCount=0
             this.heartbeatTimer=setInterval(()=>{
