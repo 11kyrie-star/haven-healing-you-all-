@@ -69,7 +69,9 @@ Haven 是一个前后端分离的情绪社区。用户可以匿名或实名发�
 
 | 层级 | 技术 |
 | --- | --- |
-| 前端 | Vue 3、TypeScript、Vite、Pinia、Vue Router、Element Plus |
+| 前端 | Vue 3、TypeScript、Vite、Element Plus、VueUse |
+| 状态与路由 | Pinia（持久化）、Vue Router |
+| 请求与安全 | Axios、DOMPurify |
 | 后端 | Node.js、Express 5、MySQL、JWT、Joi、Multer |
 | 实时能力 | WebSocket（通知）、SSE（AI 流式对话） |
 | 工程化 | ESLint、Prettier、Oxlint、unplugin 自动导入、GitHub Actions CI |
