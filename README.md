@@ -11,8 +11,9 @@
 [![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?logo=vite&logoColor=white)](https://vite.dev)
 [![Express](https://img.shields.io/badge/Express-5.x-000000?logo=express&logoColor=white)](https://expressjs.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
+[![CI](https://github.com/11kyrie-star/haven-healing-you-all-/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/11kyrie-star/haven-healing-you-all-/actions/workflows/ci.yml)
 
-[项目简介](#项目简介) · [功能特性](#功能特性) · [技术亮点](#技术亮点) · [快速开始](#快速开始) · [项目结构](#项目结构)
+[项目简介](#项目简介) · [功能特性](#功能特性) · [快速开始](#快速开始) · [项目结构](#项目结构)
 
 </div>
 
@@ -62,36 +63,7 @@ Haven 是一个前后端分离的情绪社区。用户可以匿名或实名发�
 ### 内容治理
 
 - 敏感词过滤、帖子举报、审核状态流转
-- 账号封禁与到期自动解封，封禁后 token 立即失效
-
-## 技术亮点
-
-### 带时间衰减的热榜
-
-热度值由浏览、点赞、评论加权后按发布时间衰减，列表请求时批量刷新并借助索引排序，避免把计算压力放到每次查询里：
-
-```sql
-hot_value = FLOOR(
-  (view_count * 1 + like_count * 3 + comment_count * 5)
-  / POWER(TIMESTAMPDIFF(HOUR, created_at, NOW()) + 2, 1.5)
-)
-```
-
-### WebSocket 通知推送
-
-通知先落库再推送，保证离线用户上线后仍能看到；服务端用 `Map<userId, Set<WebSocket>>` 维护在线连接并定向推送。客户端 25 秒心跳保活，断线后按 1s → 30s 指数退避重连，JWT 通过连接参数完成鉴权。
-
-### SSE 流式 AI 对话
-
-后端透传大模型的 `text/event-stream` 响应，前端用 `fetch + ReadableStream` 增量解析 `data:` 分片，并保留缓冲区处理跨 chunk 的半包；配合 `AbortController` 支持随时中止生成。
-
-### 图片处理链路
-
-前端用 Canvas 将图片等比压缩到最长边 1280px、转 WebP（质量 0.8）后再上传；后端用 multer 落盘并通过静态目录访问，同时对请求体大小做限制，避免大图拖慢接口。
-
-### 鉴权与封禁联动
-
-JWT 只负责身份识别，每次请求还会二次校验账号状态：封禁立即失效，临时封禁到期自动解封；C 端与管理端 token 通过 `scope` 字段隔离，避免越权。
+- 有专门的B端做账号封禁与到期自动解封，封禁后 token 立即失效
 
 ## 技术栈
 
@@ -100,7 +72,7 @@ JWT 只负责身份识别，每次请求还会二次校验账号状态：封禁�
 | 前端 | Vue 3、TypeScript、Vite、Pinia、Vue Router、Element Plus |
 | 后端 | Node.js、Express 5、MySQL、JWT、Joi、Multer |
 | 实时能力 | WebSocket（通知）、SSE（AI 流式对话） |
-| 工程化 | ESLint、Prettier、Oxlint、unplugin 自动导入 |
+| 工程化 | ESLint、Prettier、Oxlint、unplugin 自动导入、GitHub Actions CI |
 
 ## 快速开始
 
@@ -138,8 +110,8 @@ npm run dev
 
 ```bash
 cd frontend
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 浏览器打开 `http://localhost:5173`。前端环境变量见 `.env.development`：`VITE_API_BASE_URL` 指向后端接口，`VITE_WS_BASE_URL` 指向 WebSocket 服务。
@@ -168,27 +140,31 @@ pnpm dev
 
 ```text
 Haven/
-├── frontend/                 # C 端（Vue 3 + TypeScript）
+├── .github/workflows/ci.yml   # CI：前端检查 + 后端语法检查
+├── frontend/                  # C 端（Vue 3 + TypeScript）
 │   ├── src/
-│   │   ├── api/              # 接口封装
-│   │   ├── components/       # 通用组件
-│   │   ├── composables/      # 信息流、点赞、评论加载逻辑
-│   │   ├── router/           # 路由与登录守卫
-│   │   ├── stores/           # Pinia 状态
-│   │   ├── styles/           # 设计令牌与全局样式
-│   │   ├── utils/            # 请求、WebSocket、SSE、图片压缩
-│   │   └── views/            # 页面
+│   │   ├── api/               # 接口封装
+│   │   ├── components/        # 通用组件
+│   │   ├── composables/       # 信息流、点赞、评论加载逻辑
+│   │   ├── router/            # 路由与登录守卫
+│   │   ├── stores/            # Pinia 状态
+│   │   ├── styles/            # 设计令牌与全局样式
+│   │   ├── utils/             # 请求、WebSocket、SSE、图片压缩
+│   │   └── views/             # 页面
 │   └── .env.development
-├── backend/                  # Express + MySQL
-│   ├── router/               # 路由定义
-│   ├── handle_router/        # 业务处理
-│   ├── schema/               # Joi 参数校验
-│   ├── middleware/           # 鉴权与校验中间件
-│   ├── db/                   # 数据库连接池
-│   ├── migrate.sql           # 建表脚本
-│   ├── notify.js             # 通知落库 + WebSocket 推送
-│   ├── ai.js                 # 大模型流式调用
+├── backend/                   # Express + MySQL
+│   ├── router/                # 路由定义
+│   ├── handle_router/         # 业务处理
+│   ├── schema/                # 参数校验
+│   ├── middleware/            # 鉴权与校验中间件
+│   ├── db/                    # 数据库连接池
+│   ├── uploads/               # 头像与帖子图片
+│   ├── migrate.sql            # 基础建表脚本
+│   ├── migrate_auto.js        # 启动时补齐字段与辅助表
+│   ├── notify.js              # 通知落库 + WebSocket 推送
+│   ├── ai.js                  # 大模型流式调用
 │   └── app.js
+├── docs/images/               # README 截图
 └── README.md
 ```
 
