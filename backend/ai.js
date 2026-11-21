@@ -32,11 +32,24 @@ const AI_SYSTEM_PROMPT = [
 function chatStream(messages, callbacks) {
     const cb = callbacks || {}
     let finished = false
+    let req = null
+    let upstreamRes = null
     const done = () => { if (!finished) { finished = true; if (cb.onDone) cb.onDone() } }
     const fail = (err) => { if (!finished) { finished = true; if (cb.onError) cb.onError(err) } }
 
+    // 中止句柄：客户端断开时调用，真正断掉与上游模型的连接，
+    // 否则用户点了「停止」，模型还会继续把整段回答生成完，白扣额度
+    const handle = {
+        abort() {
+            if (finished) return
+            finished = true   // 先置位，避免 destroy 触发的 error/end 再回调出去
+            if (upstreamRes) { try { upstreamRes.destroy() } catch (e) { /* 已断开 */ } }
+            if (req) { try { req.destroy() } catch (e) { /* 已断开 */ } }
+        }
+    }
+
     let url
-    try { url = new URL(AI_BASE_URL) } catch (e) { return fail(new Error("AI 接口地址配置错误")) }
+    try { url = new URL(AI_BASE_URL) } catch (e) { fail(new Error("AI 接口地址配置错误")); return handle }
 
     // 注入树洞人格（放在最前面，不占用前端传入的历史）
     const finalMessages = [{ role: "system", content: AI_SYSTEM_PROMPT }].concat(messages.filter(m => m.role !== "system"))
@@ -48,7 +61,7 @@ function chatStream(messages, callbacks) {
         temperature: 0.8,
     })
 
-    const req = https.request({
+    req = https.request({
         hostname: url.hostname,
         port: url.port || 443,
         path: url.pathname + (url.search || ""),
@@ -60,6 +73,7 @@ function chatStream(messages, callbacks) {
             "Content-Length": Buffer.byteLength(payload),
         },
     }, (res) => {
+        upstreamRes = res
         if (res.statusCode !== 200) {
             let body = ""
             res.setEncoding("utf8")
@@ -92,6 +106,7 @@ function chatStream(messages, callbacks) {
     req.setTimeout(120000, () => { req.destroy(new Error("AI 请求超时")) })
     req.write(payload)
     req.end()
+    return handle
 }
 
 module.exports = { chatStream: chatStream, AI_MODEL: AI_MODEL, AI_BASE_URL: AI_BASE_URL, AI_SYSTEM_PROMPT: AI_SYSTEM_PROMPT }

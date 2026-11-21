@@ -127,6 +127,7 @@
 
 <script setup lang="ts">
 import { Promotion, VideoPause, Delete } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { streamrequest } from '@/utils/streamrequest'
 const text = ref('')
@@ -196,15 +197,21 @@ const pushmessage = async () => {
     }
   }
   try {
-    await streamrequest(messages.value, handlemessage, signal)
-    aimessage.value.status='done'
-  } catch (err) {
-    if ((err as Error).name === 'AbortError') {
-      aimessage.value.status='pending'
-      usermessage.value.status='error'
-      return
+    const result = await streamrequest(messages.value, handlemessage, signal)
+    if (result === 'done') {
+      aimessage.value.status = 'done'
+    } else if (result === 'stopped') {
+      aimessage.value.status = 'stopped'
+    } else if (result === 'timeout') {
+      // 兜底：模型长时间没有吐字，主动断开，避免气泡一直停在「思考中...」
+      aimessage.value.status = 'error'
+      aimessage.value.content = '网络异常，请稍后重试'
+      ElMessage.warning('AI 响应超时，请重试')
+    } else {
+      aimessage.value.status = 'error'
+      aimessage.value.content = '网络异常，请稍后重试'
+      ElMessage.warning('网络或者服务器异常')
     }
-    throw err
   } finally {
     abortController = null
     push.value = false
