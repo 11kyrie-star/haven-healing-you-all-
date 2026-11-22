@@ -22,15 +22,16 @@ import { usePanelStore } from '@/stores/panle'
 import { ws } from '@/utils/ws'
 import type { NotificationItem } from '@/types/note'
 import { getunreadnote } from '@/api/note'
-import {computed,onMounted,ref} from 'vue'
+import {computed,onMounted,ref,onUnmounted} from 'vue'
 const store=useCrumbStore()
 const notestore=useNotificationStore()
 const panlestore=usePanelStore()
 const cumbs=computed(()=>(store.stack))
 const list=ref<NotificationItem[]>([])
+let offMessage:(()=>void) | undefined
 onMounted(async()=>{
     ws.connect()
-    ws.onMessage((msg)=>{
+    offMessage=ws.onMessage((msg)=>{
         if(msg.type!=='notification' || !msg.data){
            return
         }
@@ -51,6 +52,10 @@ const panelmap={
     notification:Message
 }
 const isView=computed(()=>panelmap[panlestore.active]??Publish)
+onUnmounted(()=>{
+    offMessage?.()
+    offMessage=undefined
+})
 </script>
 
 <style scoped lang="scss">
